@@ -99,15 +99,35 @@ export const demoMapPlacements: MapPlacement[] = demoHouses.map((house, index) =
 }));
 
 export const equipmentItems: EquipmentItem[] = [
-  { id: 'straw-hat', name: '晨巡草帽', slot: 'head', requiredVisitDays: 1, description: '第一趟巡村的紀念。' },
-  { id: 'work-jacket', name: '青綠工作外套', slot: 'body', requiredVisitDays: 3, description: '耐用、醒目，不改變任何功能數值。' },
-  { id: 'feed-scoop', name: '黃銅飼料勺', slot: 'hand', requiredVisitDays: 7, description: '只改變外觀的巡舍工具。' },
-  { id: 'field-pack', name: '田野背包', slot: 'back', requiredVisitDays: 14, description: '收納巡查筆記的外觀裝備。' },
+  { id: 'straw-hat', name: '晨巡草帽', slot: 'head', requiredVisitDays: 1, description: '第一趟巡村的紀念。', assetAtlas: 'original', assetColumn: 0, assetRow: 0, assetColumns: 2, assetRows: 2 },
+  { id: 'work-jacket', name: '霧綠工作外套', slot: 'body', requiredVisitDays: 2, description: '耐用的日常巡舍外套。', assetAtlas: 'original', assetColumn: 1, assetRow: 0, assetColumns: 2, assetRows: 2 },
+  { id: 'feed-scoop', name: '舊銅飼料勺', slot: 'hand', requiredVisitDays: 3, description: '留下長年使用痕跡的飼料勺。', assetAtlas: 'original', assetColumn: 0, assetRow: 1, assetColumns: 2, assetRows: 2 },
+  { id: 'field-pack', name: '田野背包', slot: 'back', requiredVisitDays: 4, description: '收納巡查筆記的外觀裝備。', assetAtlas: 'original', assetColumn: 1, assetRow: 1, assetColumns: 2, assetRows: 2 },
+  { id: 'granary-hat', name: '穀倉織帽', slot: 'head', requiredVisitDays: 5, description: '穀倉值勤者常戴的寬沿帽。', assetAtlas: 'chronicle', assetColumn: 0, assetRow: 0, assetColumns: 5, assetRows: 4 },
+  { id: 'patrol-cap', name: '墨藍巡查帽', slot: 'head', requiredVisitDays: 6, description: '巡查員的低調識別帽。', assetAtlas: 'chronicle', assetColumn: 1, assetRow: 0, assetColumns: 5, assetRows: 4 },
+  { id: 'scholar-beret', name: '羽筆學士帽', slot: 'head', requiredVisitDays: 7, description: '記錄公會文獻時佩戴。', assetAtlas: 'chronicle', assetColumn: 2, assetRow: 0, assetColumns: 5, assetRows: 4 },
+  { id: 'weather-hood', name: '風雨皮革兜帽', slot: 'head', requiredVisitDays: 8, description: '陰雨巡舍用的舊皮兜帽。', assetAtlas: 'chronicle', assetColumn: 3, assetRow: 0, assetColumns: 5, assetRows: 4 },
+  { id: 'guild-circlet', name: '舊金公會額環', slot: 'head', requiredVisitDays: 9, description: '只代表資歷，不提供加成。', assetAtlas: 'chronicle', assetColumn: 4, assetRow: 0, assetColumns: 5, assetRows: 4 },
+  { id: 'fog-work-coat', name: '霧綠巡舍長衣', slot: 'body', requiredVisitDays: 10, description: '低彩度耐磨長衣。', assetAtlas: 'chronicle', assetColumn: 0, assetRow: 1, assetColumns: 5, assetRows: 4 },
+  { id: 'ledger-vest', name: '棕褐帳房背心', slot: 'body', requiredVisitDays: 11, description: '附有小型帳冊袋的背心。', assetAtlas: 'chronicle', assetColumn: 1, assetRow: 1, assetColumns: 5, assetRows: 4 },
+  { id: 'rain-mantle', name: '灰藍雨巡披肩', slot: 'body', requiredVisitDays: 12, description: '薄霧與細雨中的巡查披肩。', assetAtlas: 'chronicle', assetColumn: 2, assetRow: 1, assetColumns: 5, assetRows: 4 },
+  { id: 'hatchery-apron', name: '孵化師亞麻圍裙', slot: 'body', requiredVisitDays: 13, description: '照護蛋盤時使用的工作圍裙。', assetAtlas: 'chronicle', assetColumn: 3, assetRow: 1, assetColumns: 5, assetRows: 4 },
+  { id: 'guild-coat', name: '酒紅公會長衣', slot: 'body', requiredVisitDays: 14, description: '重要公報日使用的正式長衣。', assetAtlas: 'chronicle', assetColumn: 4, assetRow: 1, assetColumns: 5, assetRows: 4 },
+  { id: 'brass-scoop', name: '黃銅量穀勺', slot: 'hand', requiredVisitDays: 15, description: '量取飼料穀粒的舊銅工具。', assetAtlas: 'chronicle', assetColumn: 0, assetRow: 2, assetColumns: 5, assetRows: 4 },
+  { id: 'quill-ledger', name: '羽筆巡查帳冊', slot: 'hand', requiredVisitDays: 16, description: '記下雞舍巡查結果。', assetAtlas: 'chronicle', assetColumn: 1, assetRow: 2, assetColumns: 5, assetRows: 4 },
+  { id: 'inspection-lantern', name: '夜巡提燈', slot: 'hand', requiredVisitDays: 17, description: '夜間巡視舍況的提燈。', assetAtlas: 'chronicle', assetColumn: 2, assetRow: 2, assetColumns: 5, assetRows: 4 },
+  { id: 'measuring-rod', name: '木製丈量尺', slot: 'hand', requiredVisitDays: 18, description: '檢查設施間距的丈量尺。', assetAtlas: 'chronicle', assetColumn: 3, assetRow: 2, assetColumns: 5, assetRows: 4 },
+  { id: 'market-scroll', name: '商會行情卷', slot: 'hand', requiredVisitDays: 19, description: '保存當日土雞行情的卷宗。', assetAtlas: 'chronicle', assetColumn: 4, assetRow: 2, assetColumns: 5, assetRows: 4 },
+  { id: 'ledger-satchel', name: '皮革帳冊袋', slot: 'back', requiredVisitDays: 20, description: '攜帶契約與帳冊的肩袋。', assetAtlas: 'chronicle', assetColumn: 0, assetRow: 3, assetColumns: 5, assetRows: 4 },
+  { id: 'wheat-pack', name: '麥穗補給架', slot: 'back', requiredVisitDays: 21, description: '代表飼糧與收成的補給架。', assetAtlas: 'chronicle', assetColumn: 1, assetRow: 3, assetColumns: 5, assetRows: 4 },
+  { id: 'guild-banner', name: '折疊公會旗', slot: 'back', requiredVisitDays: 22, description: '巡村典禮使用的舊旗。', assetAtlas: 'chronicle', assetColumn: 2, assetRow: 3, assetColumns: 5, assetRows: 4 },
+  { id: 'tool-frame', name: '繩索工具架', slot: 'back', requiredVisitDays: 23, description: '收納修繕器具的木架。', assetAtlas: 'chronicle', assetColumn: 3, assetRow: 3, assetColumns: 5, assetRows: 4 },
+  { id: 'travel-cloak', name: '灰藍旅行披風', slot: 'back', requiredVisitDays: 24, description: '前往遠場巡查時攜帶。', assetAtlas: 'chronicle', assetColumn: 4, assetRow: 3, assetColumns: 5, assetRows: 4 },
 ];
 
 export const initialVisitProgress: VisitProgress = {
-  accumulatedDays: 6,
-  streakDays: 3,
-  lastVisitDate: '2026-07-23',
-  equipped: { head: 'straw-hat', body: 'work-jacket' },
+  accumulatedDays: 0,
+  streakDays: 0,
+  lastVisitDate: null,
+  equipped: {},
 };

@@ -14,7 +14,6 @@ import {
   demoShareholdings,
   initialVisitProgress,
   recordDistributionPayment,
-  recordVisit,
   reverseDistribution,
   type AuditEvent,
   type ChickenHouse,
@@ -36,6 +35,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { VillageOperations } from '../storage/types';
 import { syncPrivateHouses } from '../services/privateSync';
 import { publishPublicHouse, subscribePublicHouses } from '../services/publicHouses';
+import { recordDailyLogin, saveEquippedItem, subscribeVisitProgress } from '../services/visitProgress';
 
 const HOUSES_KEY = 'cpv:cache:houses:v1';
 const VISIT_KEY = 'cpv:draft:visit:v1';
@@ -84,7 +84,7 @@ function operation(entityType: string, entity: SyncEntity, sensitivity: EntitySe
   return { operationId, organizationId: entity.organizationId, entityType, entityId: entity.id, sensitivity, baseRevision: Math.max(0, entity.revision - 1), idempotencyKey: makeIdempotencyKey(DEVICE_ID, operationId), payload: entity, status: 'pending', attempts: 0, lastError: null, createdAt: now, updatedAt: now };
 }
 
-export function useVillageState() {
+export function useVillageState(ownerUid: string | null) {
   const [houses, setHouses] = useState<ChickenHouse[]>(demoHouses);
   const [operations, setOperations] = useState<VillageOperations>(initialOperations);
   const [visits, setVisits] = useState<VisitProgress>(initialVisitProgress);
@@ -104,12 +104,11 @@ export function useVillageState() {
         await native.initialize();
         selected = native;
       }
-      const [storedHouses, storedVisits, storedOperations] = await Promise.all([selected.loadHouses(), selected.loadVisitProgress(), selected.loadOperations()]);
+      const [storedHouses, storedOperations] = await Promise.all([selected.loadHouses(), selected.loadOperations()]);
       if (!active) return;
       setPersistence(selected);
       setStorageMode(Capacitor.isNativePlatform() ? 'native-sqlite' : 'web-cache');
       if (storedHouses.length) setHouses(storedHouses); else await selected.saveHouses(demoHouses);
-      if (storedVisits) setVisits(storedVisits); else await selected.saveVisitProgress(initialVisitProgress);
       if (storedOperations) setOperations(storedOperations); else await selected.saveOperations(initialOperations);
     })().catch(() => { /* Defaults remain usable if local storage is temporarily unavailable. */ })
       .finally(() => { if (active) setReady(true); });
@@ -120,6 +119,19 @@ export function useVillageState() {
     setHouses(remoteHouses);
     void persistence.saveHouses(remoteHouses);
   }, setSyncError), [persistence]);
+
+  useEffect(() => {
+    if (!ownerUid) {
+      setVisits(initialVisitProgress);
+      return;
+    }
+    const unsubscribe = subscribeVisitProgress(ownerUid, (progress) => {
+      setVisits(progress);
+      void persistence.saveVisitProgress(progress);
+    }, setSyncError);
+    void recordDailyLogin(ownerUid).catch((error: unknown) => setSyncError(error instanceof Error ? error.message : '無法登記今日登入。'));
+    return unsubscribe;
+  }, [ownerUid, persistence]);
 
   const updateOperations = useCallback((change: (current: VillageOperations) => VillageOperations) => {
     setOperations((current) => { const next = change(current); void persistence.saveOperations(next); return next; });
@@ -245,11 +257,20 @@ export function useVillageState() {
     }
   }, [houses, persistence, updateOperations]);
 
-  const visitToday = useCallback(() => { const today = new Date().toISOString().slice(0, 10); setVisits((current) => { const next = recordVisit(current, today); void persistence.saveVisitProgress(next); return next; }); }, [persistence]);
-  const equip = useCallback((slot: 'head' | 'body' | 'hand' | 'back', itemId: string) => { setVisits((current) => { const next = { ...current, equipped: { ...current.equipped, [slot]: itemId } }; void persistence.saveVisitProgress(next); return next; }); }, [persistence]);
+  const equip = useCallback((slot: 'head' | 'body' | 'hand' | 'back', itemId: string | null) => {
+    if (!ownerUid) return;
+    setVisits((current) => {
+      const equipped = { ...current.equipped };
+      if (itemId === null) delete equipped[slot]; else equipped[slot] = itemId;
+      const next = { ...current, equipped };
+      void persistence.saveVisitProgress(next);
+      return next;
+    });
+    void saveEquippedItem(ownerUid, slot, itemId).catch((error: unknown) => setSyncError(error instanceof Error ? error.message : '無法保存行裝。'));
+  }, [ownerUid, persistence]);
 
   const unsyncedCount = operations.outbox.filter((item) => item.status !== 'synced').length + houses.filter((house) => house.syncStatus !== 'synced').length;
-  return { houses, ...operations, visits, ready, storageMode, unsyncedCount, syncMode, syncError, addHouse, updateHouse, archiveHouse, addBatch, addShareholder, createDistribution, confirmDistributionRecord, payDistribution, reverseDistributionRecord, saveRisk, moveHouse, syncNow, visitToday, equip };
+  return { houses, ...operations, visits, ready, storageMode, unsyncedCount, syncMode, syncError, addHouse, updateHouse, archiveHouse, addBatch, addShareholder, createDistribution, confirmDistributionRecord, payDistribution, reverseDistributionRecord, saveRisk, moveHouse, syncNow, equip };
 }
 
 export type VillageState = ReturnType<typeof useVillageState>;

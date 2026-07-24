@@ -5,6 +5,17 @@ import { describe, expect, it, vi } from 'vitest';
 import type { VillageState } from '../hooks/useVillageState';
 import { HousesPage } from './HousesPage';
 
+vi.mock('../hooks/useInvestmentLedger', () => ({
+  useInvestmentLedger: (enabled: boolean) => enabled ? {
+    updatedOn: '2026-07-24', members: ['甲', '乙', '丙'], loading: false, error: null,
+    rounds: [{
+      id: 'investment-a', name: '測試投資場', teamShareBasisPoints: 2_000, caretaker: '測試代養戶', iconIndex: 3,
+      speciesLabel: '紅羽土雞', statusLabel: '目前投資中',
+      settlements: [{ id: 'settlement-a', paidOn: '2026-07-15', farmProfitLossTwd: 100_000, teamNetIncomeTwd: 20_000, feedConversionRate: 2.4, survivalRatePercent: 92, caretakerSettlementPayableTwd: 80_000, paymentMemo: '應付', lines: [{ label: '代養金', amountTwd: 80_000 }] }],
+    }],
+  } : { updatedOn: null, members: [], rounds: [], loading: false, error: null },
+}));
+
 function villageFixture(): VillageState {
   return {
     houses: demoHouses,
@@ -25,25 +36,24 @@ function villageFixture(): VillageState {
     unsyncedCount: 0,
     syncMode: 'idle',
     syncError: null,
-    addHouse: vi.fn(), updateHouse: vi.fn(), archiveHouse: vi.fn(), addBatch: vi.fn(), addShareholder: vi.fn(), createDistribution: vi.fn(), confirmDistributionRecord: vi.fn(), payDistribution: vi.fn(), reverseDistributionRecord: vi.fn(), saveRisk: vi.fn(), moveHouse: vi.fn(), syncNow: vi.fn(), visitToday: vi.fn(), equip: vi.fn(),
+    addHouse: vi.fn(), updateHouse: vi.fn(), archiveHouse: vi.fn(), addBatch: vi.fn(), addShareholder: vi.fn(), createDistribution: vi.fn(), confirmDistributionRecord: vi.fn(), payDistribution: vi.fn(), reverseDistributionRecord: vi.fn(), saveRisk: vi.fn(), moveHouse: vi.fn(), syncNow: vi.fn(), equip: vi.fn(),
   };
 }
 
 describe('public house browsing and admin operations', () => {
-  it('shows the eight current investment rounds and their audited settlements', () => {
+  it('keeps investment finance private until an administrator signs in', () => {
     render(<MemoryRouter><HousesPage village={villageFixture()} online isAdmin={false} /></MemoryRouter>);
     expect(screen.getByRole('heading', { name: '大富翁投資場次' })).toBeInTheDocument();
-    expect(screen.getByText('8 場')).toBeInTheDocument();
-    expect(screen.getByText('6 筆')).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /洪秀美場/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('投資帳冊需要管理員登入')).toBeInTheDocument();
+    expect(screen.queryByText('測試投資場')).not.toBeInTheDocument();
+  });
+
+  it('renders Firebase investment entries as illustrated house dossiers', () => {
+    render(<HousesPage village={villageFixture()} online isAdmin />);
+    expect(screen.getByRole('tab', { name: /測試投資場/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getAllByText('20%').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('民國 115/07/15')).toBeInTheDocument();
-    expect(screen.getAllByText('−$21,000')).toHaveLength(2);
-    fireEvent.click(screen.getByRole('tab', { name: /林志騰二林場/ }));
-    expect(screen.getAllByText('盈餘結算')).toHaveLength(2);
-    expect(screen.getByText('民國 115/04/15')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: /洪嘉卿場/ }));
-    expect(screen.getByText('此場目前只有持股主檔')).toBeInTheDocument();
-    expect(screen.getByText(/洪嘉卿場依 115\/07\/11 活頁簿為 20%/)).toBeInTheDocument();
+    expect(screen.getAllByText('盈餘結算')).toHaveLength(1);
   });
 
   it('lets the public browse without exposing mutation controls', () => {

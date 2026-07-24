@@ -1,6 +1,6 @@
 import { DataBadge, PixelPanel, ProgressBar } from '@chicken-village/ui';
 import type { MarketBundle } from '@chicken-village/market-data';
-import type { VisitProgress } from '@chicken-village/domain';
+import { equipmentItems, type VisitProgress } from '@chicken-village/domain';
 import { Link } from 'react-router-dom';
 import { ManagerSprite } from '../components/Sprites';
 
@@ -11,6 +11,7 @@ const menu = [
 
 export function HomePage({ bundle, visits }: { bundle: MarketBundle; visits: VisitProgress }) {
   const featured = ['egg_producer', 'broiler_large', 'red_south_male'].map((item) => bundle.records.find((record) => record.item === item)).filter(Boolean);
+  const nextReward = equipmentItems.find((item) => item.requiredVisitDays > visits.accumulatedDays);
   return (
     <div className="page home-page">
       <section className="home-hero illustrated-plate">
@@ -25,7 +26,7 @@ export function HomePage({ bundle, visits }: { bundle: MarketBundle; visits: Vis
       <div className="rpg-menu chronicle-index">{menu.map(([to, label, description], index) => <Link to={to} key={to}><b>{String(index + 1).padStart(2, '0')}</b><span><strong>{label}</strong><small>{description}</small></span><i>›</i></Link>)}</div>
       <PixelPanel className="manager-strip">
         <ManagerSprite />
-        <div><span className="eyebrow">管理者・巡村第 {visits.accumulatedDays} 天</span><strong>連續到訪 {visits.streakDays} 天</strong><ProgressBar value={(visits.accumulatedDays % 7) / 7 * 100} label="下一件裝備進度" /><small>再 {7 - visits.accumulatedDays % 7} 天取得下一件外觀</small></div>
+        <div><span className="eyebrow">管理者・登入校錄 {visits.accumulatedDays} 日</span><strong>連續登入 {visits.streakDays} 日</strong><ProgressBar value={nextReward ? visits.accumulatedDays / nextReward.requiredVisitDays * 100 : 100} label="下一件裝備進度" /><small>{nextReward ? `再 ${nextReward.requiredVisitDays - visits.accumulatedDays} 日取得「${nextReward.name}」` : '24 件行裝已全部解鎖'}</small></div>
       </PixelPanel>
     </div>
   );

@@ -28,6 +28,34 @@ service cloud.firestore {
         && request.resource.data.updatedAt is string;
     }
 
+    function ownsVisitProgress(ownerUid) {
+      return signedIn() && request.auth.uid == ownerUid;
+    }
+
+    function validVisitProgress(ownerUid) {
+      return request.resource.data.ownerUid == ownerUid
+        && request.resource.data.accumulatedDays is int
+        && request.resource.data.accumulatedDays >= 0
+        && request.resource.data.streakDays is int
+        && request.resource.data.streakDays >= 0
+        && (request.resource.data.lastVisitDate == null || request.resource.data.lastVisitDate is string)
+        && request.resource.data.equipped is map
+        && request.resource.data.updatedAt is string;
+    }
+
+    function validMarketRecord() {
+      return request.resource.data.item is string
+        && request.resource.data.label is string
+        && (request.resource.data.value == null || request.resource.data.value is number)
+        && request.resource.data.sourceDate is string
+        && request.resource.data.frequency in ['daily', 'weekly', 'monthly']
+        && request.resource.data.unit == 'TWD_PER_600G'
+        && request.resource.data.sourceName is string
+        && request.resource.data.sourceUrl is string
+        && request.resource.data.rawSnapshotHash is string
+        && request.resource.data.parserVersion is string;
+    }
+
     match /public_houses/{houseId} {
       allow read: if true;
       allow create: if isAdmin() && validHouse();
@@ -40,6 +68,36 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow read: if signedIn() && request.auth.uid == adminId;
       allow write: if false;
+    }
+
+    match /investment_houses/{houseId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /investment_ledger/{documentId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /market_history/{recordId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validMarketRecord();
+      allow delete: if false;
+    }
+
+    match /visit_progress/{ownerUid} {
+      allow read: if ownsVisitProgress(ownerUid);
+      allow create, update: if ownsVisitProgress(ownerUid) && validVisitProgress(ownerUid);
+      allow delete: if false;
+
+      match /days/{date} {
+        allow read: if ownsVisitProgress(ownerUid);
+        allow create: if ownsVisitProgress(ownerUid)
+          && request.resource.data.date == date
+          && request.resource.data.recordedAt is string;
+        allow update, delete: if false;
+      }
     }
 
     match /{document=**} {

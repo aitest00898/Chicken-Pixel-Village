@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "import:firestore": "node scripts/import-firestore.mjs"
   },
   "dependencies": {
     "@chicken-village/sql-connect-admin": "file:./sql-connect-admin-generated",

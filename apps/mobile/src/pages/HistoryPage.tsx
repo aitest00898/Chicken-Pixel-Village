@@ -1,12 +1,12 @@
 import { PixelPanel } from '@chicken-village/ui';
 import {
-  fetchMoaPoultryHistories,
   type HistoricalMarketItem,
   type HistoryPoint,
   type MarketHistoryResult,
 } from '@chicken-village/market-data';
 import { useEffect, useState } from 'react';
 import { TrendChart } from '../components/TrendChart';
+import { loadFirebaseMarketHistories } from '../services/marketHistory';
 
 const rangeOptions = [
   { days: 30, label: '30 日' },
@@ -105,7 +105,7 @@ const seriesPresentation: Record<HistoricalMarketItem, { shortLabel: string; col
   egg_transport: { shortLabel: '雞蛋・大運輸', color: '#886244' },
 };
 
-type HistoryLoader = typeof fetchMoaPoultryHistories;
+type HistoryLoader = typeof loadFirebaseMarketHistories;
 interface HistoryPageProps { loader?: HistoryLoader; now?: () => Date }
 
 const currentTime = () => new Date();
@@ -143,7 +143,7 @@ export function historyStatistics(points: HistoryPoint[]) {
   };
 }
 
-export function HistoryPage({ loader = fetchMoaPoultryHistories, now = currentTime }: HistoryPageProps = {}) {
+export function HistoryPage({ loader = loadFirebaseMarketHistories, now = currentTime }: HistoryPageProps = {}) {
   const [regionId, setRegionId] = useState<HistoryRegionId>('central');
   const [days, setDays] = useState<(typeof rangeOptions)[number]['days']>(90);
   const [results, setResults] = useState<MarketHistoryResult[]>([]);

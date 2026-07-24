@@ -140,6 +140,11 @@ export interface EquipmentItem {
   slot: EquipmentSlot;
   requiredVisitDays: number;
   description: string;
+  assetAtlas: 'original' | 'chronicle';
+  assetColumn: number;
+  assetRow: number;
+  assetColumns: number;
+  assetRows: number;
 }
 
 export interface VisitProgress {
@@ -148,4 +153,3 @@ export interface VisitProgress {
   lastVisitDate: string | null;
   equipped: Partial<Record<EquipmentSlot, string>>;
 }
-

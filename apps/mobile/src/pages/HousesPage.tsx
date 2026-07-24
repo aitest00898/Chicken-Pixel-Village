@@ -2,8 +2,9 @@ import { capacityTier, type ChickenHouse, type RiskAnswer, type RiskDimension } 
 import { DataBadge, PixelPanel, ProgressBar } from '@chicken-village/ui';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { HouseSprite } from '../components/Sprites';
-import { investmentLedgerUpdatedOn, investmentMembers, investmentRounds, type InvestmentSettlement } from '../data/investmentLedger';
+import { HouseSprite, InvestmentHouseArt } from '../components/Sprites';
+import type { InvestmentLedgerSnapshot, InvestmentSettlement } from '../data/investmentLedger';
+import { useInvestmentLedger } from '../hooks/useInvestmentLedger';
 import type { VillageState } from '../hooks/useVillageState';
 
 type Tab = 'overview' | 'batches' | 'shareholders' | 'distributions' | 'risk' | 'edit';
@@ -15,6 +16,7 @@ export function HousesPage({ village, online, isAdmin }: { village: VillageState
   const [selected, setSelected] = useState(village.houses.find((house) => !house.archivedAt)?.id ?? '');
   const [tab, setTab] = useState<Tab>('overview');
   const [message, setMessage] = useState('');
+  const investmentLedger = useInvestmentLedger(isAdmin);
   const activeHouses = village.houses.filter((house) => !house.archivedAt);
   const selectedHouse = village.houses.find((house) => house.id === selected) ?? activeHouses[0];
   useEffect(() => { if (!isAdmin && tab === 'edit') setTab('overview'); }, [isAdmin, tab]);
@@ -43,7 +45,7 @@ export function HousesPage({ village, online, isAdmin }: { village: VillageState
 
   return <div className="page houses-page">
     <header className="page-title inline-title"><div><p className="eyebrow">商會帳冊・投資卷</p><h1>投資與雞舍帳冊</h1></div>{isAdmin ? <button className="primary-button compact" onClick={() => setShowForm((value) => !value)}>＋ 新增</button> : <Link className="admin-entry-chip" to="/admin">管理員</Link>}</header>
-    <InvestmentLedger />
+    <InvestmentLedger ledger={investmentLedger} isAdmin={isAdmin} />
     <div className="ledger-section-heading"><p className="eyebrow">雞舍營運資料</p><h2>公開雞舍檔案</h2></div>
     <div className={`access-banner ${isAdmin ? 'admin' : 'public'}`}><strong>{isAdmin ? '管理員模式' : '公開瀏覽模式'}</strong><span>{isAdmin ? '可新增、編輯與封存雞舍資料。' : '所有人可瀏覽；資料異動僅限管理員。'}</span></div>
     {!online && isAdmin && <div className="offline-draft-note" role="status">管理員寫入需要網路連線；目前只能瀏覽已快取資料。</div>}
@@ -72,34 +74,43 @@ function Metric({ label, value, suffix }: { label: string; value: string; suffix
 function DataLine({ label, value }: { label: string; value: string }) { return <p className="data-line"><span>{label}</span><strong>{value}</strong></p>; }
 function SpeciesSelect() { return <label>雞種<select name="species"><option value="red_feather">紅羽土雞</option><option value="black_feather">黑羽土雞</option><option value="broiler">白肉雞</option><option value="layer">蛋雞</option><option value="other">其他</option></select></label>; }
 
-function InvestmentLedger() {
-  const [selectedId, setSelectedId] = useState('hong-xiumei');
-  const selectedRound = investmentRounds.find((round) => round.id === selectedId) ?? investmentRounds[0]!;
-  const settlementCount = investmentRounds.reduce((sum, round) => sum + round.settlements.length, 0);
-  const teamNetIncome = investmentRounds.flatMap((round) => round.settlements).reduce((sum, row) => sum + row.teamNetIncomeTwd, 0);
-  const memberNetIncome = teamNetIncome / investmentMembers.length;
+function InvestmentLedger({ ledger, isAdmin }: { ledger: InvestmentLedgerSnapshot & { loading: boolean; error: string | null }; isAdmin: boolean }) {
+  const [selectedId, setSelectedId] = useState('');
+  useEffect(() => {
+    if (!ledger.rounds.length) return;
+    if (!ledger.rounds.some((round) => round.id === selectedId)) setSelectedId(ledger.rounds[0]!.id);
+  }, [ledger.rounds, selectedId]);
+  if (!isAdmin) return <PixelPanel className="investment-ledger" title="大富翁投資場次"><div className="investment-empty"><span aria-hidden="true">◇</span><strong>投資帳冊需要管理員登入</strong><small>場次、持股與結算屬財務資料，不會寫在程式或公開給未授權訪客。</small><Link className="secondary-button compact" to="/admin">前往登入</Link></div></PixelPanel>;
+  if (ledger.loading) return <PixelPanel className="investment-ledger" title="大富翁投資場次"><div className="investment-empty"><strong>正在向 Firebase 調閱投資卷宗……</strong></div></PixelPanel>;
+  if (ledger.error) return <PixelPanel className="investment-ledger" title="大富翁投資場次"><div className="investment-empty"><strong>{ledger.error}</strong><small>沒有以程式內建資料代替。</small></div></PixelPanel>;
+  if (!ledger.rounds.length) return <PixelPanel className="investment-ledger" title="大富翁投資場次"><div className="investment-empty"><strong>Firebase 尚無投資場次資料</strong><small>完成正式匯入後會顯示 8 個投資雞舍。</small></div></PixelPanel>;
+  const selectedRound = ledger.rounds.find((round) => round.id === selectedId) ?? ledger.rounds[0]!;
+  const settlementCount = ledger.rounds.reduce((sum, round) => sum + round.settlements.length, 0);
+  const teamNetIncome = ledger.rounds.flatMap((round) => round.settlements).reduce((sum, row) => sum + row.teamNetIncomeTwd, 0);
+  const memberNetIncome = ledger.members.length ? teamNetIncome / ledger.members.length : 0;
+  const updateLabel = ledger.updatedOn ? formatRocDate(ledger.updatedOn) : '未標示';
 
-  return <PixelPanel className="investment-ledger" title="大富翁投資場次" action={<DataBadge tone="live">更新 115/07/11</DataBadge>}>
-    <p className="investment-ledger__intro">以最新版活頁簿為主檔，結算圖片補齊換肉率、育成率、代養費用與應付金額。農場總盈虧、團隊分配與代養戶結算分開呈現。</p>
+  return <PixelPanel className="investment-ledger" title="大富翁投資場次" action={<DataBadge tone="live">Firebase・{updateLabel}</DataBadge>}>
+    <p className="investment-ledger__intro">場次、持股與 6 筆結算皆由 Firebase 讀取。每個投資場次使用獨立雞舍檔案與瓦納迪斯建築圖，程式不再內建真實財務資料。</p>
     <div className="investment-ledger__summary" aria-label="投資帳冊摘要">
-      <LedgerMetric label="目前投資" value={`${investmentRounds.length} 場`} />
+      <LedgerMetric label="目前投資" value={`${ledger.rounds.length} 場`} />
       <LedgerMetric label="結算紀錄" value={`${settlementCount} 筆`} />
       <LedgerMetric label="團隊累計盈虧" value={formatSignedTwd(teamNetIncome)} tone={teamNetIncome < 0 ? 'loss' : 'gain'} />
       <LedgerMetric label="每位夥伴累計" value={formatSignedTwd(memberNetIncome)} tone={memberNetIncome < 0 ? 'loss' : 'gain'} />
     </div>
-    <div className="investment-round-tabs" role="tablist" aria-label="投資場次">
-      {investmentRounds.map((round) => <button type="button" role="tab" aria-selected={selectedRound.id === round.id} className={selectedRound.id === round.id ? 'selected' : ''} onClick={() => setSelectedId(round.id)} key={round.id}><strong>{round.name}</strong><span>團隊 {formatPercent(round.teamSharePercent)}・{round.settlements.length ? `${round.settlements.length} 筆結算` : '待補結算'}</span></button>)}
+    <div className="investment-house-files" role="tablist" aria-label="投資雞舍檔案">
+      {ledger.rounds.map((round) => <button type="button" role="tab" aria-selected={selectedRound.id === round.id} className={selectedRound.id === round.id ? 'selected' : ''} onClick={() => setSelectedId(round.id)} key={round.id}><InvestmentHouseArt iconIndex={round.iconIndex} name={round.name} /><span><strong>{round.name}</strong><small>{round.speciesLabel}・{round.statusLabel}</small><b>團隊 {formatBasisPoints(round.teamShareBasisPoints)}</b></span></button>)}
     </div>
     <section className="investment-round-detail" aria-live="polite">
-      <header><div><p className="folio-kicker">CURRENT INVESTMENT</p><h3>{selectedRound.name}</h3><span>{selectedRound.caretaker ? `代養戶／場主：${selectedRound.caretaker}` : '尚未提供代養戶與結算資料'}</span></div><b>{formatPercent(selectedRound.teamSharePercent)}</b></header>
+      <header><InvestmentHouseArt iconIndex={selectedRound.iconIndex} name={selectedRound.name} /><div><p className="folio-kicker">CURRENT INVESTMENT</p><h3>{selectedRound.name}</h3><span>{selectedRound.caretaker ? `代養戶／場主：${selectedRound.caretaker}` : '尚未提供代養戶與結算資料'}</span></div><b>{formatBasisPoints(selectedRound.teamShareBasisPoints)}</b></header>
       <div className="investment-share-grid">
-        <div><small>團隊持股</small><strong>{formatPercent(selectedRound.teamSharePercent)}</strong></div>
-        {investmentMembers.map((member) => <div key={member}><small>{member}</small><strong>{formatPercent(selectedRound.teamSharePercent / investmentMembers.length)}</strong></div>)}
+        <div><small>團隊持股</small><strong>{formatBasisPoints(selectedRound.teamShareBasisPoints)}</strong></div>
+        {ledger.members.map((member) => <div key={member}><small>{member}</small><strong>{formatPercent(selectedRound.teamShareBasisPoints / 100 / ledger.members.length)}</strong></div>)}
       </div>
-      {selectedRound.settlements.length ? <div className="investment-settlement-list">{[...selectedRound.settlements].sort((a, b) => b.paidOn.localeCompare(a.paidOn)).map((row) => <SettlementCard settlement={row} key={row.id} />)}</div> : <div className="investment-empty"><span aria-hidden="true">◇</span><strong>此場目前只有持股主檔</strong><small>活頁簿尚未登記發錢日、盈虧或結算明細。</small></div>}
+      {selectedRound.settlements.length ? <div className="investment-settlement-list">{[...selectedRound.settlements].sort((a, b) => b.paidOn.localeCompare(a.paidOn)).map((row) => <SettlementCard settlement={row} memberCount={ledger.members.length} key={row.id} />)}</div> : <div className="investment-empty"><span aria-hidden="true">◇</span><strong>此場目前只有持股主檔</strong><small>Firebase 尚未登記發錢日、盈虧或結算明細。</small></div>}
     </section>
-    <aside className="investment-source-note"><strong>資料校讀</strong><span>持股與盈虧採《大富翁資料.xlsx》更新版；洪嘉卿場依 115/07/11 活頁簿為 20%，早期占比分配圖仍為 10%。結算明細來自附件圖片 2–7，未提供的欄位不推測。</span></aside>
-    <small className="audit-caption">來源更新：{investmentLedgerUpdatedOn}・金額為新臺幣・每位夥伴金額以未四捨五入數值加總後顯示。</small>
+    <aside className="investment-source-note"><strong>資料校讀</strong><span>洪嘉卿場以最新版資料的 20% 為準；Firebase 內使用 2,000 basis points。附件未提供的雞舍容量、在養數與批次不推測。</span></aside>
+    <small className="audit-caption">來源更新：{ledger.updatedOn ?? '—'}・金額為整數新臺幣・Firebase 為目前帳冊主檔。</small>
   </PixelPanel>;
 }
 
@@ -107,8 +118,8 @@ function LedgerMetric({ label, value, tone }: { label: string; value: string; to
   return <div><small>{label}</small><strong className={tone ? `is-${tone}` : ''}>{value}</strong></div>;
 }
 
-function SettlementCard({ settlement }: { settlement: InvestmentSettlement }) {
-  const memberIncome = settlement.teamNetIncomeTwd / investmentMembers.length;
+function SettlementCard({ settlement, memberCount }: { settlement: InvestmentSettlement; memberCount: number }) {
+  const memberIncome = memberCount ? settlement.teamNetIncomeTwd / memberCount : 0;
   return <article className={`investment-settlement ${settlement.farmProfitLossTwd < 0 ? 'is-loss' : 'is-gain'}`}>
     <header><div><time dateTime={settlement.paidOn}>{formatRocDate(settlement.paidOn)}</time><strong>{settlement.farmProfitLossTwd < 0 ? '虧損結算' : '盈餘結算'}</strong></div><b>{formatSignedTwd(settlement.teamNetIncomeTwd)}</b></header>
     <div className="investment-settlement__metrics">
@@ -123,6 +134,7 @@ function SettlementCard({ settlement }: { settlement: InvestmentSettlement }) {
 }
 
 function formatPercent(value: number) { return `${value.toFixed(2).replace(/\.00$/, '')}%`; }
+function formatBasisPoints(value: number) { return formatPercent(value / 100); }
 function formatTwd(value: number) { return `$${Math.round(value).toLocaleString('zh-TW')}`; }
 function formatSignedTwd(value: number, showPlus = true) { const rounded = Math.round(value); return `${rounded < 0 ? '−' : showPlus && rounded > 0 ? '+' : ''}$${Math.abs(rounded).toLocaleString('zh-TW')}`; }
 function formatRocDate(value: string) { const [year = 1911, month = 1, day = 1] = value.split('-').map(Number); return `民國 ${year - 1911}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`; }

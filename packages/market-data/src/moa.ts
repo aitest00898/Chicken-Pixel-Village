@@ -2,14 +2,14 @@ import type { HistoricalMarketItem, HistoryPoint, MarketBundle, MarketFrequency,
 
 const BASE = 'https://data.moa.gov.tw/api/v1';
 export const MOA_PARSER_VERSION = 'moa-poultry-v1.0.0';
-const ASSOCIATION_BULLETIN_ENDPOINT = 'association-bulletin';
-const CENTRAL_LIVESTOCK_MONTHLY_ENDPOINT = 'central-livestock-monthly';
-const ASSOCIATION_BULLETIN_URL = 'https://www.poultry.org.tw/';
-const ASSOCIATION_BULLETIN_SOURCE = '養雞協會日報表（附圖）';
-const ASSOCIATION_BULLETIN_PARSER_VERSION = 'association-bulletin-v1.1.0';
-const CENTRAL_LIVESTOCK_MONTHLY_URL = 'https://www.naif.org.tw/';
-const CENTRAL_LIVESTOCK_MONTHLY_SOURCE = '中央畜產會「台灣地區畜禽產品價格調查」月報';
-const CENTRAL_LIVESTOCK_MONTHLY_PARSER_VERSION = 'central-livestock-monthly-v1.0.0';
+export const ASSOCIATION_BULLETIN_ENDPOINT = 'association-bulletin';
+export const CENTRAL_LIVESTOCK_MONTHLY_ENDPOINT = 'central-livestock-monthly';
+export const ASSOCIATION_BULLETIN_URL = 'https://www.poultry.org.tw/';
+export const ASSOCIATION_BULLETIN_SOURCE = '養雞協會日報表（Firebase 史料）';
+export const ASSOCIATION_BULLETIN_PARSER_VERSION = 'association-bulletin-v1.2.0';
+export const CENTRAL_LIVESTOCK_MONTHLY_URL = 'https://www.naif.org.tw/';
+export const CENTRAL_LIVESTOCK_MONTHLY_SOURCE = '中央畜產會「台灣地區畜禽產品價格調查」月報';
+export const CENTRAL_LIVESTOCK_MONTHLY_PARSER_VERSION = 'central-livestock-monthly-v1.1.0';
 
 interface MoaResponse<T> { RS?: string; Data?: T[]; Next?: boolean }
 interface RedRow {
@@ -21,178 +21,6 @@ interface BroilerRow {
 }
 
 type PoultryRow = RedRow & BlackRow & BroilerRow & Record<string, string | undefined>;
-
-function bulletinRow(TransDate: string, SourceDocument: string, values: PoultryRow): PoultryRow {
-  return {
-    TransDate,
-    SourceDocument,
-    fighting_east_free_female: '88',
-    fighting_capon_all: '120',
-    heritage_capon_all: '85',
-    ...values,
-  };
-}
-
-const associationBulletinRows: PoultryRow[] = [
-  bulletinRow('2025/06/19', 'BC1293B9-D829-496E-9571-9D27B2D8F733.jpeg', {
-    black_north_free_male: '62', black_north_free_female: '62', black_north_caged_male: '56', black_north_caged_female: '56',
-    black_central_free_male: '62', black_central_free_female: '62', black_central_caged_male: '56', black_central_caged_female: '56',
-    black_south_free_male: '64', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '56', golden_central_female: '56',
-    heritage_north_male: '62', heritage_north_female: '62', heritage_central_male: '62', heritage_central_female: '62', heritage_south_male: '62', heritage_south_female: '62',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '88', fighting_north_caged_female: '83', fighting_central_free_female: '88', fighting_central_caged_female: '83',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '77', zhubei_imitation_capon_all: '123',
-  }),
-  bulletinRow('2025/10/16', 'B4D1FFD9-8071-4C75-9A16-B0D79435D43B.jpeg', {
-    black_north_free_male: '61', black_north_free_female: '61', black_north_caged_male: '47', black_north_caged_female: '47',
-    black_central_free_male: '61', black_central_free_female: '61', black_central_caged_male: '47', black_central_caged_female: '47',
-    black_south_free_male: '64', black_south_free_female: '64', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '46', golden_central_female: '46', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '88', fighting_north_caged_female: '83', fighting_central_free_female: '88', fighting_central_caged_female: '83',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '77', zhubei_imitation_capon_all: '123',
-  }),
-  bulletinRow('2025/10/24', 'F548B773-DB49-46BD-920B-DD3860719E8E.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '45', black_north_caged_female: '45',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '45', black_central_caged_female: '45',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '46', golden_central_female: '46', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '92', fighting_north_caged_female: '87', fighting_central_free_female: '92', fighting_central_caged_female: '87',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '60', zhubei_imitation_hen_all: '77', zhubei_imitation_capon_all: '123',
-  }),
-  bulletinRow('2025/10/25', '594EEA7B-1C0E-462D-A793-F99E22E71D4C.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '46', black_north_caged_female: '46',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '46', black_central_caged_female: '46',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '47', golden_central_female: '47', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '92', fighting_north_caged_female: '87', fighting_central_free_female: '92', fighting_central_caged_female: '87',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '60', zhubei_imitation_hen_all: '77', zhubei_imitation_capon_all: '123',
-  }),
-  bulletinRow('2025/10/27', 'D2AB69B4-82CF-4E7B-ACF6-5A38B8FB09DE.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '47', black_north_caged_female: '47',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '47', black_central_caged_female: '47',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '48', golden_central_female: '48', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '94', fighting_north_caged_female: '89', fighting_central_free_female: '94', fighting_central_caged_female: '89',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '79', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/10/28', '64EB4DDC-A9D8-4127-A2E9-92310B59075C.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '47', black_north_caged_female: '47',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '47', black_central_caged_female: '47',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '48', golden_central_female: '48', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '81', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/10/31', 'FCFF0763-4A38-4E9C-8607-587CF7DD23CB.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '48', black_north_caged_female: '48',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '48', black_central_caged_female: '48',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '50', golden_central_female: '50', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/01', '7CF618BF-9689-47A1-BE1E-4BA80F519FB6.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '49', black_north_caged_female: '49',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '49', black_central_caged_female: '49',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '51', golden_central_female: '51', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '62', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/03', '1BB4ACD5-E692-4737-8CF7-93CB41359C89.jpeg', {
-    black_north_free_male: '59', black_north_free_female: '59', black_north_caged_male: '50', black_north_caged_female: '50',
-    black_central_free_male: '59', black_central_free_female: '59', black_central_caged_male: '50', black_central_caged_female: '50',
-    black_south_free_male: '62', black_south_free_female: '62', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '52', golden_central_female: '52', heritage_north_male: '61', heritage_north_female: '61', heritage_central_male: '61', heritage_central_female: '61', heritage_south_male: '61', heritage_south_female: '61',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '64', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/05', '69E4418B-45CB-4068-8D5A-D0D7054D4A8E.jpeg', {
-    black_north_free_male: '61', black_north_free_female: '61', black_north_caged_male: '51', black_north_caged_female: '51',
-    black_central_free_male: '61', black_central_free_female: '61', black_central_caged_male: '51', black_central_caged_female: '51',
-    black_south_free_male: '64', black_south_free_female: '60', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '53', golden_central_female: '53', heritage_north_male: '63', heritage_north_female: '63', heritage_central_male: '63', heritage_central_female: '63', heritage_south_male: '63', heritage_south_female: '63',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '64', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/06', '6494B7C9-FD2D-48C7-B9BB-6C66353887AD.jpeg', {
-    black_north_free_male: '63', black_north_free_female: '63', black_north_caged_male: '52', black_north_caged_female: '52',
-    black_central_free_male: '63', black_central_free_female: '63', black_central_caged_male: '52', black_central_caged_female: '52',
-    black_south_free_male: '64', black_south_free_female: '60', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '53', golden_central_female: '53', heritage_north_male: '65', heritage_north_female: '65', heritage_central_male: '65', heritage_central_female: '65', heritage_south_male: '65', heritage_south_female: '65',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '69', guinea_central_female: '69', wenchang_north: '64', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/20', '3136F20A-94C2-400F-A917-3AAFF7B661B3.jpeg', {
-    black_north_free_male: '64', black_north_free_female: '60', black_north_caged_male: '55', black_north_caged_female: '52',
-    black_central_free_male: '64', black_central_free_female: '60', black_central_caged_male: '55', black_central_caged_female: '52',
-    black_south_free_male: '64', black_south_free_female: '60', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '55', golden_central_female: '55', heritage_north_male: '65', heritage_north_female: '65', heritage_central_male: '65', heritage_central_female: '65', heritage_south_male: '65', heritage_south_female: '65',
-    silkie_central: '66', silkie_south: '68', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '71', guinea_central_female: '71', wenchang_north: '64', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/11/24', 'E458107E-91BA-49AC-8629-C7F58DE85E76.jpeg', {
-    black_north_free_male: '64', black_north_free_female: '60', black_north_caged_male: '56', black_north_caged_female: '52',
-    black_central_free_male: '64', black_central_free_female: '60', black_central_caged_male: '56', black_central_caged_female: '52',
-    black_south_free_male: '65', black_south_free_female: '60', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '56', golden_central_female: '56', heritage_north_male: '65', heritage_north_female: '65', heritage_central_male: '65', heritage_central_female: '65', heritage_south_male: '65', heritage_south_female: '65',
-    silkie_central: '66', silkie_south: '68', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '71', guinea_central_female: '71', wenchang_north: '66', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2025/12/08', '1B536DED-8725-4F83-9B07-B54C88150925.jpeg', {
-    black_north_free_male: '66', black_north_free_female: '60', black_north_caged_male: '57', black_north_caged_female: '53',
-    black_central_free_male: '66', black_central_free_female: '60', black_central_caged_male: '57', black_central_caged_female: '53',
-    black_south_free_male: '68', black_south_free_female: '60', black_east_free_male: '63', black_east_free_female: '63',
-    golden_central_male: '58', golden_central_female: '57', heritage_north_male: '66', heritage_north_female: '60', heritage_central_male: '66', heritage_central_female: '60', heritage_south_male: '66', heritage_south_female: '60',
-    silkie_central: '66', silkie_south: '68', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '71', guinea_central_female: '71', wenchang_north: '66', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2026/01/30', '392034CC-2D8E-47B4-AE6C-0DF847C8425E.jpeg', {
-    black_north_free_male: '66', black_north_free_female: '60', black_north_caged_male: '58', black_north_caged_female: '55',
-    black_central_free_male: '66', black_central_free_female: '60', black_central_caged_male: '58', black_central_caged_female: '55',
-    black_south_free_male: '70', black_south_free_female: '63', black_east_free_male: '64', black_east_free_female: '64',
-    golden_central_male: '58', golden_central_female: '57', heritage_north_male: '66', heritage_north_female: '60', heritage_central_male: '66', heritage_central_female: '60', heritage_south_male: '66', heritage_south_female: '60',
-    silkie_central: '66', silkie_south: '68', fighting_north_free_female: '97', fighting_north_caged_female: '92', fighting_central_free_female: '97', fighting_central_caged_female: '92',
-    guinea_north_female: '74', guinea_central_female: '74', wenchang_north: '66', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2026/03/16', 'D12CC850-D1BA-41EE-8E3E-1903A91D88E5.jpeg', {
-    black_north_free_male: '62', black_north_free_female: '62', black_north_caged_male: '58', black_north_caged_female: '55',
-    black_central_free_male: '62', black_central_free_female: '62', black_central_caged_male: '58', black_central_caged_female: '55',
-    black_south_free_male: '65', black_south_free_female: '65', black_east_free_male: '64', black_east_free_female: '64',
-    golden_north_male: '58', golden_north_female: '57', golden_central_male: '58', golden_central_female: '57',
-    heritage_north_male: '62', heritage_north_female: '62', heritage_central_male: '62', heritage_central_female: '62', heritage_south_male: '62', heritage_south_female: '62',
-    silkie_central: '66', silkie_south: '68', fighting_north_free_female: '99', fighting_north_caged_female: '94', fighting_central_free_female: '99', fighting_central_caged_female: '94',
-    guinea_north_female: '74', guinea_central_female: '74', wenchang_north: '66', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2026/06/01', 'B8FFA345-CA63-405E-81D1-CA45F5542A91.jpeg', {
-    black_north_free_male: '58', black_north_free_female: '60', black_north_caged_male: '52', black_north_caged_female: '52',
-    black_central_free_male: '58', black_central_free_female: '60', black_central_caged_male: '52', black_central_caged_female: '52',
-    black_south_free_male: '60', black_south_free_female: '60', black_east_free_male: '62', black_east_free_female: '62',
-    golden_north_male: '50', golden_north_female: '50', golden_central_male: '50', golden_central_female: '50',
-    heritage_north_male: '58', heritage_north_female: '60', heritage_central_male: '58', heritage_central_female: '60', heritage_south_male: '58', heritage_south_female: '60',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '97', fighting_north_caged_female: '92', fighting_central_free_female: '97', fighting_central_caged_female: '92',
-    guinea_north_female: '73', guinea_central_female: '73', wenchang_north: '62', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-  bulletinRow('2026/07/17', 'provided-association-bulletin-2026-07-17.jpg', {
-    black_north_free_male: '56', black_north_free_female: '58', black_north_caged_male: '50', black_north_caged_female: '50',
-    black_central_free_male: '56', black_central_free_female: '58', black_central_caged_male: '49', black_central_caged_female: '49',
-    black_south_free_male: '59', black_south_free_female: '59', black_east_free_male: '62', black_east_free_female: '62',
-    golden_north_male: '48', golden_north_female: '48', golden_central_male: '48', golden_central_female: '48',
-    heritage_north_male: '56', heritage_north_female: '58', heritage_central_male: '56', heritage_central_female: '58', heritage_south_male: '56', heritage_south_female: '58',
-    silkie_central: '64', silkie_south: '66', fighting_north_free_female: '95', fighting_north_caged_female: '90', fighting_central_free_female: '95', fighting_central_caged_female: '90',
-    guinea_north_female: '72', guinea_central_female: '72', wenchang_north: '60', zhubei_imitation_hen_all: '82', zhubei_imitation_capon_all: '125',
-  }),
-];
-
-const centralLivestockMonthlyRows: PoultryRow[] = [
-  { TransDate: '2025/12/31', SourceDocument: '20260304_170912.3182.pdf', national_red_monthly: '93.33', national_black_male_monthly: '96.67', national_black_female_monthly: '86.67' },
-  { TransDate: '2026/01/31', SourceDocument: '20260306_155123.90702.pdf', national_red_monthly: '93.33', national_black_male_monthly: '94.84', national_black_female_monthly: '86.67' },
-  { TransDate: '2026/02/28', SourceDocument: '20260323_182316.55058.pdf', national_red_monthly: '93.33', national_black_male_monthly: '91.81', national_black_female_monthly: '91.23' },
-  { TransDate: '2026/03/31', SourceDocument: '20260506_120325.32628.pdf', national_red_monthly: '92.85', national_black_male_monthly: '89.95', national_black_female_monthly: '89.95' },
-  { TransDate: '2026/04/30', SourceDocument: '20260515_161534.77239.pdf', national_red_monthly: '88.67', national_black_male_monthly: '88.33', national_black_female_monthly: '88.33' },
-  { TransDate: '2026/05/31', SourceDocument: '20260626_173655.32670.pdf', national_red_monthly: '85.05', national_black_male_monthly: '85.11', national_black_female_monthly: '85.11' },
-  { TransDate: '2026/06/30', SourceDocument: '20260715_170323.52841.pdf', national_red_monthly: '78.50', national_black_male_monthly: '81.56', national_black_female_monthly: '81.56' },
-];
 
 export interface HistorySeriesDefinition {
   item: HistoricalMarketItem;
@@ -338,38 +166,10 @@ export async function fetchMoaPoultryHistories(
     if (!definition) throw new Error(`Unsupported poultry history item: ${item}`);
     return definition;
   });
-  const endpoints = [...new Set(definitions.map((definition) => definition.endpoint))];
+  const storedEndpoints = new Set([ASSOCIATION_BULLETIN_ENDPOINT, CENTRAL_LIVESTOCK_MONTHLY_ENDPOINT]);
+  const remoteDefinitions = definitions.filter((definition) => !storedEndpoints.has(definition.endpoint));
+  const endpoints = [...new Set(remoteDefinitions.map((definition) => definition.endpoint))];
   const responses = await Promise.all(endpoints.map(async (endpoint) => {
-    if (endpoint === ASSOCIATION_BULLETIN_ENDPOINT) {
-      const start = apiDate(startDate);
-      const end = apiDate(endDate);
-      const rows = associationBulletinRows.filter((row) => row.TransDate !== undefined && row.TransDate >= start && row.TransDate <= end);
-      const payload: MoaResponse<PoultryRow> = { RS: 'OK', Data: rows, Next: false };
-      const text = JSON.stringify(payload);
-      const snapshot: RawSnapshot = {
-        sourceUrl: ASSOCIATION_BULLETIN_URL,
-        fetchedAt,
-        payload,
-        sha256: await sha256(text),
-        parserVersion: ASSOCIATION_BULLETIN_PARSER_VERSION,
-      };
-      return { endpoint, payload, snapshot, sourceName: ASSOCIATION_BULLETIN_SOURCE };
-    }
-    if (endpoint === CENTRAL_LIVESTOCK_MONTHLY_ENDPOINT) {
-      const start = apiDate(startDate);
-      const end = apiDate(endDate);
-      const rows = centralLivestockMonthlyRows.filter((row) => row.TransDate !== undefined && row.TransDate >= start && row.TransDate <= end);
-      const payload: MoaResponse<PoultryRow> = { RS: 'OK', Data: rows, Next: false };
-      const text = JSON.stringify(payload);
-      const snapshot: RawSnapshot = {
-        sourceUrl: CENTRAL_LIVESTOCK_MONTHLY_URL,
-        fetchedAt,
-        payload,
-        sha256: await sha256(text),
-        parserVersion: CENTRAL_LIVESTOCK_MONTHLY_PARSER_VERSION,
-      };
-      return { endpoint, payload, snapshot, sourceName: CENTRAL_LIVESTOCK_MONTHLY_SOURCE };
-    }
     const query = new URLSearchParams({ Start_time: apiDate(startDate), End_time: apiDate(endDate) });
     const sourceUrl = `${BASE}/${endpoint}/?${query.toString()}`;
     const request: RequestInit = { headers: { Accept: 'application/json' } };
@@ -388,7 +188,7 @@ export async function fetchMoaPoultryHistories(
     };
     return { endpoint, payload, snapshot, sourceName: '農業部 Open Data' };
   }));
-  return definitions.map((definition) => {
+  return remoteDefinitions.map((definition) => {
     const response = responses.find((candidate) => candidate.endpoint === definition.endpoint);
     if (!response) throw new Error(`MOA ${definition.endpoint} response is missing`);
     return {

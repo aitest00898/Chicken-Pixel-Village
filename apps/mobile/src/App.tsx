@@ -12,12 +12,13 @@ import { HousesPage } from './pages/HousesPage';
 import { ManagerPage } from './pages/ManagerPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AdminPage } from './pages/AdminPage';
+import { persistDailyMarketRecords } from './services/marketHistory';
 
 export function App() {
   const location = useLocation();
   const { bundle, syncing } = useMarketData();
   const authentication = useAuthentication();
-  const village = useVillageState();
+  const village = useVillageState(authentication.userId);
   const [online, setOnline] = useState(navigator.onLine);
   const [dark, setDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches);
   const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -26,6 +27,10 @@ export function App() {
   useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light'; }, [dark]);
   useEffect(() => { document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'; }, [reduced]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
+  useEffect(() => {
+    if (!authentication.isAdmin || bundle.mode !== 'live') return;
+    void persistDailyMarketRecords(bundle.records).catch((error: unknown) => console.error('Unable to archive daily market records', error));
+  }, [authentication.isAdmin, bundle]);
 
   if (!village.ready || !authentication.ready) return <div className="splash-screen"><div className="splash-screen__art" /><div className="splash-screen__copy"><span className="folio-kicker">VOLUME I・領地營運誌</span><p>雞情像素村</p><h1>正在展開村莊編年史……</h1><small>校讀雞舍帳冊、行情公報與巡查紀錄</small></div></div>;
 
@@ -37,7 +42,7 @@ export function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/village" element={<VillagePage houses={village.houses} placements={village.mapPlacements} onMove={village.moveHouse} canEdit={authentication.isAdmin} />} />
         <Route path="/houses" element={<HousesPage village={village} online={online} isAdmin={authentication.isAdmin} />} />
-        <Route path="/manager" element={<ManagerPage visits={village.visits} onVisit={village.visitToday} onEquip={village.equip} />} />
+        <Route path="/manager" element={<ManagerPage visits={village.visits} signedIn={authentication.isAdmin} onEquip={village.equip} />} />
         <Route path="/admin" element={<AdminPage configured={authentication.configured} isAdmin={authentication.isAdmin} username={authentication.username} authError={authentication.error} houseCount={village.houses.filter((house) => !house.archivedAt).length} onSignIn={authentication.signIn} onSignOut={authentication.signOut} />} />
         <Route path="/settings" element={<SettingsPage dark={dark} reduced={reduced} onDark={setDark} onReduced={setReduced} mode={bundle.mode} storageMode={village.storageMode} isAdmin={authentication.isAdmin} adminUsername={authentication.username} onAdminSignOut={authentication.signOut} online={online} unsyncedCount={village.unsyncedCount} syncMode={village.syncMode} syncError={village.syncError} onSync={() => { void village.syncNow(online); }} />} />
         <Route path="*" element={<Navigate to="/" replace />} />

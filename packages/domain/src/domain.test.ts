@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings } from './index';
+import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings } from './index';
 import { demoShareholdings } from './fixtures';
 import type { DistributionRecord, RiskAnswer, RiskDimension } from './types';
 
@@ -50,6 +50,19 @@ describe('daily visit', () => {
     const afterBreak = recordVisit(start, '2026-07-23');
     expect(afterBreak).toMatchObject({ accumulatedDays: 6, streakDays: 1 });
     expect(recordVisit(afterBreak, '2026-07-23')).toEqual(afterBreak);
+  });
+
+  it('counts three distinct dates exactly once and exposes twenty-four cosmetic rewards', () => {
+    const first = recordVisit({ accumulatedDays: 0, streakDays: 0, lastVisitDate: null, equipped: {} }, '2026-07-22');
+    const duplicate = recordVisit(first, '2026-07-22');
+    const second = recordVisit(duplicate, '2026-07-23');
+    const third = recordVisit(second, '2026-07-24');
+    expect(duplicate).toEqual(first);
+    expect(third).toMatchObject({ accumulatedDays: 3, streakDays: 3, lastVisitDate: '2026-07-24' });
+    expect(equipmentItems).toHaveLength(24);
+    expect(new Set(equipmentItems.map((item) => item.id)).size).toBe(24);
+    expect(equipmentItems.filter((item) => item.requiredVisitDays >= 5)).toHaveLength(20);
+    expect(equipmentItems.every((item) => ['head', 'body', 'hand', 'back'].includes(item.slot))).toBe(true);
   });
 });
 

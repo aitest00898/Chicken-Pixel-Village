@@ -1,28 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { investmentMembers, investmentRounds } from './investmentLedger';
+import { parseInvestmentRound } from './investmentLedger';
 
-describe('investment ledger source data', () => {
-  it('keeps the eight current venues and six supplied settlements', () => {
-    expect(investmentRounds).toHaveLength(8);
-    expect(investmentRounds.flatMap((round) => round.settlements)).toHaveLength(6);
-    expect(investmentRounds.filter((round) => round.settlements.length === 0)).toHaveLength(4);
+describe('Firebase investment ledger boundary', () => {
+  it('parses basis points and integer settlement amounts without embedding real records', () => {
+    const round = parseInvestmentRound('house-a', {
+      name: '測試雞舍', teamShareBasisPoints: 2_000, caretaker: '測試代養戶', iconIndex: 7,
+      speciesLabel: '紅羽土雞', statusLabel: '目前投資中',
+      settlements: [{
+        id: 'settlement-a', paidOn: '2026-07-15', farmProfitLossTwd: 100_000,
+        teamNetIncomeTwd: 20_000, feedConversionRate: 2.4, survivalRatePercent: 92,
+        caretakerSettlementPayableTwd: 80_000, paymentMemo: '應付',
+        lines: [{ label: '代養金', amountTwd: 80_000 }],
+      }],
+    });
+    expect(round).toMatchObject({ id: 'house-a', teamShareBasisPoints: 2_000, iconIndex: 7 });
+    expect(round?.settlements[0]?.teamNetIncomeTwd).toBe(20_000);
   });
 
-  it('reconciles every settlement line to its caretaker payable amount', () => {
-    for (const settlement of investmentRounds.flatMap((round) => round.settlements)) {
-      const lineTotal = settlement.lines.reduce((sum, line) => sum + line.amountTwd, 0);
-      expect(lineTotal, settlement.id).toBe(settlement.caretakerSettlementPayableTwd);
-    }
-  });
-
-  it('reconciles farm profit and team ownership without rounding away the member totals', () => {
-    for (const round of investmentRounds) {
-      for (const settlement of round.settlements) {
-        expect(settlement.teamNetIncomeTwd).toBeCloseTo(settlement.farmProfitLossTwd * round.teamSharePercent / 100, 5);
-      }
-    }
-    const teamNet = investmentRounds.flatMap((round) => round.settlements).reduce((sum, settlement) => sum + settlement.teamNetIncomeTwd, 0);
-    expect(teamNet).toBeCloseTo(419_739.6, 5);
-    expect(teamNet / investmentMembers.length).toBeCloseTo(139_913.2, 5);
+  it('rejects invalid ownership percentages before they reach the UI', () => {
+    expect(parseInvestmentRound('bad', { name: '錯誤', teamShareBasisPoints: 10_001 })).toBeNull();
+    expect(parseInvestmentRound('bad', { name: '錯誤', teamShareBasisPoints: 12.5 })).toBeNull();
   });
 });

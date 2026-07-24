@@ -26,7 +26,7 @@ interface TrendChartProps {
 
 const width = 520;
 const height = 210;
-const holdDuration = 1_000;
+const holdDuration = 500;
 const inactivityDuration = 15_000;
 const movementTolerance = 10;
 
@@ -218,7 +218,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
         className="trend-chart__plot"
         data-testid="trend-query-surface"
         tabIndex={0}
-        aria-label={queryActive ? '十字查價中，按 Escape 可退出' : '折線圖查價區，長按 1 秒或按 Enter 啟動'}
+        aria-label={queryActive ? '十字查價中，按 Escape 可退出' : '折線圖查價區，停留 0.5 秒或按 Enter 啟動'}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointer}
@@ -269,7 +269,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
         </div> : null}
       </div>
       <div className="chart-axis"><span>{geometry.firstDate.slice(5).replace('-', '/')}</span><span>{geometry.lastDate.slice(5).replace('-', '/')}</span></div>
-      <p className="chart-query-hint">{queryActive ? '查價中・移動手指更新日期與行情線' : '在折線圖上停留 1 秒，即可啟動十字查價'}</p>
+      <p className="chart-query-hint">{queryActive ? '查價中・移動手指更新日期與行情線' : '在折線圖上停留 0.5 秒，即可啟動十字查價'}</p>
     </div>
   );
 }

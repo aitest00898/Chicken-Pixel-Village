@@ -54,6 +54,7 @@ export function useAuthentication() {
   return {
     ready,
     configured: hasFirebaseConfig,
+    userId: user?.uid ?? null,
     isAdmin: Boolean(user) && isAdmin,
     username: Boolean(user) && isAdmin ? ADMIN_USERNAME : null,
     error,
