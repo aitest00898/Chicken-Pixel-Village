@@ -1,18 +1,63 @@
-# Art Direction
+# 瓦納迪斯風格（Vanadis Chronicle Style）
 
-The visual language is an original chibi 16-bit top-down poultry village. It borrows only broad era-level traits: crisp pixel clusters, compact silhouettes, warm dialogue pacing and readable map composition.
+《雞情像素村》的正式視覺語言是「瓦納迪斯風格」：畫面首先是一套被學者、旅人與管理公會整理保存的世界設定集與產業編年史，而不是普通奇幻插畫、可愛農場遊戲或全畫面像素 RPG。
 
-Palette anchors: sunrise peach, slate teal, moss green, straw gold, rust and navy outlines. UI panels use warm charcoal and parchment rather than reproducing a known game's blue menu treatment.
+## 不可變的七項核心
 
-Generated assets:
+1. 設定集，而非普通插畫。
+2. 保存良好的泛黃羊皮紙，而非純白、平滑米色或嚴重燒焦藏寶圖。
+3. 低彩度水彩、水粉、鉛筆結構線、細墨線與乾刷，而非光滑數位渲染。
+4. 地圖、建築、人物、徽章與 live HTML 註解共同構成世界。
+5. 沉穩、古老、可生活且有歷史厚度，不幼兒化、不血腥黑暗。
+6. 像素人物與裝備只作為輔助資訊層，不讓整體全部像素化。
+7. 資訊可讀性、真實日期、單位、來源與狀態永遠高於裝飾。
 
-- `dawn-village.png`: portrait loading and market hero.
-- `village-map.png`: tappable village board.
-- `sprite-atlas.png`: manager, foster farmer, merchant, hen, equipment and capacity-tier houses.
-- `app-icon-master.png`: red-feather rooster village crest used by iOS and Android launcher assets.
+## 色彩與材質
 
-All text remains live HTML. Art contains no product name, price or source text. No protected franchise assets, logos, fonts, names or signature objects are used.
+- 60–70%：羊皮紙米褐、土壤與中性色。
+- 20–30%：灰藍、霧綠、土棕、煙灰與深墨褐。
+- 5–10%：舊金、暗紅、冷紫藍等重要標記。
+- 禁止螢光、糖果色、大面積鮮綠／天空藍、純黑、塑膠高光與 HDR。
 
-The four master assets were generated with the built-in image generation model from original prompts written for this repository, then integrated manually. Chroma-key cleanup was used only for the transparent sprite atlas; the loading scene, map and crest remain full original paintings.
+紙張要有細微纖維、水痕、墨水滲透、褪色與不均顆粒，但不能影響資料閱讀。遠景自然暈散，主體局部精細，保留完成與未完成的層次。
 
-Exact prompts are archived in `ART_PROMPTS.md`.
+## App 的兩層結構
+
+氣氛層使用羊皮紙、水彩場景、墨線建築、公會徽章、細線、舊金標記與書頁轉場。功能層維持現代行動 App 所需的高對比文字、清楚數字、44px 以上觸控區、明確同步／離線／錯誤狀態、鍵盤焦點、深色模式與 reduced motion。
+
+真實功能可以使用編年史語彙包裝，但不能改變資料意義：
+
+| 真實功能 | 瓦納迪斯呈現 |
+| --- | --- |
+| 今日行情 | 商會每日公報 |
+| 歷史行情 | 市場編年史 |
+| 我的村莊 | 管理者領地圖 |
+| 我的雞舍 | 雞舍管理帳冊 |
+| 股東比例 | 投資契約卷宗 |
+| 分潤紀錄 | 商會結算帳簿 |
+| 風險評估 | 雞舍巡查報告 |
+| 裝備 | 管理者行裝圖鑑 |
+| 資料來源 | 公會文獻與官方檔案 |
+
+## 人物
+
+- 原比例：6–7 頭身、半寫實、表情內斂，布料／皮革／木材／少量金屬，裝備具實際用途。
+- Q 版：2.5–3 頭身，保留職業辨識物，不做嬰兒比例、巨大閃亮眼睛或塑膠公仔。
+- 像素：16×24 至 32×48 邏輯像素、受限色盤、輪廓優先、整數倍最近鄰縮放。
+
+正式文字全部由 HTML/CSS 或原生 UI 後製。生成圖片不得包含假繁體中文、價格、日期、來源或任何需要正確性的文字。
+
+## 正式資產
+
+- `vanadis-village-hero.webp`：首頁與啟動畫面的直式領地總覽。
+- `vanadis-village-map.webp`：可疊加 HTML 標記的管理者領地圖。
+- `vanadis-market-bulletin.webp`：每日行情公報的商人與市場場景。
+- `vanadis-role-chronicle.webp`：管理者、代養戶、行情商人、孵化師、巡查員與帳房員人物圖鑑。
+- `vanadis-guild-seal.png`：雞冠、羽毛、蛋、麥穗與帳冊構成的管理公會徽章。
+- `sprite-atlas.png`：保留為像素輔助層，後續改繪必須維持既有 logical grid 與裁切座標。
+
+以上點陣資產由 Codex 內建圖像生成工具依專案原創提示生成，再以 WebP／PNG 整合。完整提示記錄於 `ART_PROMPTS.md`。
+
+## 明確禁止
+
+高飽和可愛農場遊戲、現代手遊廣告、光滑 3D、塑膠材質、照片寫實、HDR、霓虹科技、全畫面低解析像素、巨大動漫眼睛、賽璐璐上色、過度華麗金框、大量現代圓角卡片、血腥黑暗奇幻，以及任何生成亂碼文字。

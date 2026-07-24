@@ -10,7 +10,7 @@ Updated: 2026-07-24
 | 3 Firebase emulator backend | complete-local | SQL Connect compiler and PGlite emulator startup passed; Web/Admin SDKs generated; no production resources |
 | 4 Sync | complete-local | Revision/outbox state machine, manual financial conflicts, offline UI and persisted queue; configured clients use real SQL Connect house pull/push, while unconfigured demo mode is labelled local-only |
 | 5 Public market adapters | complete | MOA adapter, raw SHA-256 provenance, verified fallback fixture and deterministic merchant formatter |
-| 6 Village and equipment | complete | Original loading art, movable/synced house map placement, sprite atlas, manager equipment and app icon |
+| 6 Village and equipment | complete | Vanadis Chronicle watercolor folios, movable/synced territory map, supporting pixel atlas, manager equipment and guild-seal app icon |
 | 7 Security and mobile platforms | in progress | Auth/App Check boundaries, Keychain/Keystore secret and native projects done; native compile blocked by local toolchains |
 | 8 End-to-end QA | in progress | Operational UI tests plus 320/390 px browser QA passed; native simulator/device tests remain |
 | 9 Firebase dev project | registered | Spark project `chicken-pixel-village`; Web/iOS/Android clients configured; no paid services deployed |

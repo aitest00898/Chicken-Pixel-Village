@@ -1,6 +1,6 @@
 # 雞情像素村
 
-《雞情像素村》是手機優先的家禽行情、雞舍營運、持股分潤與風險管理 App。介面採原創 16-bit 俯視像素村風格，資料層採離線優先設計：正式私人資料以 Firebase SQL Connect／Cloud SQL PostgreSQL 為 canonical source，iOS／Android 使用原生 SQLite 作離線副本與 outbox，Web 只保存可重建快取。
+《雞情像素村》是手機優先的家禽行情、雞舍營運、持股分潤與風險管理 App。介面採原創「瓦納迪斯風格（Vanadis Chronicle Style）」：以羊皮紙、水彩墨線、世界設定集與少量低解析像素人物呈現真實產業資料。資料層採離線優先設計：正式私人資料以 Firebase SQL Connect／Cloud SQL PostgreSQL 為 canonical source，iOS／Android 使用原生 SQLite 作離線副本與 outbox，Web 只保存可重建快取。
 
 ## 本機開始
 
@@ -35,6 +35,6 @@ pnpm firebase:emulators
 - `packages/domain`：雞舍、持股、分潤、風險領域規則
 - `packages/market-data`：農業部行情 adapter 與 deterministic 商人台詞
 - `packages/sync`：outbox、revision、idempotency 與衝突規則
-- `packages/ui`：共用像素 UI
+- `packages/ui`：共用編年史式 UI 與高可讀資料元件
 - `firebase/sql-connect`：SQL Connect schema、connector、seed
 - `firebase/functions`：行情代理與受控伺服器操作

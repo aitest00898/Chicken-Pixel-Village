@@ -3,7 +3,7 @@
 ## Immutable product constraints
 
 - The product name shown to users is 《雞情像素村》.
-- Art must be original chibi 16-bit top-down pixel RPG art. Never copy Final Fantasy, Square Enix, or other protected assets, names, layouts, music, characters, typography, or signature combinations.
+- Art must use the original **Vanadis Chronicle Style** defined in `docs/ART_DIRECTION.md`: aged parchment, low-saturation watercolor, pencil and ink world-setting plates, with pixel characters only as a supporting information layer. Never copy protected assets, names, layouts, music, characters, typography, or signature combinations.
 - Equipment is cosmetic only. It must never change prices, finance, risk, permissions, sync, or notifications.
 - Public prices remain usable without login. Private chicken-house, shareholder, distribution, and risk data require membership authorization.
 - Daily, weekly, and monthly market records must remain separate. Never invent daily values from weekly or monthly data.
@@ -45,4 +45,3 @@ Each Gate requires relevant focused tests followed by `pnpm verify`. Do not weak
 - Do not add a remote or push.
 - Do not commit generated secrets, local database files, build products, Pods, Gradle caches, or signing materials.
 - Keep raw public-data snapshots, payload hashes, parser versions, normalized records, validation state, source publication time, and fetch time auditable.
-

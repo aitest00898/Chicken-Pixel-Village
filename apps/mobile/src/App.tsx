@@ -27,7 +27,7 @@ export function App() {
   useEffect(() => { document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'; }, [reduced]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
 
-  if (!village.ready || !authentication.ready) return <div className="splash-screen"><div className="splash-screen__art" /><div className="splash-screen__copy"><p>雞情像素村</p><h1>正在開啟村莊……</h1><small>讀取本機雞舍與巡村紀錄</small></div></div>;
+  if (!village.ready || !authentication.ready) return <div className="splash-screen"><div className="splash-screen__art" /><div className="splash-screen__copy"><span className="folio-kicker">VOLUME I・領地營運誌</span><p>雞情像素村</p><h1>正在展開村莊編年史……</h1><small>校讀雞舍帳冊、行情公報與巡查紀錄</small></div></div>;
 
   return (
     <AppShell offline={!online} syncLabel={syncing ? '正在確認最新行情…' : village.unsyncedCount ? `本機草稿 ${village.unsyncedCount} 筆待同步` : bundle.mode === 'live' ? '正式行情已同步' : '使用已驗證快照'}>
