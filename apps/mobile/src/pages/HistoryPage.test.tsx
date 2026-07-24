@@ -46,8 +46,18 @@ describe('history page', () => {
       'heritage_north_male', 'fighting_north_free_female', 'guinea_north_female', 'wenchang_north',
     ]));
 
+    fireEvent.click(screen.getByRole('button', { name: '全台土雞' }));
+    expect(await screen.findByRole('img', { name: '全台土雞多系列價格疊圖' })).toBeInTheDocument();
+    expect(screen.getByText('7 條行情線')).toBeInTheDocument();
+    expect(screen.getByText('日／月正式資料')).toBeInTheDocument();
+    const nationalItems = vi.mocked(loader).mock.calls.at(-1)?.[0] ?? [];
+    expect(nationalItems).toEqual([
+      'national_red_monthly', 'national_black_male_monthly', 'national_black_female_monthly',
+      'zhubei_imitation_hen_all', 'zhubei_imitation_capon_all', 'fighting_capon_all', 'heritage_capon_all',
+    ]);
+
     fireEvent.click(screen.getByRole('button', { name: '30 日' }));
-    await waitFor(() => expect(loader).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(loader).toHaveBeenCalledTimes(4));
     expect(screen.getByRole('button', { name: '30 日' })).toHaveAttribute('aria-pressed', 'true');
     const lastCall = vi.mocked(loader).mock.calls.at(-1)!;
     expect(Math.round((lastCall[2].getTime() - lastCall[1].getTime()) / 86_400_000)).toBe(29);

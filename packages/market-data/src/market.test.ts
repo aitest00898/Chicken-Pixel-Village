@@ -95,4 +95,33 @@ describe('MOA history parser', () => {
       vi.unstubAllGlobals();
     }
   });
+
+  it('loads every supplied association bulletin date without duplicating a day', async () => {
+    const [northCaged, imitationHen] = await fetchMoaPoultryHistories(
+      ['black_north_caged_male', 'zhubei_imitation_hen_all'],
+      new Date('2025-06-19T00:00:00+08:00'),
+      new Date('2026-07-17T00:00:00+08:00'),
+    );
+    expect(northCaged?.points).toHaveLength(18);
+    expect(new Set(northCaged?.points.map((point) => point.date)).size).toBe(18);
+    expect(northCaged?.points[0]).toEqual({ date: '2025-06-19', value: 56 });
+    expect(northCaged?.points.at(-1)).toEqual({ date: '2026-07-17', value: 50 });
+    expect(imitationHen?.points).toContainEqual({ date: '2025-10-27', value: 79 });
+    expect(imitationHen?.points).toContainEqual({ date: '2025-10-28', value: 81 });
+  });
+
+  it('keeps the seven PDF monthly averages separate and converts kilograms to Taiwanese catties', async () => {
+    const results = await fetchMoaPoultryHistories(
+      ['national_red_monthly', 'national_black_male_monthly', 'national_black_female_monthly'],
+      new Date('2025-12-01T00:00:00+08:00'),
+      new Date('2026-06-30T00:00:00+08:00'),
+    );
+    expect(results.every((result) => result.frequency === 'monthly')).toBe(true);
+    expect(results.every((result) => result.sourceName.includes('中央畜產會'))).toBe(true);
+    expect(results[0]?.points).toHaveLength(7);
+    expect(results[0]?.points[0]).toEqual({ date: '2025-12-31', value: 55.998 });
+    expect(results[0]?.points.at(-1)).toEqual({ date: '2026-06-30', value: 47.1 });
+    expect(results[1]?.points.at(-1)).toEqual({ date: '2026-06-30', value: 48.936 });
+    expect(results[2]?.points.at(-1)).toEqual({ date: '2026-06-30', value: 48.936 });
+  });
 });

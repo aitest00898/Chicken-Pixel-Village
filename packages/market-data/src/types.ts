@@ -89,17 +89,26 @@ export type AssociationBulletinMarketItem =
   | 'fighting_east_free_female'
   | 'guinea_north_female'
   | 'guinea_central_female'
-  | 'wenchang_north';
+  | 'wenchang_north'
+  | 'zhubei_imitation_hen_all'
+  | 'zhubei_imitation_capon_all'
+  | 'fighting_capon_all'
+  | 'heritage_capon_all';
+
+export type NationalMonthlyMarketItem =
+  | 'national_red_monthly'
+  | 'national_black_male_monthly'
+  | 'national_black_female_monthly';
 
 export type HistoricalMarketItem = Exclude<MarketItem,
-  'chick_layer' | 'chick_broiler' | 'chick_red_feather' | 'chick_black_feather'> | AssociationBulletinMarketItem;
+  'chick_layer' | 'chick_broiler' | 'chick_red_feather' | 'chick_black_feather'> | AssociationBulletinMarketItem | NationalMonthlyMarketItem;
 
 export interface MarketHistoryResult {
   item: HistoricalMarketItem;
   label: string;
   points: HistoryPoint[];
   unit: 'TWD_PER_600G';
-  frequency: 'daily';
+  frequency: MarketFrequency;
   sourceName: string;
   sourceUrl: string;
   fetchedAt: string;

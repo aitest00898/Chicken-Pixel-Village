@@ -12,14 +12,16 @@ const rangeOptions = [
   { days: 30, label: '30 日' },
   { days: 90, label: '90 日' },
   { days: 365, label: '1 年' },
+  { days: 730, label: '2 年' },
 ] as const;
 
-type HistoryRegionId = 'north' | 'central' | 'south' | 'east' | 'reference';
+type HistoryRegionId = 'north' | 'central' | 'south' | 'east' | 'national' | 'reference';
 interface HistoryRegion {
   id: HistoryRegionId;
   label: string;
   description: string;
   items: readonly HistoricalMarketItem[];
+  frequencyLabel: string;
 }
 
 const historyRegions = [
@@ -28,20 +30,24 @@ const historyRegions = [
     'black_north_free_male', 'black_north_free_female', 'black_north_caged_male', 'black_north_caged_female',
     'golden_north_male', 'golden_north_female', 'heritage_north_male', 'heritage_north_female',
     'fighting_north_free_female', 'fighting_north_caged_female', 'guinea_north_female', 'wenchang_north',
-  ] },
+  ], frequencyLabel: '官方日資料' },
   { id: 'central', label: '中區', description: '紅羽、黑羽、皇金、古早、烏骨、鬥雞與珍珠雞行情', items: [
     'red_central_male', 'red_central_female',
     'black_central_free_male', 'black_central_free_female', 'black_central_caged_male', 'black_central_caged_female',
     'golden_central_male', 'golden_central_female', 'heritage_central_male', 'heritage_central_female',
     'silkie_central', 'fighting_central_free_female', 'fighting_central_caged_female', 'guinea_central_female',
-  ] },
+  ], frequencyLabel: '官方日資料' },
   { id: 'south', label: '南區', description: '紅羽、黑羽、古早、烏骨與高屏白肉雞行情', items: [
     'red_south_male', 'red_south_female',
     'black_south_free_male', 'black_south_free_female', 'black_south_male', 'black_south_female',
     'heritage_south_male', 'heritage_south_female', 'silkie_south', 'broiler_store_kp',
-  ] },
-  { id: 'east', label: '花東區', description: '黑羽放山雞與鬥雞母行情', items: ['black_east_free_male', 'black_east_free_female', 'fighting_east_free_female'] },
-  { id: 'reference', label: '全台參考', description: '白肉雞與雞蛋產業參考行情', items: ['broiler_large', 'broiler_medium', 'egg_producer', 'egg_transport'] },
+  ], frequencyLabel: '官方日資料' },
+  { id: 'east', label: '花東區', description: '黑羽放山雞與鬥雞母行情', items: ['black_east_free_male', 'black_east_free_female', 'fighting_east_free_female'], frequencyLabel: '官方日資料' },
+  { id: 'national', label: '全台土雞', description: '全國月均紅羽、黑羽行情，以及全區竹北仿雞、鬥閹雞與古早閹雞日價', items: [
+    'national_red_monthly', 'national_black_male_monthly', 'national_black_female_monthly',
+    'zhubei_imitation_hen_all', 'zhubei_imitation_capon_all', 'fighting_capon_all', 'heritage_capon_all',
+  ], frequencyLabel: '日／月正式資料' },
+  { id: 'reference', label: '全台參考', description: '白肉雞與雞蛋產業參考行情', items: ['broiler_large', 'broiler_medium', 'egg_producer', 'egg_transport'], frequencyLabel: '官方日資料' },
 ] as const satisfies readonly HistoryRegion[];
 
 const seriesPresentation: Record<HistoricalMarketItem, { shortLabel: string; color: string }> = {
@@ -85,6 +91,13 @@ const seriesPresentation: Record<HistoricalMarketItem, { shortLabel: string; col
   guinea_north_female: { shortLabel: '珍珠雞母', color: '#6e7c91' },
   guinea_central_female: { shortLabel: '珍珠雞母', color: '#6e7c91' },
   wenchang_north: { shortLabel: '文昌雞', color: '#7c8056' },
+  zhubei_imitation_hen_all: { shortLabel: '竹北仿雞母', color: '#846f4f' },
+  zhubei_imitation_capon_all: { shortLabel: '竹北仿閹雞', color: '#7f5544' },
+  fighting_capon_all: { shortLabel: '鬥閹雞', color: '#684a42' },
+  heritage_capon_all: { shortLabel: '古早閹雞', color: '#8c6847' },
+  national_red_monthly: { shortLabel: '紅羽・全國月均', color: '#657873' },
+  national_black_male_monthly: { shortLabel: '黑羽公・全國月均', color: '#4f5b52' },
+  national_black_female_monthly: { shortLabel: '黑羽母・全國月均', color: '#75677b' },
   broiler_large: { shortLabel: '白肉雞・2kg+', color: '#7c8056' },
   broiler_medium: { shortLabel: '白肉雞・1.75–1.95kg', color: '#6e7c91' },
   broiler_store_kp: { shortLabel: '白肉雞・高屏', color: '#a06a54' },
@@ -173,13 +186,13 @@ export function HistoryPage({ loader = fetchMoaPoultryHistories, now = currentTi
 
   return (
     <div className="page history-page">
-      <header className="page-title"><p className="eyebrow">商會史料館</p><h1>行情沿革</h1><p>先選地區，再比較農業部 API 與養雞協會日報表收錄的各類家禽行情；缺值保留，不補寫。</p></header>
+      <header className="page-title"><p className="eyebrow">商會史料館</p><h1>行情沿革</h1><p>先選地區，再比較農業部 API、養雞協會日報與中央畜產會月報收錄的各類家禽行情；缺值保留，不補寫。</p></header>
 
       <section className="history-controls" aria-label="歷史行情篩選">
         <fieldset className="history-region"><legend>行情地區</legend>{historyRegions.map((option) => <button key={option.id} type="button" className={`chip${regionId === option.id ? ' selected' : ''}`} aria-pressed={regionId === option.id} onClick={() => { setQueryActive(false); setRegionId(option.id); }}>{option.label}</button>)}</fieldset>
         <p className="history-region-note">{region.description}</p>
         <fieldset className="history-range"><legend>查閱期間</legend>{rangeOptions.map((option) => <button key={option.days} type="button" className={`chip${days === option.days ? ' selected' : ''}`} aria-pressed={days === option.days} onClick={() => { setQueryActive(false); setDays(option.days); }}>{option.label}</button>)}</fieldset>
-        <div className="history-frequency"><span>資料頻率</span><strong>官方日資料</strong></div>
+        <div className="history-frequency"><span>資料頻率</span><strong>{region.frequencyLabel}</strong></div>
       </section>
 
       <PixelPanel>
@@ -203,10 +216,11 @@ export function HistoryPage({ loader = fetchMoaPoultryHistories, now = currentTi
         <ul className="notes-list">
           <li>資料單位：元／台斤（600 公克）；各線保留官方欄位原意。</li>
           <li>所選卷期：{firstDate && lastDate ? `${firstDate} 至 ${lastDate}` : `最近 ${days} 日`}</li>
-          <li>紅羽、南區黑羽舍飼、白肉雞及雞蛋採農業部 API；其他雞種採養雞協會日報表補充。</li>
-          <li>日報表補充品項目前收錄 2026-07-17；未取得日報的日期保留缺值，不回填或推估。</li>
+          <li>分區紅羽、南區黑羽舍飼、白肉雞及雞蛋採農業部 API；其他分區雞種採養雞協會日報表補充。</li>
+          <li>日報表補充品項收錄 2025-06-19 至 2026-07-17 共 18 個報表日期；未取得日報的日期保留缺值，不回填或推估。</li>
+          <li>全國月均土雞價採中央畜產會月報，收錄 2025 年 12 月至 2026 年 6 月；原始單位為元／公斤，圖表依 1 台斤＝0.6 公斤換算。</li>
           <li>南區疊圖含高屏門市白肉雞參考價；全台參考則收錄非區域性的白肉雞與雞蛋欄位。</li>
-          <li>來源頻率只有每日資料；週、月資料未經正式來源驗證，因此不提供假切換。</li>
+          <li>分區行情維持日資料；全台土雞另提供經來源文件驗證的月均資料，沒有把月均值冒充單日行情。</li>
           <li>缺值會中斷各自折線，統計只計有效資料，不會插值。</li>
           {sourceLinks.map((result, index) => <li key={result.sourceUrl}>資料來源 {index + 1}：<a href={result.sourceUrl} target="_blank" rel="noreferrer">{result.sourceName}</a></li>)}
         </ul>
