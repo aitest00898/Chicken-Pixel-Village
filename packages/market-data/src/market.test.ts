@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { marketFreshness, merchantLine, verifiedMarketFixture } from './index';
+import { marketFreshness, merchantLine, parseMoaHistoryRows, verifiedMarketFixture } from './index';
 
 describe('merchant formatter', () => {
   const current = verifiedMarketFixture.find((record) => record.item === 'egg_producer')!;
@@ -28,3 +28,24 @@ describe('freshness', () => {
   });
 });
 
+describe('MOA history parser', () => {
+  it('maps the selected series, preserves missing values and sorts oldest first', () => {
+    const points = parseMoaHistoryRows('red_north_female', [
+      { TransDate: '2026/07/03', RedFeather_N_F: '休市' },
+      { TransDate: '2026/07/01', RedFeather_N_F: '46.0' },
+      { TransDate: '2026/07/02', RedFeather_N_F: '47.5' },
+    ]);
+    expect(points).toEqual([
+      { date: '2026-07-01', value: 46 },
+      { date: '2026-07-02', value: 47.5 },
+      { date: '2026-07-03', value: null },
+    ]);
+  });
+
+  it('reads black-feather, broiler and egg fields independently', () => {
+    const row = [{ TransDate: '2026/07/01', BlackFeather_S_M: '48', 'TaijinPrice_2.0kgup': '33.8', egg_Producer_Price: '34.5' }];
+    expect(parseMoaHistoryRows('black_south_male', row)[0]?.value).toBe(48);
+    expect(parseMoaHistoryRows('broiler_large', row)[0]?.value).toBe(33.8);
+    expect(parseMoaHistoryRows('egg_producer', row)[0]?.value).toBe(34.5);
+  });
+});

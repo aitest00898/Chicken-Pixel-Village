@@ -55,14 +55,14 @@ export const officialMarketProxy = onCall<OfficialMarketInput>(
     if (!validOfficialMarketRange(endpoint, start, end)) {
       throw new HttpsError('invalid-argument', 'endpoint、start 或 end 無效。');
     }
-    const upstream = new URL(`https://data.moa.gov.tw/api/v1/${endpoint}`);
+    const upstream = new URL(`https://data.moa.gov.tw/api/v1/${endpoint}/`);
     upstream.searchParams.set('Start_time', start);
     upstream.searchParams.set('End_time', end);
     try {
       const upstreamResponse = await fetch(upstream, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10_000) });
       const body = await upstreamResponse.text();
       if (!upstreamResponse.ok) throw new Error(`MOA returned ${upstreamResponse.status}`);
-      return { endpoint, fetchedAt: new Date().toISOString(), payload: JSON.parse(body) as unknown };
+      return { endpoint, fetchedAt: new Date().toISOString(), payload: JSON.parse(body.replace(/^\uFEFF/, '')) as unknown };
     } catch (error) {
       console.error('officialMarketProxy upstream failure', { endpoint, error });
       throw new HttpsError('unavailable', '農業部正式資料來源目前無法連線。');

@@ -57,7 +57,7 @@ small { line-height: 1.4; }
 .topbar__crest { text-align: center; filter: drop-shadow(2px 2px 0 #0008); }
 .icon-button { width: 42px; height: 42px; border: 2px solid #6d9993; border-radius: 7px; display: grid; place-items: center; color: #fff4d3; background: #0e2c32; text-decoration: none; font-size: 1.4rem; cursor: pointer; }
 
-.bottom-nav { position: fixed; z-index: 50; bottom: 0; width: min(100%, 720px); height: calc(66px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); display: grid; grid-template-columns: repeat(5, 1fr); background: #102f36f6; border-top: 3px solid #e2b55c; box-shadow: 0 -3px 0 #071d22; }
+.bottom-nav { position: fixed; z-index: 50; bottom: 0; width: min(100%, 720px); height: calc(66px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); display: grid; grid-template-columns: repeat(6, 1fr); background: #102f36f6; border-top: 3px solid #e2b55c; box-shadow: 0 -3px 0 #071d22; }
 .bottom-nav a { min-width: 0; color: #9fc3bd; text-decoration: none; display: grid; place-items: center; align-content: center; gap: 2px; border-inline-end: 1px solid #31575b; }
 .bottom-nav a.active { color: #ffe297; background: #1b4b50; }
 .bottom-nav a span { font: 700 1.25rem ui-monospace, monospace; line-height: 1; }
@@ -126,8 +126,22 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .legal-note { margin: 0; padding: 10px; color: var(--muted); border-left: 4px solid var(--gold); font-size: .7rem; line-height: 1.5; }
 
 .filter-row { display: flex; gap: 7px; overflow: auto; padding-bottom: 2px; }
-.chip { min-height: 38px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); white-space: nowrap; }
+.chip { min-height: 44px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); white-space: nowrap; }
 .chip.selected { color: #fff6d9; border-color: #0c3439; background: var(--teal); }
+.history-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; padding: 14px; background: color-mix(in srgb, var(--paper) 82%, transparent); border: 1px solid var(--line); box-shadow: 3px 4px 0 #5c4b3030; }
+.history-controls > label, .history-range legend, .history-frequency span { color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
+.history-controls > label { grid-column: 1 / -1; }
+.history-select { grid-column: 1 / -1; width: 100%; min-height: 48px; padding: 0 38px 0 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 1px; font: 700 .82rem ui-serif, serif; }
+.history-range { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.history-range legend { width: 100%; margin-bottom: 7px; }
+.history-frequency { align-self: end; min-height: 44px; display: grid; justify-items: end; align-content: center; gap: 2px; padding-left: 12px; border-left: 1px solid var(--line); }
+.history-frequency strong { color: var(--rust); font-size: .75rem; white-space: nowrap; }
+.history-status:empty { display: none; }
+.history-empty { min-height: 190px; display: grid; place-items: center; align-content: center; gap: 10px; padding: 22px; color: var(--muted); text-align: center; border: 1px dashed var(--line); }
+.history-empty strong { color: var(--ink); line-height: 1.6; }
+.history-chart-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 8px; }
+.history-chart-heading h2 { margin: 3px 0 0; font-size: 1rem; }
+.history-chart-heading > small { color: var(--muted); white-space: nowrap; }
 .trend-chart { width: 100%; overflow: hidden; }
 .trend-chart svg { width: 100%; min-height: 180px; overflow: visible; }
 .chart-grid { stroke: color-mix(in srgb, var(--line) 40%, transparent); stroke-width: 1; stroke-dasharray: 4 5; }
@@ -241,6 +255,8 @@ button:disabled { cursor: not-allowed; opacity: .48; }
   .manager-stage { grid-template-columns: 98px 1fr; padding: 12px; }
   .manager-stage .primary-button { padding-inline: 8px; font-size: .75rem; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .history-controls { grid-template-columns: 1fr; }
+  .history-frequency { justify-items: start; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--line); }
 }
 
 @media (prefers-reduced-motion: reduce) {

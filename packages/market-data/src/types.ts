@@ -52,3 +52,22 @@ export interface MarketBundle {
   message: string;
 }
 
+export interface HistoryPoint {
+  date: string;
+  value: number | null;
+}
+
+export type HistoricalMarketItem = Exclude<MarketItem,
+  'chick_layer' | 'chick_broiler' | 'chick_red_feather' | 'chick_black_feather'>;
+
+export interface MarketHistoryResult {
+  item: HistoricalMarketItem;
+  label: string;
+  points: HistoryPoint[];
+  unit: 'TWD_PER_600G';
+  frequency: 'daily';
+  sourceName: string;
+  sourceUrl: string;
+  fetchedAt: string;
+  snapshot: RawSnapshot;
+}

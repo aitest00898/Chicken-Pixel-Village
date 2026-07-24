@@ -1,4 +1,4 @@
-import type { MarketRecord } from './types';
+import type { HistoryPoint, MarketRecord } from './types';
 
 const fetchedAt = '2026-07-24T04:30:00.000Z';
 const sourceDate = '2026-07-23';
@@ -32,11 +32,8 @@ export const verifiedMarketFixture: MarketRecord[] = [
   { ...base, id: `${sourceDate}:black_south_female`, item: 'black_south_female', label: '黑羽土雞・母・舍飼', value: 48 },
 ];
 
-export interface HistoryPoint { date: string; value: number | null }
-
 export const redSouthHistory: HistoryPoint[] = [
   ['2026-05-01', 52], ['2026-05-08', 52], ['2026-05-15', 54], ['2026-05-22', 54], ['2026-05-29', 52],
   ['2026-06-05', 52], ['2026-06-12', 52], ['2026-06-19', 52], ['2026-06-26', 52], ['2026-07-03', 50],
   ['2026-07-10', 50], ['2026-07-17', 50], ['2026-07-23', 50],
 ].map(([date, value]) => ({ date: String(date), value: Number(value) }));
-

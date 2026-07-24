@@ -4,6 +4,7 @@ import type { PropsWithChildren } from 'react';
 const tabs = [
   { to: '/', label: '總覽', icon: 'book' },
   { to: '/today', label: '公報', icon: 'coin' },
+  { to: '/history', label: '歷史', icon: 'history' },
   { to: '/village', label: '領地', icon: 'map' },
   { to: '/houses', label: '帳冊', icon: 'house' },
   { to: '/manager', label: '管理者', icon: 'person' },
@@ -13,6 +14,7 @@ function ChronicleIcon({ name }: { name: (typeof tabs)[number]['icon'] | 'settin
   const paths = {
     book: <><path d="M4 5.5c2.2-.8 4.3-.4 6 1v11c-1.7-1.4-3.8-1.8-6-1V5.5Z" /><path d="M20 5.5c-2.2-.8-4.3-.4-6 1v11c1.7-1.4 3.8-1.8 6-1V5.5Z" /></>,
     coin: <><circle cx="12" cy="12" r="7" /><path d="M9 12h6M12 9v6" /></>,
+    history: <><path d="M5 19V9M10 19V5M15 19v-7M20 19V8" /><path d="m4 14 6-5 5 1 5-5" /></>,
     map: <><path d="m4 6 5-2 6 2 5-2v14l-5 2-6-2-5 2V6Z" /><path d="M9 4v14M15 6v14" /></>,
     house: <><path d="m4 11 8-7 8 7" /><path d="M6.5 9.5V20h11V9.5M10 20v-6h4v6" /></>,
     person: <><circle cx="12" cy="7" r="3" /><path d="M6 20c.5-5 2.5-7 6-7s5.5 2 6 7M5 20h14" /></>,
