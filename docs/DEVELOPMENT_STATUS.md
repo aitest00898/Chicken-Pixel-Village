@@ -16,6 +16,8 @@ Updated: 2026-07-24
 | 9 Firebase dev project | registered | Spark project `chicken-pixel-village`; Web/iOS/Android clients configured; no paid services deployed |
 | 10 Production readiness | in progress | Release checklist and verified local build exist; signing, DR and production validation remain |
 
+Netlify uses the repository-root `netlify.toml`, builds only the mobile Vite workspace, publishes `apps/mobile/dist`, and rewrites client-side routes to `index.html`.
+
 The locally executable scope is complete except for full Auth/Functions/Storage cross-emulator E2E and native device builds. Paid and production-only gates remain intentionally held.
 
 External constraints: Android Gradle cannot start because this Mac has no Java runtime/Android SDK. Xcode resolves Capacitor, SQLCipher and ZIPFoundation packages, but cannot build because the iOS 26.5 platform is not installed. A free Firebase project and platform clients are registered, but no production backend service has been deployed.
