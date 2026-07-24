@@ -16,7 +16,7 @@ import { persistDailyMarketRecords } from './services/marketHistory';
 
 export function App() {
   const location = useLocation();
-  const { bundle, syncing } = useMarketData();
+  const { bundle, previousRecords, syncing } = useMarketData();
   const authentication = useAuthentication();
   const village = useVillageState(authentication.userId);
   const [online, setOnline] = useState(navigator.onLine);
@@ -38,7 +38,7 @@ export function App() {
     <AppShell offline={!online} syncLabel={syncing ? '正在確認最新行情…' : village.unsyncedCount ? `本機草稿 ${village.unsyncedCount} 筆待同步` : bundle.mode === 'live' ? '正式行情已同步' : '使用已驗證快照'}>
       <Routes>
         <Route path="/" element={<HomePage bundle={bundle} visits={village.visits} />} />
-        <Route path="/today" element={<TodayPage bundle={bundle} syncing={syncing} />} />
+        <Route path="/today" element={<TodayPage bundle={bundle} previousRecords={previousRecords} syncing={syncing} />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/village" element={<VillagePage houses={village.houses} placements={village.mapPlacements} onMove={village.moveHouse} canEdit={authentication.isAdmin} />} />
         <Route path="/houses" element={<HousesPage village={village} online={online} isAdmin={authentication.isAdmin} />} />

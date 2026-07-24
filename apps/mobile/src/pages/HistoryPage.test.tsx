@@ -73,10 +73,12 @@ describe('history page', () => {
 });
 
 it('computes a change only across adjacent valid records', () => {
-  expect(historyStatistics([
+  const statistics = historyStatistics([
     { date: '2026-07-01', value: 50 },
     { date: '2026-07-02', value: 48 },
     { date: '2026-07-03', value: null },
     { date: '2026-07-04', value: 46 },
-  ]).latestChange).toBe('2026-07-02');
+  ]);
+  expect(statistics.latestChange).toBe('2026-07-02');
+  expect(statistics).toMatchObject({ previousDate: '2026-07-02', difference: -2, percentage: -4.2 });
 });

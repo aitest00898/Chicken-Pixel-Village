@@ -1,13 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fetchMoaPoultryHistories, marketFreshness, merchantLine, parseMoaHistoryRows, verifiedMarketFixture } from './index';
+import { fetchMoaPoultryHistories, marketChange, marketFreshness, merchantLine, parseMoaHistoryRows, verifiedMarketFixture } from './index';
 
 describe('merchant formatter', () => {
   const current = verifiedMarketFixture.find((record) => record.item === 'egg_producer')!;
 
   it('describes rise, fall and flat deterministically', () => {
-    expect(merchantLine(current, { ...current, value: 33.5 })).toContain('上升 1.0 元');
-    expect(merchantLine(current, { ...current, value: 35.5 })).toContain('下降 1.0 元');
-    expect(merchantLine(current, { ...current, value: 34.5 })).toContain('持平');
+    const previous = { ...current, sourceDate: '2026-07-22' };
+    expect(merchantLine(current, { ...previous, value: 33.5 })).toContain('上升 1.0 元（3.0%）');
+    expect(merchantLine(current, { ...previous, value: 35.5 })).toContain('下降 1.0 元（2.8%）');
+    expect(merchantLine(current, { ...previous, value: 34.5 })).toContain('持平');
+    expect(marketChange(current, { ...previous, value: 33.5 })).toEqual({ difference: 1, percentage: 3, direction: 'up' });
   });
 
   it('does not invent missing values', () => {

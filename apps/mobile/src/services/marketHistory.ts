@@ -129,3 +129,35 @@ export async function persistDailyMarketRecords(records: readonly MarketRecord[]
   });
   await batch.commit();
 }
+
+export async function loadPreviousMarketRecords(records: readonly MarketRecord[]): Promise<MarketRecord[]> {
+  if (!records.length) return [];
+  const validDates = records.map((record) => record.sourceDate).filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)).sort();
+  const earliest = validDates[0];
+  const latest = validDates.at(-1);
+  if (!earliest || !latest) return [];
+  const startDate = new Date(`${earliest}T12:00:00`);
+  startDate.setDate(startDate.getDate() - 120);
+  const stored = await loadStoredRecords(startDate, new Date(`${latest}T12:00:00`));
+  return records.flatMap((current) => {
+    const previous = stored
+      .filter((row) => row.item === current.item && row.value !== null && row.sourceDate < current.sourceDate)
+      .sort((left, right) => left.sourceDate.localeCompare(right.sourceDate))
+      .at(-1);
+    if (!previous) return [];
+    return [{
+      ...current,
+      id: `${previous.sourceDate}:${current.item}`,
+      value: previous.value,
+      sourceDate: previous.sourceDate,
+      sourcePublishedAt: null,
+      fetchedAt: previous.fetchedAt,
+      sourceName: previous.sourceName,
+      sourceUrl: previous.sourceUrl,
+      status: 'verified-cache' as const,
+      rawSnapshotHash: previous.rawSnapshotHash,
+      parserVersion: previous.parserVersion,
+      validationStatus: 'valid' as const,
+    }];
+  });
+}

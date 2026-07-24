@@ -122,7 +122,12 @@ function shortDate(date: string | null): string {
 }
 
 export function historyStatistics(points: HistoryPoint[]) {
-  const values = points.flatMap((point) => point.value === null ? [] : [point.value]);
+  const validPoints = points.filter((point): point is HistoryPoint & { value: number } => point.value !== null);
+  const values = validPoints.map((point) => point.value);
+  const latestPoint = validPoints.at(-1);
+  const previousPoint = validPoints.at(-2);
+  const difference = latestPoint && previousPoint ? Number((latestPoint.value - previousPoint.value).toFixed(3)) : null;
+  const percentage = difference !== null && previousPoint?.value ? Number((difference / previousPoint.value * 100).toFixed(1)) : null;
   let previous: number | null = null;
   let latestChange: string | null = null;
   for (const point of points) {
@@ -140,6 +145,9 @@ export function historyStatistics(points: HistoryPoint[]) {
     lowest: values.length ? Math.min(...values) : null,
     average: values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null,
     latestChange,
+    previousDate: previousPoint?.date ?? null,
+    difference,
+    percentage,
   };
 }
 
@@ -207,7 +215,7 @@ export function HistoryPage({ loader = loadFirebaseMarketHistories, now = curren
           <TrendChart series={summaries.map(({ result, presentation }) => ({ id: result.item, label: presentation.shortLabel, color: presentation.color, data: result.points }))} label={`${region.label}多系列價格疊圖`} queryActive={queryActive} onQueryActiveChange={setQueryActive} />
           <div className="history-series-ledger">{summaries.map(({ result, statistics, presentation }) => <article key={result.item}>
             <header><i style={{ background: presentation.color }} /><strong>{presentation.shortLabel}</strong><b>{statistics.latest?.toFixed(1) ?? '—'}</b></header>
-            <div><span>平均 {statistics.average?.toFixed(1) ?? '—'}</span><span>高／低 {statistics.highest?.toFixed(1) ?? '—'}／{statistics.lowest?.toFixed(1) ?? '—'}</span><span>調價 {shortDate(statistics.latestChange)}</span></div>
+            <div><span>平均 {statistics.average?.toFixed(1) ?? '—'}</span><span>高／低 {statistics.highest?.toFixed(1) ?? '—'}／{statistics.lowest?.toFixed(1) ?? '—'}</span><span>調價 {shortDate(statistics.latestChange)}</span><span>漲跌 {statistics.difference === null ? '—' : statistics.difference === 0 ? '持平' : `${statistics.difference > 0 ? '+' : '−'}${Math.abs(statistics.difference).toFixed(1)}${statistics.percentage === null ? '' : `（${statistics.percentage > 0 ? '+' : '−'}${Math.abs(statistics.percentage).toFixed(1)}%）`}・較 ${shortDate(statistics.previousDate)}`}</span></div>
           </article>)}</div>
         </> : null}
       </PixelPanel>

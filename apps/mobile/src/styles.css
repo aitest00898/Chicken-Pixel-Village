@@ -123,6 +123,11 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .price-card span { font-size: .7rem; color: var(--muted); }
 .price-card strong { color: var(--teal); font: 900 1.65rem ui-monospace, monospace; }
 .price-card small { font-size: .62rem; }
+.price-change { margin-top: 4px; font-weight: 800; }
+.price-change.up { color: #8b4438; }
+.price-change.down { color: #3f6967; }
+.price-change.flat { color: #6f674f; }
+.price-change.unavailable { color: var(--muted); font-weight: 500; }
 .legal-note { margin: 0; padding: 10px; color: var(--muted); border-left: 4px solid var(--gold); font-size: .7rem; line-height: 1.5; }
 
 .filter-row { display: flex; gap: 7px; overflow: auto; padding-bottom: 2px; }
