@@ -1,0 +1,39 @@
+{
+  "name": "chicken-pixel-village",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "雞情像素村 - mobile-first poultry market and private flock operations app",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=22 <27"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @chicken-village/mobile dev",
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test:run && pnpm build",
+    "cap:sync": "pnpm --filter @chicken-village/mobile cap:sync",
+    "firebase:emulators": "firebase emulators:start --project demo-chicken-pixel-village",
+    "sql:emulator": "firebase emulators:start --only dataconnect --project demo-chicken-pixel-village"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.7.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.65.0",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
