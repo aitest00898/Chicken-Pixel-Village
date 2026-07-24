@@ -32,12 +32,19 @@ describe('history page', () => {
     const loader: HistoryLoader = vi.fn(async (items: readonly HistoricalMarketItem[]) => items.map(resultFor));
     render(<MemoryRouter><HistoryPage loader={loader} now={fixedNow} /></MemoryRouter>);
 
-    expect(await screen.findByRole('img', { name: '南區多系列價格疊圖' })).toBeInTheDocument();
-    expect(screen.getByText('5 條行情線')).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: '中區多系列價格疊圖' })).toBeInTheDocument();
+    expect(screen.getByText('14 條行情線')).toBeInTheDocument();
+    expect(screen.getAllByText('皇金・公').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('烏骨雞').length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: '北區' }));
     expect(await screen.findByRole('img', { name: '北區多系列價格疊圖' })).toBeInTheDocument();
-    expect(screen.getByText('2 條行情線')).toBeInTheDocument();
-    expect(vi.mocked(loader).mock.calls.at(-1)?.[0]).toEqual(['red_north_male', 'red_north_female']);
+    expect(screen.getByText('14 條行情線')).toBeInTheDocument();
+    const northItems = vi.mocked(loader).mock.calls.at(-1)?.[0] ?? [];
+    expect(northItems).toHaveLength(14);
+    expect(northItems).toEqual(expect.arrayContaining([
+      'red_north_male', 'black_north_free_male', 'golden_north_male',
+      'heritage_north_male', 'fighting_north_free_female', 'guinea_north_female', 'wenchang_north',
+    ]));
 
     fireEvent.click(screen.getByRole('button', { name: '30 日' }));
     await waitFor(() => expect(loader).toHaveBeenCalledTimes(3));

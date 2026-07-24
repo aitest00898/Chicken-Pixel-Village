@@ -68,4 +68,31 @@ describe('MOA history parser', () => {
       vi.unstubAllGlobals();
     }
   });
+
+  it('merges the official API series with the supplied association bulletin without inventing missing dates', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      RS: 'OK',
+      Data: [{ TransDate: '2026/07/17', RedFeather_C_M: '47' }],
+      Next: false,
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const results = await fetchMoaPoultryHistories(
+        ['red_central_male', 'golden_central_male', 'silkie_central'],
+        new Date('2026-07-16T00:00:00+08:00'),
+        new Date('2026-07-18T00:00:00+08:00'),
+      );
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(results.map((result) => result.points)).toEqual([
+        [{ date: '2026-07-17', value: 47 }],
+        [{ date: '2026-07-17', value: 48 }],
+        [{ date: '2026-07-17', value: 64 }],
+      ]);
+      expect(results.map((result) => result.sourceName)).toEqual([
+        '農業部 Open Data', '養雞協會日報表（附圖）', '養雞協會日報表（附圖）',
+      ]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

@@ -2,6 +2,10 @@ import type { HistoricalMarketItem, HistoryPoint, MarketBundle, MarketHistoryRes
 
 const BASE = 'https://data.moa.gov.tw/api/v1';
 export const MOA_PARSER_VERSION = 'moa-poultry-v1.0.0';
+const ASSOCIATION_BULLETIN_ENDPOINT = 'association-bulletin';
+const ASSOCIATION_BULLETIN_URL = 'https://www.poultry.org.tw/';
+const ASSOCIATION_BULLETIN_SOURCE = '養雞協會日報表（附圖）';
+const ASSOCIATION_BULLETIN_PARSER_VERSION = 'association-bulletin-v1.0.0';
 
 interface MoaResponse<T> { RS?: string; Data?: T[]; Next?: boolean }
 interface RedRow {
@@ -12,7 +16,43 @@ interface BroilerRow {
   TransDate?: string; 'TaijinPrice_2.0kgup'?: string; 'TaijinPrice_1.75kg_1.95kg'?: string; Store_KP_TaijinPrice?: string; egg_Price?: string; egg_Producer_Price?: string;
 }
 
-type PoultryRow = RedRow & BlackRow & BroilerRow;
+type PoultryRow = RedRow & BlackRow & BroilerRow & Record<string, string | undefined>;
+
+const associationBulletinRows: PoultryRow[] = [{
+  TransDate: '2026/07/17',
+  black_north_free_male: '56',
+  black_north_free_female: '58',
+  black_north_caged_male: '50',
+  black_north_caged_female: '50',
+  black_central_free_male: '56',
+  black_central_free_female: '58',
+  black_central_caged_male: '49',
+  black_central_caged_female: '49',
+  black_south_free_male: '59',
+  black_south_free_female: '59',
+  black_east_free_male: '62',
+  black_east_free_female: '62',
+  golden_north_male: '48',
+  golden_north_female: '48',
+  golden_central_male: '48',
+  golden_central_female: '48',
+  heritage_north_male: '56',
+  heritage_north_female: '58',
+  heritage_central_male: '56',
+  heritage_central_female: '58',
+  heritage_south_male: '56',
+  heritage_south_female: '58',
+  silkie_central: '64',
+  silkie_south: '66',
+  fighting_north_free_female: '95',
+  fighting_north_caged_female: '90',
+  fighting_central_free_female: '95',
+  fighting_central_caged_female: '90',
+  fighting_east_free_female: '88',
+  guinea_north_female: '72',
+  guinea_central_female: '72',
+  wenchang_north: '60',
+}];
 
 export interface HistorySeriesDefinition {
   item: HistoricalMarketItem;
@@ -31,6 +71,38 @@ export const historyMarketOptions: readonly HistorySeriesDefinition[] = [
   { item: 'red_south_female', label: '紅羽土雞・母・南區', group: '紅羽土雞', endpoint: 'PoultryTransType_RedFeather', read: (row) => row.RedFeather_S_F },
   { item: 'black_south_male', label: '黑羽土雞・公・南區舍飼', group: '黑羽土雞', endpoint: 'PoultryTransType_BlackFeather', read: (row) => row.BlackFeather_S_M },
   { item: 'black_south_female', label: '黑羽土雞・母・南區舍飼', group: '黑羽土雞', endpoint: 'PoultryTransType_BlackFeather', read: (row) => row.BlackFeather_S_F },
+  { item: 'black_north_free_male', label: '黑羽土雞・公・北區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_north_free_male },
+  { item: 'black_north_free_female', label: '黑羽土雞・母・北區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_north_free_female },
+  { item: 'black_north_caged_male', label: '黑羽土雞・公・北區舍飼', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_north_caged_male },
+  { item: 'black_north_caged_female', label: '黑羽土雞・母・北區舍飼', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_north_caged_female },
+  { item: 'black_central_free_male', label: '黑羽土雞・公・中區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_central_free_male },
+  { item: 'black_central_free_female', label: '黑羽土雞・母・中區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_central_free_female },
+  { item: 'black_central_caged_male', label: '黑羽土雞・公・中區舍飼', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_central_caged_male },
+  { item: 'black_central_caged_female', label: '黑羽土雞・母・中區舍飼', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_central_caged_female },
+  { item: 'black_south_free_male', label: '黑羽土雞・公・南區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_south_free_male },
+  { item: 'black_south_free_female', label: '黑羽土雞・母・南區放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_south_free_female },
+  { item: 'black_east_free_male', label: '黑羽土雞・公・花東放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_east_free_male },
+  { item: 'black_east_free_female', label: '黑羽土雞・母・花東放山', group: '黑羽土雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.black_east_free_female },
+  { item: 'golden_north_male', label: '皇金雞・公・北區', group: '皇金雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.golden_north_male },
+  { item: 'golden_north_female', label: '皇金雞・母・北區', group: '皇金雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.golden_north_female },
+  { item: 'golden_central_male', label: '皇金雞・公・中區', group: '皇金雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.golden_central_male },
+  { item: 'golden_central_female', label: '皇金雞・母・中區', group: '皇金雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.golden_central_female },
+  { item: 'heritage_north_male', label: '古早雞・公・北區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_north_male },
+  { item: 'heritage_north_female', label: '古早雞・母・北區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_north_female },
+  { item: 'heritage_central_male', label: '古早雞・公・中區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_central_male },
+  { item: 'heritage_central_female', label: '古早雞・母・中區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_central_female },
+  { item: 'heritage_south_male', label: '古早雞・公・南區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_south_male },
+  { item: 'heritage_south_female', label: '古早雞・母・南區', group: '古早雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.heritage_south_female },
+  { item: 'silkie_central', label: '烏骨雞・中區', group: '烏骨雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.silkie_central },
+  { item: 'silkie_south', label: '烏骨雞・南區', group: '烏骨雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.silkie_south },
+  { item: 'fighting_north_free_female', label: '鬥雞母・北區放山', group: '鬥雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.fighting_north_free_female },
+  { item: 'fighting_north_caged_female', label: '鬥雞母・北區舍飼', group: '鬥雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.fighting_north_caged_female },
+  { item: 'fighting_central_free_female', label: '鬥雞母・中區放山', group: '鬥雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.fighting_central_free_female },
+  { item: 'fighting_central_caged_female', label: '鬥雞母・中區舍飼', group: '鬥雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.fighting_central_caged_female },
+  { item: 'fighting_east_free_female', label: '鬥雞母・花東放山', group: '鬥雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.fighting_east_free_female },
+  { item: 'guinea_north_female', label: '珍珠雞母・北區', group: '珍珠雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.guinea_north_female },
+  { item: 'guinea_central_female', label: '珍珠雞母・中區', group: '珍珠雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.guinea_central_female },
+  { item: 'wenchang_north', label: '文昌雞・北區', group: '文昌雞', endpoint: ASSOCIATION_BULLETIN_ENDPOINT, read: (row) => row.wenchang_north },
   { item: 'broiler_large', label: '白肉雞・2.0 kg 以上', group: '白肉雞', endpoint: 'PoultryTransType_BoiledChicken_Eggs', read: (row) => row['TaijinPrice_2.0kgup'] },
   { item: 'broiler_medium', label: '白肉雞・1.75–1.95 kg', group: '白肉雞', endpoint: 'PoultryTransType_BoiledChicken_Eggs', read: (row) => row['TaijinPrice_1.75kg_1.95kg'] },
   { item: 'broiler_store_kp', label: '白肉雞・高屏門市', group: '白肉雞', endpoint: 'PoultryTransType_BoiledChicken_Eggs', read: (row) => row.Store_KP_TaijinPrice },
@@ -117,6 +189,21 @@ export async function fetchMoaPoultryHistories(
   });
   const endpoints = [...new Set(definitions.map((definition) => definition.endpoint))];
   const responses = await Promise.all(endpoints.map(async (endpoint) => {
+    if (endpoint === ASSOCIATION_BULLETIN_ENDPOINT) {
+      const start = apiDate(startDate);
+      const end = apiDate(endDate);
+      const rows = associationBulletinRows.filter((row) => row.TransDate !== undefined && row.TransDate >= start && row.TransDate <= end);
+      const payload: MoaResponse<PoultryRow> = { RS: 'OK', Data: rows, Next: false };
+      const text = JSON.stringify(payload);
+      const snapshot: RawSnapshot = {
+        sourceUrl: ASSOCIATION_BULLETIN_URL,
+        fetchedAt,
+        payload,
+        sha256: await sha256(text),
+        parserVersion: ASSOCIATION_BULLETIN_PARSER_VERSION,
+      };
+      return { endpoint, payload, snapshot, sourceName: ASSOCIATION_BULLETIN_SOURCE };
+    }
     const query = new URLSearchParams({ Start_time: apiDate(startDate), End_time: apiDate(endDate) });
     const sourceUrl = `${BASE}/${endpoint}/?${query.toString()}`;
     const request: RequestInit = { headers: { Accept: 'application/json' } };
@@ -133,7 +220,7 @@ export async function fetchMoaPoultryHistories(
       sha256: await sha256(text),
       parserVersion: MOA_PARSER_VERSION,
     };
-    return { endpoint, payload, snapshot };
+    return { endpoint, payload, snapshot, sourceName: '農業部 Open Data' };
   }));
   return definitions.map((definition) => {
     const response = responses.find((candidate) => candidate.endpoint === definition.endpoint);
@@ -144,7 +231,7 @@ export async function fetchMoaPoultryHistories(
       points: parseMoaHistoryRows(definition.item, response.payload.Data ?? []),
       unit: 'TWD_PER_600G',
       frequency: 'daily',
-      sourceName: '農業部 Open Data',
+      sourceName: response.sourceName,
       sourceUrl: response.snapshot.sourceUrl,
       fetchedAt,
       snapshot: response.snapshot,

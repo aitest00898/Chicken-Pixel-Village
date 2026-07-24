@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe('trend chart long-press query', () => {
-  it('activates after two seconds, follows the pointer and exits after inactivity', async () => {
+  it('activates after one second, follows the pointer and exits after inactivity', async () => {
     vi.useFakeTimers();
     vi.spyOn(SVGSVGElement.prototype, 'getBoundingClientRect').mockReturnValue({
       left: 0, top: 0, right: 520, bottom: 210, width: 520, height: 210, x: 0, y: 0,
@@ -42,7 +42,7 @@ describe('trend chart long-press query', () => {
     const surface = screen.getByTestId('trend-query-surface');
 
     fireEvent.pointerDown(surface, { pointerId: 7, pointerType: 'touch', clientX: 0, clientY: 175, button: 0 });
-    await act(async () => vi.advanceTimersByTime(1_999));
+    await act(async () => vi.advanceTimersByTime(999));
     expect(screen.getByText('待機')).toBeInTheDocument();
 
     await act(async () => vi.advanceTimersByTime(1));

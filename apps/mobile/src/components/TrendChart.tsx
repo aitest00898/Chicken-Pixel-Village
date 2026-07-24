@@ -26,7 +26,7 @@ interface TrendChartProps {
 
 const width = 520;
 const height = 210;
-const holdDuration = 2_000;
+const holdDuration = 1_000;
 const inactivityDuration = 15_000;
 const movementTolerance = 10;
 
@@ -218,7 +218,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
         className="trend-chart__plot"
         data-testid="trend-query-surface"
         tabIndex={0}
-        aria-label={queryActive ? '十字查價中，按 Escape 可退出' : '折線圖查價區，長按 2 秒或按 Enter 啟動'}
+        aria-label={queryActive ? '十字查價中，按 Escape 可退出' : '折線圖查價區，長按 1 秒或按 Enter 啟動'}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointer}
@@ -232,6 +232,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
           {series.map((entry) => {
             const segments: string[] = [];
             let current: string[] = [];
+            const showEntryPoints = showPoints || entry.data.filter((item) => item.value !== null).length === 1;
             entry.data.forEach((item) => {
               if (item.value === null) {
                 if (current.length > 1) segments.push(current.join(' '));
@@ -243,7 +244,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
             if (current.length > 1) segments.push(current.join(' '));
             return <g key={entry.id} aria-label={entry.label}>
               {segments.map((segment, index) => <polyline key={`${entry.id}-${index}`} points={segment} className="chart-line" style={{ stroke: entry.color }} />)}
-              {showPoints ? entry.data.map((item) => {
+              {showEntryPoints ? entry.data.map((item) => {
                 if (item.value === null) return null;
                 const [x, y] = geometry.coordinate(item.date, item.value);
                 return <circle key={`${entry.id}-${item.date}`} cx={x} cy={y} r="3.5" style={{ fill: entry.color }} />;
@@ -268,7 +269,7 @@ export function TrendChart({ series, label, queryActive, onQueryActiveChange }: 
         </div> : null}
       </div>
       <div className="chart-axis"><span>{geometry.firstDate.slice(5).replace('-', '/')}</span><span>{geometry.lastDate.slice(5).replace('-', '/')}</span></div>
-      <p className="chart-query-hint">{queryActive ? '查價中・移動手指更新日期與行情線' : '在折線圖上停留 2 秒，即可啟動十字查價'}</p>
+      <p className="chart-query-hint">{queryActive ? '查價中・移動手指更新日期與行情線' : '在折線圖上停留 1 秒，即可啟動十字查價'}</p>
     </div>
   );
 }

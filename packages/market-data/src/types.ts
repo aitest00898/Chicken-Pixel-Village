@@ -57,8 +57,42 @@ export interface HistoryPoint {
   value: number | null;
 }
 
+export type AssociationBulletinMarketItem =
+  | 'black_north_free_male'
+  | 'black_north_free_female'
+  | 'black_north_caged_male'
+  | 'black_north_caged_female'
+  | 'black_central_free_male'
+  | 'black_central_free_female'
+  | 'black_central_caged_male'
+  | 'black_central_caged_female'
+  | 'black_south_free_male'
+  | 'black_south_free_female'
+  | 'black_east_free_male'
+  | 'black_east_free_female'
+  | 'golden_north_male'
+  | 'golden_north_female'
+  | 'golden_central_male'
+  | 'golden_central_female'
+  | 'heritage_north_male'
+  | 'heritage_north_female'
+  | 'heritage_central_male'
+  | 'heritage_central_female'
+  | 'heritage_south_male'
+  | 'heritage_south_female'
+  | 'silkie_central'
+  | 'silkie_south'
+  | 'fighting_north_free_female'
+  | 'fighting_north_caged_female'
+  | 'fighting_central_free_female'
+  | 'fighting_central_caged_female'
+  | 'fighting_east_free_female'
+  | 'guinea_north_female'
+  | 'guinea_central_female'
+  | 'wenchang_north';
+
 export type HistoricalMarketItem = Exclude<MarketItem,
-  'chick_layer' | 'chick_broiler' | 'chick_red_feather' | 'chick_black_feather'>;
+  'chick_layer' | 'chick_broiler' | 'chick_red_feather' | 'chick_black_feather'> | AssociationBulletinMarketItem;
 
 export interface MarketHistoryResult {
   item: HistoricalMarketItem;
