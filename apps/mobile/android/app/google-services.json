@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "740619725797",
+    "project_id": "chicken-pixel-village",
+    "storage_bucket": "chicken-pixel-village.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740619725797:android:96d30ba3fa04180db65d0c",
+        "android_client_info": {
+          "package_name": "tw.joe.chickenpixelvillage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo_UZublMM_U49zVwQK5NUr9Wgn4NjaQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

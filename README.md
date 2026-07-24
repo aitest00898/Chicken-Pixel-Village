@@ -27,7 +27,7 @@ pnpm firebase:emulators
 
 ## 安全邊界
 
-此 repository 不包含正式 Firebase project、憑證、真實股東或財務資料，也不會自行部署、push 或建立付費 Cloud SQL。詳情見 `docs/SECURITY.md` 與 `docs/FIREBASE_SETUP.md`。
+此 repository 已連接免費 Spark Firebase 開發專案，並包含 Firebase 公開用戶端設定；不包含服務帳戶、伺服器憑證、真實股東或財務資料，也不會自行部署、push 或建立付費 Cloud SQL。詳情見 `docs/SECURITY.md` 與 `docs/FIREBASE_SETUP.md`。
 
 ## Workspace
 

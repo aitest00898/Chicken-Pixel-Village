@@ -13,9 +13,9 @@ Updated: 2026-07-24
 | 6 Village and equipment | complete | Original loading art, movable/synced house map placement, sprite atlas, manager equipment and app icon |
 | 7 Security and mobile platforms | in progress | Auth/App Check boundaries, Keychain/Keystore secret and native projects done; native compile blocked by local toolchains |
 | 8 End-to-end QA | in progress | Operational UI tests plus 320/390 px browser QA passed; native simulator/device tests remain |
-| 9 Firebase dev project | blocked-external | No approved project or paid resources |
+| 9 Firebase dev project | registered | Spark project `chicken-pixel-village`; Web/iOS/Android clients configured; no paid services deployed |
 | 10 Production readiness | in progress | Release checklist and verified local build exist; signing, DR and production validation remain |
 
 The locally executable scope is complete except for full Auth/Functions/Storage cross-emulator E2E and native device builds. Paid and production-only gates remain intentionally held.
 
-External constraints: Android Gradle cannot start because this Mac has no Java runtime/Android SDK. Xcode resolves Capacitor, SQLCipher and ZIPFoundation packages, but cannot build because the iOS 26.5 platform is not installed. No production Firebase action has been taken.
+External constraints: Android Gradle cannot start because this Mac has no Java runtime/Android SDK. Xcode resolves Capacitor, SQLCipher and ZIPFoundation packages, but cannot build because the iOS 26.5 platform is not installed. A free Firebase project and platform clients are registered, but no production backend service has been deployed.
