@@ -2,6 +2,7 @@ import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
 import { connectDataConnectEmulator, getDataConnect, type DataConnect } from 'firebase/data-connect';
 import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions';
+import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore';
 import { connectorConfig } from '@chicken-village/sql-connect';
 
 const config = {
@@ -25,18 +26,21 @@ let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let functions: Functions | null = null;
 let dataConnect: DataConnect | null = null;
+let firestore: Firestore | null = null;
 
 if (isCompleteFirebaseConfig(config)) {
   app = initializeApp(config);
   auth = getAuth(app);
   functions = getFunctions(app, 'asia-east1');
   dataConnect = getDataConnect(app, connectorConfig);
+  firestore = getFirestore(app);
   if (usingFirebaseEmulators) {
     const host = import.meta.env.VITE_FIREBASE_EMULATOR_HOST ?? '127.0.0.1';
     connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
     connectFunctionsEmulator(functions, host, 5001);
     connectDataConnectEmulator(dataConnect, host, 9399);
+    connectFirestoreEmulator(firestore, host, 8080);
   }
 }
 
-export { app as firebaseApp, auth as firebaseAuth, functions as firebaseFunctions, dataConnect as firebaseDataConnect };
+export { app as firebaseApp, auth as firebaseAuth, functions as firebaseFunctions, dataConnect as firebaseDataConnect, firestore as firebaseFirestore };

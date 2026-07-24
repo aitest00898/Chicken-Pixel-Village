@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function validHouse() {
+      return request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 30
+        && request.resource.data.species in ['red_feather', 'black_feather', 'broiler', 'layer', 'other']
+        && request.resource.data.designCapacity is int
+        && request.resource.data.designCapacity > 0
+        && request.resource.data.designCapacity <= 1000000
+        && request.resource.data.currentBirdCount is int
+        && request.resource.data.currentBirdCount >= 0
+        && request.resource.data.currentBirdCount <= request.resource.data.designCapacity
+        && request.resource.data.revision is int
+        && request.resource.data.revision >= 0
+        && request.resource.data.createdAt is string
+        && request.resource.data.updatedAt is string;
+    }
+
+    match /public_houses/{houseId} {
+      allow read: if true;
+      allow create: if isAdmin() && validHouse();
+      allow update: if isAdmin() && validHouse()
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if false;
+    }
+
+    match /admins/{adminId} {
+      allow read: if signedIn() && request.auth.uid == adminId;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

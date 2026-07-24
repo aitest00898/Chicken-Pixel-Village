@@ -12,6 +12,8 @@ The Web client values are in `apps/mobile/.env.example`; the native Firebase con
 
 The tracked `.firebaserc` defines only the `dev` alias and intentionally does not select a default project. Use `firebase use dev` explicitly before any approved real-project command. No production service has been deployed.
 
+Public chicken-house records use Cloud Firestore collection `public_houses`. Reads are public; creates and updates require Firebase Authentication plus a matching `admins/{uid}` document. The administrator password is never stored in source code or Netlify variables. Firestore rules are tracked in `firebase/firestore.rules`.
+
 ## Local, no-cost workflow
 
 1. Install dependencies with `pnpm install`.

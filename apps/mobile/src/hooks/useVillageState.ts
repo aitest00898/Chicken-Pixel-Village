@@ -35,6 +35,7 @@ import { get, set } from 'idb-keyval';
 import { useCallback, useEffect, useState } from 'react';
 import type { VillageOperations } from '../storage/types';
 import { syncPrivateHouses } from '../services/privateSync';
+import { publishPublicHouse, subscribePublicHouses } from '../services/publicHouses';
 
 const HOUSES_KEY = 'cpv:cache:houses:v1';
 const VISIT_KEY = 'cpv:draft:visit:v1';
@@ -115,38 +116,42 @@ export function useVillageState() {
     return () => { active = false; void selected.close(); };
   }, []);
 
+  useEffect(() => subscribePublicHouses((remoteHouses) => {
+    setHouses(remoteHouses);
+    void persistence.saveHouses(remoteHouses);
+  }, setSyncError), [persistence]);
+
   const updateOperations = useCallback((change: (current: VillageOperations) => VillageOperations) => {
     setOperations((current) => { const next = change(current); void persistence.saveOperations(next); return next; });
   }, [persistence]);
 
-  const addHouse = useCallback((house: ChickenHouse) => {
+  const addHouse = useCallback(async (house: ChickenHouse) => {
+    await publishPublicHouse(house);
     const now = new Date().toISOString();
     setHouses((current) => { const next = [...current, house]; void persistence.saveHouses(next); return next; });
     const placement: MapPlacement = { ...baseEntity(now), chickenHouseId: house.id, plotId: `plot-${houses.length + 1}`, xBasisPoints: 1_500 + (houses.length % 3) * 2_700, yBasisPoints: 6_900 };
-    updateOperations((current) => ({ ...current, mapPlacements: [...current.mapPlacements, placement], auditEvents: [...current.auditEvents, audit('chicken_house', house.id, 'house.create_draft', now, null, 0)], outbox: [...current.outbox, operation('chicken_house', house, 'descriptive_private', now), operation('map_placement', placement, 'descriptive_private', now)] }));
+    updateOperations((current) => ({ ...current, mapPlacements: [...current.mapPlacements, placement], auditEvents: [...current.auditEvents, audit('chicken_house', house.id, 'house.create', now, null, 1)], outbox: [...current.outbox, operation('map_placement', placement, 'descriptive_private', now)] }));
   }, [houses.length, persistence, updateOperations]);
 
-  const updateHouse = useCallback((houseId: string, patch: Partial<Pick<ChickenHouse, 'name' | 'species' | 'designCapacity' | 'currentBirdCount'>>) => {
+  const updateHouse = useCallback(async (houseId: string, patch: Partial<Pick<ChickenHouse, 'name' | 'species' | 'designCapacity' | 'currentBirdCount'>>) => {
     const now = new Date().toISOString();
-    setHouses((current) => {
-      const before = current.find((row) => row.id === houseId); if (!before) return current;
-      const changed: ChickenHouse = { ...before, ...patch, revision: before.revision + 1, updatedAt: now, operationId: crypto.randomUUID(), syncStatus: 'pending' };
-      const next = current.map((row) => row.id === houseId ? changed : row); void persistence.saveHouses(next);
-      updateOperations((ops) => ({ ...ops, auditEvents: [...ops.auditEvents, audit('chicken_house', houseId, 'house.update', now, before.revision, changed.revision)], outbox: [...ops.outbox, operation('chicken_house', changed, 'descriptive_private', now)] }));
-      return next;
-    });
-  }, [persistence, updateOperations]);
+    const before = houses.find((row) => row.id === houseId);
+    if (!before) throw new Error('找不到要更新的雞舍。');
+    const changed: ChickenHouse = { ...before, ...patch, revision: before.revision + 1, updatedAt: now, operationId: crypto.randomUUID(), syncStatus: 'synced' };
+    await publishPublicHouse(changed);
+    setHouses((current) => { const next = current.map((row) => row.id === houseId ? changed : row); void persistence.saveHouses(next); return next; });
+    updateOperations((ops) => ({ ...ops, auditEvents: [...ops.auditEvents, audit('chicken_house', houseId, 'house.update', now, before.revision, changed.revision)] }));
+  }, [houses, persistence, updateOperations]);
 
-  const archiveHouse = useCallback((houseId: string) => {
+  const archiveHouse = useCallback(async (houseId: string) => {
     const now = new Date().toISOString();
-    setHouses((current) => {
-      const before = current.find((row) => row.id === houseId); if (!before) return current;
-      const changed = { ...before, archivedAt: now, revision: before.revision + 1, updatedAt: now, operationId: crypto.randomUUID(), syncStatus: 'pending' as const };
-      const next = current.map((row) => row.id === houseId ? changed : row); void persistence.saveHouses(next);
-      updateOperations((ops) => ({ ...ops, auditEvents: [...ops.auditEvents, audit('chicken_house', houseId, 'house.archive', now, before.revision, changed.revision)], outbox: [...ops.outbox, operation('chicken_house', changed, 'descriptive_private', now)] }));
-      return next;
-    });
-  }, [persistence, updateOperations]);
+    const before = houses.find((row) => row.id === houseId);
+    if (!before) throw new Error('找不到要封存的雞舍。');
+    const changed: ChickenHouse = { ...before, archivedAt: now, revision: before.revision + 1, updatedAt: now, operationId: crypto.randomUUID(), syncStatus: 'synced' };
+    await publishPublicHouse(changed);
+    setHouses((current) => { const next = current.map((row) => row.id === houseId ? changed : row); void persistence.saveHouses(next); return next; });
+    updateOperations((ops) => ({ ...ops, auditEvents: [...ops.auditEvents, audit('chicken_house', houseId, 'house.archive', now, before.revision, changed.revision)] }));
+  }, [houses, persistence, updateOperations]);
 
   const addBatch = useCallback((houseId: string, values: Pick<FlockBatch, 'batchCode' | 'species' | 'placedCount' | 'placementDate' | 'expectedSaleDate'>) => {
     const now = new Date().toISOString(); const entity: FlockBatch = { ...baseEntity(now), ...values, chickenHouseId: houseId, currentCount: values.placedCount, status: 'draft' };
