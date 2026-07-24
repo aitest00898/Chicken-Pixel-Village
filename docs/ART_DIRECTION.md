@@ -54,6 +54,7 @@
 - `vanadis-market-bulletin.webp`：每日行情公報的商人與市場場景。
 - `vanadis-role-chronicle.webp`：管理者、代養戶、行情商人、孵化師、巡查員與帳房員人物圖鑑。
 - `vanadis-guild-seal.png`：雞冠、羽毛、蛋、麥穗與帳冊構成的管理公會徽章。
+- iOS／Android launcher 與 splash：以公會徽章、村莊直式總覽和商會橫式市場場景產生各密度原生資產。
 - `sprite-atlas.png`：保留為像素輔助層，後續改繪必須維持既有 logical grid 與裁切座標。
 
 以上點陣資產由 Codex 內建圖像生成工具依專案原創提示生成，再以 WebP／PNG 整合。完整提示記錄於 `ART_PROMPTS.md`。
