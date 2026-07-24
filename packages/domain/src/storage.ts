@@ -27,6 +27,27 @@ export const SQLITE_MIGRATIONS: Migration[] = [
       `CREATE TABLE IF NOT EXISTS visit_progress (owner_key TEXT PRIMARY KEY, payload_json TEXT NOT NULL, revision INTEGER NOT NULL, updated_at TEXT NOT NULL)`,
     ],
   },
+  {
+    version: 3,
+    statements: [
+      `CREATE TABLE IF NOT EXISTS foster_farmers (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, payload_json TEXT NOT NULL, revision INTEGER NOT NULL, sync_status TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT)`,
+      `CREATE TABLE IF NOT EXISTS distribution_entries (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, distribution_record_id TEXT NOT NULL, shareholder_id TEXT NOT NULL, payload_json TEXT NOT NULL, revision INTEGER NOT NULL, sync_status TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT)`,
+      `CREATE TABLE IF NOT EXISTS risk_answers (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, risk_assessment_id TEXT NOT NULL, payload_json TEXT NOT NULL, updated_at TEXT NOT NULL)`,
+      `CREATE INDEX IF NOT EXISTS idx_batches_house ON flock_batches(chicken_house_id, deleted_at)`,
+      `CREATE INDEX IF NOT EXISTS idx_holdings_house ON shareholdings(chicken_house_id, deleted_at)`,
+      `CREATE INDEX IF NOT EXISTS idx_distributions_house ON distribution_records(chicken_house_id, deleted_at)`,
+      `CREATE INDEX IF NOT EXISTS idx_risk_house ON risk_assessments(chicken_house_id, deleted_at)`,
+    ],
+  },
+  {
+    version: 4,
+    statements: [
+      `CREATE TABLE IF NOT EXISTS organizations (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, payload_json TEXT NOT NULL, revision INTEGER NOT NULL, sync_status TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT)`,
+      `CREATE TABLE IF NOT EXISTS organization_memberships (id TEXT PRIMARY KEY, organization_id TEXT NOT NULL, user_id TEXT NOT NULL, role TEXT NOT NULL, active INTEGER NOT NULL, payload_json TEXT NOT NULL, revision INTEGER NOT NULL, sync_status TEXT NOT NULL, updated_at TEXT NOT NULL, deleted_at TEXT)`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_membership_org_user ON organization_memberships(organization_id, user_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_audit_entity_time ON audit_events(entity_type, entity_id, occurred_at)`,
+    ],
+  },
 ];
 
 export interface LocalDatabase {

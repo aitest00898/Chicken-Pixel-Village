@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { confirmDistributionAdmin } from '@chicken-village/sql-connect-admin';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { isUuid, validExpectedRevision, validOfficialMarketRange } from './validation.js';
 
 initializeApp();
 setGlobalOptions({ region: 'asia-east1', maxInstances: 10 });
@@ -11,10 +12,6 @@ interface ConfirmDistributionInput {
   expectedRevision?: unknown;
 }
 
-function isUuid(value: unknown): value is string {
-  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-}
-
 export const confirmDistribution = onCall<ConfirmDistributionInput>(
   { enforceAppCheck: true, consumeAppCheckToken: true },
   async (request) => {
@@ -22,7 +19,7 @@ export const confirmDistribution = onCall<ConfirmDistributionInput>(
       throw new HttpsError('unauthenticated', '需要已驗證的非匿名帳號。');
     }
     const { distributionId, expectedRevision } = request.data;
-    if (!isUuid(distributionId) || !Number.isSafeInteger(expectedRevision) || Number(expectedRevision) < 1) {
+    if (!isUuid(distributionId) || !validExpectedRevision(expectedRevision)) {
       throw new HttpsError('invalid-argument', 'distributionId 或 expectedRevision 無效。');
     }
 
@@ -43,12 +40,6 @@ export const confirmDistribution = onCall<ConfirmDistributionInput>(
   },
 );
 
-const OFFICIAL_ENDPOINTS = new Set([
-  'PoultryTransType_RedFeather',
-  'PoultryTransType_BlackFeather',
-  'PoultryTransType_BoiledChicken_Eggs',
-]);
-
 interface OfficialMarketInput {
   endpoint?: unknown;
   start?: unknown;
@@ -61,7 +52,7 @@ export const officialMarketProxy = onCall<OfficialMarketInput>(
     const endpoint = typeof request.data.endpoint === 'string' ? request.data.endpoint : '';
     const start = typeof request.data.start === 'string' ? request.data.start : '';
     const end = typeof request.data.end === 'string' ? request.data.end : '';
-    if (!OFFICIAL_ENDPOINTS.has(endpoint) || !/^\d{4}\/\d{2}\/\d{2}$/.test(start) || !/^\d{4}\/\d{2}\/\d{2}$/.test(end)) {
+    if (!validOfficialMarketRange(endpoint, start, end)) {
       throw new HttpsError('invalid-argument', 'endpoint、start 或 end 無效。');
     }
     const upstream = new URL(`https://data.moa.gov.tw/api/v1/${endpoint}`);

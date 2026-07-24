@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, recordDistributionPayment, recordVisit, validateShareholdings } from './index';
+import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings } from './index';
 import { demoShareholdings } from './fixtures';
 import type { DistributionRecord, RiskAnswer, RiskDimension } from './types';
 
@@ -53,3 +53,11 @@ describe('daily visit', () => {
   });
 });
 
+describe('local database migrations', () => {
+  it('adds normalized operation tables without destructive statements', () => {
+    expect(SQLITE_MIGRATIONS.at(-1)?.version).toBe(4);
+    const sql = SQLITE_MIGRATIONS.flatMap((migration) => migration.statements).join('\n').toLowerCase();
+    for (const table of ['organizations', 'organization_memberships', 'distribution_entries', 'risk_answers', 'foster_farmers']) expect(sql).toContain(`create table if not exists ${table}`);
+    expect(sql).not.toMatch(/\bdrop\s+table\b|\bdelete\s+from\b/);
+  });
+});

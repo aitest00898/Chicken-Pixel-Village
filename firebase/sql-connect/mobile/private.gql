@@ -13,12 +13,17 @@ query MyChickenHouses @auth(level: USER) {
   }
 }
 
-mutation CreateOrganization($name: String!) @auth(level: USER) {
-  organization_insert(data: {ownerUid_expr: "auth.uid", name: $name})
+mutation CreateOrganization($id: UUID!, $name: String!) @auth(level: USER) @transaction {
+  organization_insert(data: {id: $id, ownerUid_expr: "auth.uid", name: $name})
+  organizationMembership_insert(data: {organizationId: $id, userUid_expr: "auth.uid", role: "owner", active: true})
 }
 
-mutation CreateChickenHouse($organizationId: UUID!, $name: String!, $capacity: Int!, $occupancy: Int!, $houseType: String!) @auth(level: USER) {
+mutation CreateChickenHouse($id: UUID!, $organizationId: UUID!, $name: String!, $capacity: Int!, $occupancy: Int!, $houseType: String!) @auth(level: USER) @transaction {
+  query @redact @check(expr: "response.query.organizationMemberships.size() == 1", message: "Active owner membership is required.") {
+    organizationMemberships(where: {organizationId: {eq: $organizationId}, userUid: {eq_expr: "auth.uid"}, role: {eq: "owner"}, active: {eq: true}}, limit: 1) { organizationId }
+  }
   chickenHouse_insert(data: {
+    id: $id
     organizationId: $organizationId
     ownerUid_expr: "auth.uid"
     name: $name
@@ -26,6 +31,20 @@ mutation CreateChickenHouse($organizationId: UUID!, $name: String!, $capacity: I
     occupancy: $occupancy
     houseType: $houseType
   })
+}
+
+mutation UpdateChickenHouse($id: UUID!, $expectedRevision: Int!, $name: String!, $capacity: Int!, $occupancy: Int!, $houseType: String!) @auth(level: USER) @transaction {
+  query @redact @check(expr: "response.query.chickenHouses.size() == 1", message: "House is missing, stale, or belongs to another user.") {
+    chickenHouses(where: {id: {eq: $id}, ownerUid: {eq_expr: "auth.uid"}, revision: {eq: $expectedRevision}, deletedAt: {isNull: true}}, limit: 1) { id }
+  }
+  chickenHouse_update(id: $id, data: {
+    name: $name
+    capacity: $capacity
+    occupancy: $occupancy
+    houseType: $houseType
+    revision_update: {inc: 1}
+    updatedAt_expr: "request.time"
+  }) @check(expr: "this != null", message: "House update did not modify a record.")
 }
 
 # Financial confirmation and reversal are intentionally not available to a

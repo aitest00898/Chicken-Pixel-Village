@@ -42,6 +42,13 @@ function createChickenHouse(dcOrVarsOrOptions, varsOrOptions, options) {
 }
 exports.createChickenHouse = createChickenHouse;
 
+function updateChickenHouse(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('UpdateChickenHouse', inputVars, inputOpts);
+}
+exports.updateChickenHouse = updateChickenHouse;
+
 function financialRecordsServerOnly(dcOrOptions, options) {
   const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
   dcInstance.useGen(true);

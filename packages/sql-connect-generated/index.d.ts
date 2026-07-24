@@ -36,6 +36,7 @@ export interface CreateChickenHouseData {
 }
 
 export interface CreateChickenHouseVariables {
+  id: UUIDString;
   organizationId: UUIDString;
   name: string;
   capacity: number;
@@ -45,9 +46,11 @@ export interface CreateChickenHouseVariables {
 
 export interface CreateOrganizationData {
   organization_insert: Organization_Key;
+  organizationMembership_insert: OrganizationMembership_Key;
 }
 
 export interface CreateOrganizationVariables {
+  id: UUIDString;
   name: string;
 }
 
@@ -133,6 +136,12 @@ export interface MyOrganizationsData {
   } & Organization_Key)[];
 }
 
+export interface OrganizationMembership_Key {
+  organizationId: UUIDString;
+  userUid: string;
+  __typename?: 'OrganizationMembership_Key';
+}
+
 export interface Organization_Key {
   id: UUIDString;
   __typename?: 'Organization_Key';
@@ -159,10 +168,47 @@ export interface SyncOperation_Key {
   __typename?: 'SyncOperation_Key';
 }
 
+export interface UpdateChickenHouseData {
+  chickenHouse_update?: ChickenHouse_Key | null;
+}
+
+export interface UpdateChickenHouseVariables {
+  id: UUIDString;
+  expectedRevision: number;
+  name: string;
+  capacity: number;
+  occupancy: number;
+  houseType: string;
+}
+
 export interface VisitProgress_Key {
   ownerUid: string;
   __typename?: 'VisitProgress_Key';
 }
+
+interface LatestMarketRecordsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<LatestMarketRecordsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<LatestMarketRecordsData, undefined>;
+  operationName: string;
+}
+export const latestMarketRecordsRef: LatestMarketRecordsRef;
+
+export function latestMarketRecords(options?: ExecuteQueryOptions): QueryPromise<LatestMarketRecordsData, undefined>;
+export function latestMarketRecords(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<LatestMarketRecordsData, undefined>;
+
+interface ListEquipmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListEquipmentData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListEquipmentData, undefined>;
+  operationName: string;
+}
+export const listEquipmentRef: ListEquipmentRef;
+
+export function listEquipment(options?: ExecuteQueryOptions): QueryPromise<ListEquipmentData, undefined>;
+export function listEquipment(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<ListEquipmentData, undefined>;
 
 interface ConfirmDistributionAdminRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -224,6 +270,18 @@ export const createChickenHouseRef: CreateChickenHouseRef;
 export function createChickenHouse(vars: CreateChickenHouseVariables): MutationPromise<CreateChickenHouseData, CreateChickenHouseVariables>;
 export function createChickenHouse(dc: DataConnect, vars: CreateChickenHouseVariables): MutationPromise<CreateChickenHouseData, CreateChickenHouseVariables>;
 
+interface UpdateChickenHouseRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateChickenHouseVariables): MutationRef<UpdateChickenHouseData, UpdateChickenHouseVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateChickenHouseVariables): MutationRef<UpdateChickenHouseData, UpdateChickenHouseVariables>;
+  operationName: string;
+}
+export const updateChickenHouseRef: UpdateChickenHouseRef;
+
+export function updateChickenHouse(vars: UpdateChickenHouseVariables): MutationPromise<UpdateChickenHouseData, UpdateChickenHouseVariables>;
+export function updateChickenHouse(dc: DataConnect, vars: UpdateChickenHouseVariables): MutationPromise<UpdateChickenHouseData, UpdateChickenHouseVariables>;
+
 interface FinancialRecordsServerOnlyRef {
   /* Allow users to create refs without passing in DataConnect */
   (): QueryRef<FinancialRecordsServerOnlyData, undefined>;
@@ -235,28 +293,4 @@ export const financialRecordsServerOnlyRef: FinancialRecordsServerOnlyRef;
 
 export function financialRecordsServerOnly(options?: ExecuteQueryOptions): QueryPromise<FinancialRecordsServerOnlyData, undefined>;
 export function financialRecordsServerOnly(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<FinancialRecordsServerOnlyData, undefined>;
-
-interface LatestMarketRecordsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<LatestMarketRecordsData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<LatestMarketRecordsData, undefined>;
-  operationName: string;
-}
-export const latestMarketRecordsRef: LatestMarketRecordsRef;
-
-export function latestMarketRecords(options?: ExecuteQueryOptions): QueryPromise<LatestMarketRecordsData, undefined>;
-export function latestMarketRecords(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<LatestMarketRecordsData, undefined>;
-
-interface ListEquipmentRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<ListEquipmentData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<ListEquipmentData, undefined>;
-  operationName: string;
-}
-export const listEquipmentRef: ListEquipmentRef;
-
-export function listEquipment(options?: ExecuteQueryOptions): QueryPromise<ListEquipmentData, undefined>;
-export function listEquipment(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<ListEquipmentData, undefined>;
 

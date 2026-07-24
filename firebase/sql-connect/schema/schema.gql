@@ -11,6 +11,16 @@ type Organization @table(key: "id") {
   deletedAt: Timestamp
 }
 
+type OrganizationMembership @table(key: ["organization", "userUid"]) {
+  organization: Organization!
+  userUid: String! @col(name: "user_uid")
+  role: String!
+  active: Boolean! @default(value: true)
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
 type ChickenHouse @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
   organization: Organization!

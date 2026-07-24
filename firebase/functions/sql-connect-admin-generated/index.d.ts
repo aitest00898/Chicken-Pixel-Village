@@ -34,6 +34,7 @@ export interface CreateChickenHouseData {
 }
 
 export interface CreateChickenHouseVariables {
+  id: UUIDString;
   organizationId: UUIDString;
   name: string;
   capacity: number;
@@ -43,9 +44,11 @@ export interface CreateChickenHouseVariables {
 
 export interface CreateOrganizationData {
   organization_insert: Organization_Key;
+  organizationMembership_insert: OrganizationMembership_Key;
 }
 
 export interface CreateOrganizationVariables {
+  id: UUIDString;
   name: string;
 }
 
@@ -131,6 +134,12 @@ export interface MyOrganizationsData {
   } & Organization_Key)[];
 }
 
+export interface OrganizationMembership_Key {
+  organizationId: UUIDString;
+  userUid: string;
+  __typename?: 'OrganizationMembership_Key';
+}
+
 export interface Organization_Key {
   id: UUIDString;
   __typename?: 'Organization_Key';
@@ -155,6 +164,19 @@ export interface Shareholding_Key {
 export interface SyncOperation_Key {
   operationId: UUIDString;
   __typename?: 'SyncOperation_Key';
+}
+
+export interface UpdateChickenHouseData {
+  chickenHouse_update?: ChickenHouse_Key | null;
+}
+
+export interface UpdateChickenHouseVariables {
+  id: UUIDString;
+  expectedRevision: number;
+  name: string;
+  capacity: number;
+  occupancy: number;
+  houseType: string;
 }
 
 export interface VisitProgress_Key {
@@ -186,6 +208,11 @@ export function createOrganization(vars: CreateOrganizationVariables, options?: 
 export function createChickenHouse(dc: DataConnect, vars: CreateChickenHouseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateChickenHouseData>>;
 /** Generated Node Admin SDK operation action function for the 'CreateChickenHouse' Mutation. Allow users to pass in custom DataConnect instances. */
 export function createChickenHouse(vars: CreateChickenHouseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateChickenHouseData>>;
+
+/** Generated Node Admin SDK operation action function for the 'UpdateChickenHouse' Mutation. Allow users to execute without passing in DataConnect. */
+export function updateChickenHouse(dc: DataConnect, vars: UpdateChickenHouseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateChickenHouseData>>;
+/** Generated Node Admin SDK operation action function for the 'UpdateChickenHouse' Mutation. Allow users to pass in custom DataConnect instances. */
+export function updateChickenHouse(vars: UpdateChickenHouseVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpdateChickenHouseData>>;
 
 /** Generated Node Admin SDK operation action function for the 'FinancialRecordsServerOnly' Query. Allow users to execute without passing in DataConnect. */
 export function financialRecordsServerOnly(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<FinancialRecordsServerOnlyData>>;
