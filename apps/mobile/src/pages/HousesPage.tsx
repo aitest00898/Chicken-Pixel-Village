@@ -1,8 +1,9 @@
 import { capacityTier, type ChickenHouse, type RiskAnswer, type RiskDimension } from '@chicken-village/domain';
-import { PixelPanel, ProgressBar } from '@chicken-village/ui';
+import { DataBadge, PixelPanel, ProgressBar } from '@chicken-village/ui';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { HouseSprite } from '../components/Sprites';
+import { investmentLedgerUpdatedOn, investmentMembers, investmentRounds, type InvestmentSettlement } from '../data/investmentLedger';
 import type { VillageState } from '../hooks/useVillageState';
 
 type Tab = 'overview' | 'batches' | 'shareholders' | 'distributions' | 'risk' | 'edit';
@@ -41,13 +42,15 @@ export function HousesPage({ village, online, isAdmin }: { village: VillageState
   }
 
   return <div className="page houses-page">
-    <header className="page-title inline-title"><div><p className="eyebrow">公開雞舍資訊</p><h1>雞舍一覽</h1></div>{isAdmin ? <button className="primary-button compact" onClick={() => setShowForm((value) => !value)}>＋ 新增</button> : <Link className="admin-entry-chip" to="/admin">管理員</Link>}</header>
+    <header className="page-title inline-title"><div><p className="eyebrow">商會帳冊・投資卷</p><h1>投資與雞舍帳冊</h1></div>{isAdmin ? <button className="primary-button compact" onClick={() => setShowForm((value) => !value)}>＋ 新增</button> : <Link className="admin-entry-chip" to="/admin">管理員</Link>}</header>
+    <InvestmentLedger />
+    <div className="ledger-section-heading"><p className="eyebrow">雞舍營運資料</p><h2>公開雞舍檔案</h2></div>
     <div className={`access-banner ${isAdmin ? 'admin' : 'public'}`}><strong>{isAdmin ? '管理員模式' : '公開瀏覽模式'}</strong><span>{isAdmin ? '可新增、編輯與封存雞舍資料。' : '所有人可瀏覽；資料異動僅限管理員。'}</span></div>
     {!online && isAdmin && <div className="offline-draft-note" role="status">管理員寫入需要網路連線；目前只能瀏覽已快取資料。</div>}
     {message && <div className="operation-message" role="status"><span>{message}</span><button aria-label="關閉訊息" onClick={() => setMessage('')}>×</button></div>}
     {showForm && <form className="house-form" onSubmit={(event) => { void submitHouse(event); }}><label>雞舍名稱<input required name="name" maxLength={30} /></label><SpeciesSelect /><label>設計容量<input required name="capacity" type="number" min="1" max="1000000" /></label><button className="primary-button" type="submit">保存本機草稿</button><small>容量會決定村莊中的建築規模。</small></form>}
     <div className="summary-grid summary-grid--wide">
-      <Metric label="投資雞舍" value={String(activeHouses.length)} suffix="舍" /><Metric label="設計總容量" value={metrics.totalCapacity.toLocaleString()} suffix="隻" /><Metric label="當前在養" value={metrics.totalBirds.toLocaleString()} suffix="隻" /><Metric label="權益雞數" value={metrics.equityBirds.toLocaleString()} suffix="依持股計算" />
+      <Metric label="已建檔雞舍" value={String(activeHouses.length)} suffix="舍" /><Metric label="設計總容量" value={metrics.totalCapacity.toLocaleString()} suffix="隻" /><Metric label="當前在養" value={metrics.totalBirds.toLocaleString()} suffix="隻" /><Metric label="權益雞數" value={metrics.equityBirds.toLocaleString()} suffix="依持股計算" />
       <Metric label="已確認分潤" value={`$${metrics.confirmed.toLocaleString()}`} suffix="TWD" /><Metric label="待付分潤" value={`$${metrics.unpaid.toLocaleString()}`} suffix="TWD" /><Metric label="加權風險" value={metrics.weightedRisk === null ? '—' : String(metrics.weightedRisk)} suffix={`高風險 ${metrics.highRisk} 舍`} /><Metric label="下次預計出貨" value={metrics.nextSale} suffix={`未同步 ${village.unsyncedCount} 筆`} />
     </div>
     <div className="house-switcher">{activeHouses.map((house) => <button className={selectedHouse?.id === house.id ? 'selected' : ''} onClick={() => { setSelected(house.id); setTab('overview'); }} key={house.id}>{house.name}</button>)}</div>
@@ -68,6 +71,61 @@ export function HousesPage({ village, online, isAdmin }: { village: VillageState
 function Metric({ label, value, suffix }: { label: string; value: string; suffix: string }) { return <PixelPanel><small>{label}</small><strong>{value}</strong><span>{suffix}</span></PixelPanel>; }
 function DataLine({ label, value }: { label: string; value: string }) { return <p className="data-line"><span>{label}</span><strong>{value}</strong></p>; }
 function SpeciesSelect() { return <label>雞種<select name="species"><option value="red_feather">紅羽土雞</option><option value="black_feather">黑羽土雞</option><option value="broiler">白肉雞</option><option value="layer">蛋雞</option><option value="other">其他</option></select></label>; }
+
+function InvestmentLedger() {
+  const [selectedId, setSelectedId] = useState('hong-xiumei');
+  const selectedRound = investmentRounds.find((round) => round.id === selectedId) ?? investmentRounds[0]!;
+  const settlementCount = investmentRounds.reduce((sum, round) => sum + round.settlements.length, 0);
+  const teamNetIncome = investmentRounds.flatMap((round) => round.settlements).reduce((sum, row) => sum + row.teamNetIncomeTwd, 0);
+  const memberNetIncome = teamNetIncome / investmentMembers.length;
+
+  return <PixelPanel className="investment-ledger" title="大富翁投資場次" action={<DataBadge tone="live">更新 115/07/11</DataBadge>}>
+    <p className="investment-ledger__intro">以最新版活頁簿為主檔，結算圖片補齊換肉率、育成率、代養費用與應付金額。農場總盈虧、團隊分配與代養戶結算分開呈現。</p>
+    <div className="investment-ledger__summary" aria-label="投資帳冊摘要">
+      <LedgerMetric label="目前投資" value={`${investmentRounds.length} 場`} />
+      <LedgerMetric label="結算紀錄" value={`${settlementCount} 筆`} />
+      <LedgerMetric label="團隊累計盈虧" value={formatSignedTwd(teamNetIncome)} tone={teamNetIncome < 0 ? 'loss' : 'gain'} />
+      <LedgerMetric label="每位夥伴累計" value={formatSignedTwd(memberNetIncome)} tone={memberNetIncome < 0 ? 'loss' : 'gain'} />
+    </div>
+    <div className="investment-round-tabs" role="tablist" aria-label="投資場次">
+      {investmentRounds.map((round) => <button type="button" role="tab" aria-selected={selectedRound.id === round.id} className={selectedRound.id === round.id ? 'selected' : ''} onClick={() => setSelectedId(round.id)} key={round.id}><strong>{round.name}</strong><span>團隊 {formatPercent(round.teamSharePercent)}・{round.settlements.length ? `${round.settlements.length} 筆結算` : '待補結算'}</span></button>)}
+    </div>
+    <section className="investment-round-detail" aria-live="polite">
+      <header><div><p className="folio-kicker">CURRENT INVESTMENT</p><h3>{selectedRound.name}</h3><span>{selectedRound.caretaker ? `代養戶／場主：${selectedRound.caretaker}` : '尚未提供代養戶與結算資料'}</span></div><b>{formatPercent(selectedRound.teamSharePercent)}</b></header>
+      <div className="investment-share-grid">
+        <div><small>團隊持股</small><strong>{formatPercent(selectedRound.teamSharePercent)}</strong></div>
+        {investmentMembers.map((member) => <div key={member}><small>{member}</small><strong>{formatPercent(selectedRound.teamSharePercent / investmentMembers.length)}</strong></div>)}
+      </div>
+      {selectedRound.settlements.length ? <div className="investment-settlement-list">{[...selectedRound.settlements].sort((a, b) => b.paidOn.localeCompare(a.paidOn)).map((row) => <SettlementCard settlement={row} key={row.id} />)}</div> : <div className="investment-empty"><span aria-hidden="true">◇</span><strong>此場目前只有持股主檔</strong><small>活頁簿尚未登記發錢日、盈虧或結算明細。</small></div>}
+    </section>
+    <aside className="investment-source-note"><strong>資料校讀</strong><span>持股與盈虧採《大富翁資料.xlsx》更新版；洪嘉卿場依 115/07/11 活頁簿為 20%，早期占比分配圖仍為 10%。結算明細來自附件圖片 2–7，未提供的欄位不推測。</span></aside>
+    <small className="audit-caption">來源更新：{investmentLedgerUpdatedOn}・金額為新臺幣・每位夥伴金額以未四捨五入數值加總後顯示。</small>
+  </PixelPanel>;
+}
+
+function LedgerMetric({ label, value, tone }: { label: string; value: string; tone?: 'gain' | 'loss' }) {
+  return <div><small>{label}</small><strong className={tone ? `is-${tone}` : ''}>{value}</strong></div>;
+}
+
+function SettlementCard({ settlement }: { settlement: InvestmentSettlement }) {
+  const memberIncome = settlement.teamNetIncomeTwd / investmentMembers.length;
+  return <article className={`investment-settlement ${settlement.farmProfitLossTwd < 0 ? 'is-loss' : 'is-gain'}`}>
+    <header><div><time dateTime={settlement.paidOn}>{formatRocDate(settlement.paidOn)}</time><strong>{settlement.farmProfitLossTwd < 0 ? '虧損結算' : '盈餘結算'}</strong></div><b>{formatSignedTwd(settlement.teamNetIncomeTwd)}</b></header>
+    <div className="investment-settlement__metrics">
+      <div><small>農場總盈虧</small><strong>{formatSignedTwd(settlement.farmProfitLossTwd)}</strong></div>
+      <div><small>團隊分配盈虧</small><strong>{formatSignedTwd(settlement.teamNetIncomeTwd)}</strong></div>
+      <div><small>每位夥伴</small><strong>{formatSignedTwd(memberIncome)}</strong></div>
+      <div><small>換肉率／育成率</small><strong>{settlement.feedConversionRate}／{settlement.survivalRatePercent}%</strong></div>
+    </div>
+    <div className="caretaker-payable"><span>代養結算應付</span><strong>{formatTwd(settlement.caretakerSettlementPayableTwd)}</strong>{settlement.caretakerProfitSharePayableTwd !== undefined && <small>另列盈餘分配 {formatTwd(settlement.caretakerProfitSharePayableTwd)}</small>}</div>
+    <details><summary>展開費用與扣款明細</summary><div className="investment-line-items">{settlement.lines.map((line) => <p key={`${settlement.id}-${line.label}`}><span>{line.label}</span><strong className={line.amountTwd < 0 ? 'negative' : ''}>{formatSignedTwd(line.amountTwd, false)}</strong></p>)}</div><p className="settlement-memo">{settlement.paymentMemo}</p></details>
+  </article>;
+}
+
+function formatPercent(value: number) { return `${value.toFixed(2).replace(/\.00$/, '')}%`; }
+function formatTwd(value: number) { return `$${Math.round(value).toLocaleString('zh-TW')}`; }
+function formatSignedTwd(value: number, showPlus = true) { const rounded = Math.round(value); return `${rounded < 0 ? '−' : showPlus && rounded > 0 ? '+' : ''}$${Math.abs(rounded).toLocaleString('zh-TW')}`; }
+function formatRocDate(value: string) { const [year = 1911, month = 1, day = 1] = value.split('-').map(Number); return `民國 ${year - 1911}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`; }
 
 function Overview({ houseId, village }: { houseId: string; village: VillageState }) {
   const batch = village.batches.filter((row) => row.chickenHouseId === houseId).sort((a, b) => b.placementDate.localeCompare(a.placementDate))[0];

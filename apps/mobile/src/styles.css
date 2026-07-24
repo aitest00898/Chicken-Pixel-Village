@@ -197,6 +197,67 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .summary-grid .pixel-panel { display: grid; align-content: center; min-height: 96px; padding: 10px; }
 .summary-grid small { color: var(--muted); font-size: .66rem; }.summary-grid strong { color: var(--teal); font: 900 1.35rem ui-monospace, monospace; }.summary-grid span { font-size: .6rem; }
 .summary-grid--wide .pixel-panel { min-height: 106px; }.summary-grid--wide strong { font-size: clamp(.82rem, 4.2vw, 1.25rem); overflow-wrap: anywhere; }
+.ledger-section-heading { margin: 5px 2px -5px; padding-top: 6px; border-top: 1px solid var(--line); }
+.ledger-section-heading h2 { margin: 0; font-size: 1.1rem; letter-spacing: .08em; }
+.investment-ledger { padding: 13px; }
+.investment-ledger .pixel-panel__header { align-items: center; }
+.investment-ledger .pixel-panel__header h2 { flex: 1; }
+.investment-ledger__intro { margin: 0 0 12px; color: var(--muted); font-size: .73rem; line-height: 1.7; }
+.investment-ledger__summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); }
+.investment-ledger__summary > div { min-width: 0; min-height: 76px; display: grid; align-content: center; gap: 5px; padding: 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.investment-ledger__summary small { color: var(--muted); font-size: .6rem; }
+.investment-ledger__summary strong { color: var(--teal); font: 900 clamp(.86rem, 4.3vw, 1.18rem) ui-monospace, "SFMono-Regular", monospace; overflow-wrap: anywhere; }
+.investment-ledger__summary strong.is-loss { color: var(--danger); }
+.investment-round-tabs { display: flex; gap: 0; margin: 13px 0 0; overflow-x: auto; border: 1px solid var(--line); scrollbar-width: thin; }
+.investment-round-tabs button { min-width: 130px; min-height: 62px; display: grid; align-content: center; gap: 4px; padding: 8px 10px; color: var(--ink); background: transparent; border: 0; border-right: 1px solid var(--line); text-align: left; cursor: pointer; }
+.investment-round-tabs button strong { font-size: .72rem; }
+.investment-round-tabs button span { color: var(--muted); font-size: .57rem; white-space: nowrap; }
+.investment-round-tabs button.selected { color: #eee4d0; background: #585f51; }
+.investment-round-tabs button.selected span { color: #d9cdb6; }
+.investment-round-detail { border: 1px solid var(--line); border-top: 0; }
+.investment-round-detail > header { min-height: 94px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px; background: linear-gradient(110deg, #9b83561d, transparent 72%); border-bottom: 1px solid var(--line); }
+.investment-round-detail > header div { min-width: 0; }
+.investment-round-detail > header h3 { margin: 2px 0 5px; font-size: 1.08rem; letter-spacing: .06em; }
+.investment-round-detail > header span { color: var(--muted); font-size: .62rem; }
+.investment-round-detail > header b { flex: none; color: var(--rust); font: 900 1.7rem ui-monospace, "SFMono-Regular", monospace; }
+.investment-share-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+.investment-share-grid > div { min-width: 0; display: grid; gap: 3px; padding: 9px 7px; border-right: 1px solid var(--line); text-align: center; }
+.investment-share-grid > div:last-child { border-right: 0; }
+.investment-share-grid small { overflow: hidden; color: var(--muted); font-size: .55rem; text-overflow: ellipsis; white-space: nowrap; }
+.investment-share-grid strong { color: var(--teal); font: 900 .76rem ui-monospace, "SFMono-Regular", monospace; }
+.investment-settlement-list { display: grid; gap: 11px; padding: 11px; }
+.investment-settlement { background: #a98c5513; border: 1px solid var(--line); }
+.investment-settlement > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; border-bottom: 1px solid var(--line); }
+.investment-settlement > header > div { display: grid; gap: 2px; }
+.investment-settlement time { color: var(--muted); font: 700 .58rem ui-monospace, "SFMono-Regular", monospace; }
+.investment-settlement > header strong { font-size: .78rem; }
+.investment-settlement > header b { color: #52655f; font: 900 1rem ui-monospace, "SFMono-Regular", monospace; }
+.investment-settlement.is-loss > header b { color: var(--danger); }
+.investment-settlement__metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.investment-settlement__metrics > div { min-width: 0; display: grid; gap: 3px; padding: 9px 10px; border-right: 1px dotted var(--line); border-bottom: 1px dotted var(--line); }
+.investment-settlement__metrics small { color: var(--muted); font-size: .57rem; }
+.investment-settlement__metrics strong { font: 800 .72rem ui-monospace, "SFMono-Regular", monospace; overflow-wrap: anywhere; }
+.caretaker-payable { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3px 10px; padding: 10px; background: #6c7b6d16; border-bottom: 1px solid var(--line); }
+.caretaker-payable span { font-size: .66rem; font-weight: 800; }
+.caretaker-payable strong { color: var(--rust); font: 900 .95rem ui-monospace, "SFMono-Regular", monospace; }
+.caretaker-payable small { grid-column: 1 / -1; color: var(--muted); font-size: .58rem; text-align: right; }
+.investment-settlement details { padding: 9px 10px; }
+.investment-settlement summary { min-height: 32px; display: flex; align-items: center; color: var(--teal); font-size: .65rem; font-weight: 900; cursor: pointer; list-style: none; }
+.investment-settlement summary::before { content: '＋'; margin-right: 6px; color: var(--rust); }
+.investment-settlement details[open] summary::before { content: '−'; }
+.investment-line-items { margin-top: 5px; border-top: 1px dotted var(--line); }
+.investment-line-items p { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 6px 2px; border-bottom: 1px dotted color-mix(in srgb, var(--line) 55%, transparent); font-size: .62rem; }
+.investment-line-items p span { color: var(--muted); }
+.investment-line-items p strong { font-family: ui-monospace, "SFMono-Regular", monospace; white-space: nowrap; }
+.investment-line-items p strong.negative { color: var(--danger); }
+.settlement-memo { margin: 8px 0 0; color: var(--muted); font-size: .6rem; line-height: 1.55; }
+.investment-empty { min-height: 148px; display: grid; place-items: center; align-content: center; gap: 7px; padding: 20px; text-align: center; }
+.investment-empty > span { color: var(--gold); font-size: 1.4rem; }
+.investment-empty small { color: var(--muted); font-size: .65rem; }
+.investment-source-note { display: grid; gap: 5px; margin-top: 11px; padding: 9px 10px; background: #9b835619; border-left: 2px solid var(--rust); }
+.investment-source-note strong { color: var(--rust); font-size: .66rem; }
+.investment-source-note span { color: var(--muted); font-size: .62rem; line-height: 1.55; }
+.investment-ledger > .audit-caption { display: block; margin-top: 8px; }
 .offline-draft-note, .operation-message { padding: 10px 12px; color: #6a4513; background: #fff0bf; border: 2px solid #c28a38; font-size: .72rem; line-height: 1.5; }
 .operation-message { display: flex; justify-content: space-between; gap: 8px; align-items: center; }.operation-message button { min-width: 32px; min-height: 32px; color: inherit; background: transparent; border: 0; font-size: 1.2rem; }
 .house-switcher { display: flex; gap: 7px; overflow: auto; }

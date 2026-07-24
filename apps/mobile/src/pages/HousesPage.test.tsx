@@ -30,6 +30,22 @@ function villageFixture(): VillageState {
 }
 
 describe('public house browsing and admin operations', () => {
+  it('shows the eight current investment rounds and their audited settlements', () => {
+    render(<MemoryRouter><HousesPage village={villageFixture()} online isAdmin={false} /></MemoryRouter>);
+    expect(screen.getByRole('heading', { name: '大富翁投資場次' })).toBeInTheDocument();
+    expect(screen.getByText('8 場')).toBeInTheDocument();
+    expect(screen.getByText('6 筆')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /洪秀美場/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('民國 115/07/15')).toBeInTheDocument();
+    expect(screen.getAllByText('−$21,000')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('tab', { name: /林志騰二林場/ }));
+    expect(screen.getAllByText('盈餘結算')).toHaveLength(2);
+    expect(screen.getByText('民國 115/04/15')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /洪嘉卿場/ }));
+    expect(screen.getByText('此場目前只有持股主檔')).toBeInTheDocument();
+    expect(screen.getByText(/洪嘉卿場依 115\/07\/11 活頁簿為 20%/)).toBeInTheDocument();
+  });
+
   it('lets the public browse without exposing mutation controls', () => {
     render(<MemoryRouter><HousesPage village={villageFixture()} online isAdmin={false} /></MemoryRouter>);
     expect(screen.getByText('公開瀏覽模式')).toBeInTheDocument();
@@ -41,7 +57,7 @@ describe('public house browsing and admin operations', () => {
 
   it('shows operational metrics and edit controls to an administrator', () => {
     render(<HousesPage village={villageFixture()} online isAdmin />);
-    for (const label of ['投資雞舍', '設計總容量', '當前在養', '權益雞數', '已確認分潤', '待付分潤', '加權風險', '下次預計出貨']) expect(screen.getByText(label)).toBeInTheDocument();
+    for (const label of ['已建檔雞舍', '設計總容量', '當前在養', '權益雞數', '已確認分潤', '待付分潤', '加權風險', '下次預計出貨']) expect(screen.getByText(label)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '＋ 新增' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '編輯' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: '風險' }));
