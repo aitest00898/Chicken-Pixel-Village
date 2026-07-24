@@ -142,6 +142,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .history-chart-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 8px; }
 .history-chart-heading h2 { margin: 3px 0 0; font-size: 1rem; }
 .history-chart-heading > small { color: var(--muted); white-space: nowrap; }
+.secondary-button.compact.history-query-exit { min-height: 44px; color: var(--rust); border-color: var(--rust); background: transparent; white-space: nowrap; }
 .history-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 12px 0 8px; }
 .history-legend > div { display: grid; grid-template-columns: 9px auto auto; align-items: center; gap: 5px; min-height: 28px; color: var(--muted); font-size: .65rem; }
 .history-legend i, .history-series-ledger i { width: 9px; height: 9px; display: inline-block; border: 1px solid #41392e; transform: rotate(45deg); }
@@ -153,11 +154,24 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .history-series-ledger header b { color: var(--rust); font: 800 .9rem ui-monospace, "SFMono-Regular", monospace; }
 .history-series-ledger article > div { margin-top: 7px; display: grid; gap: 3px; color: var(--muted); font-size: .6rem; }
 .trend-chart { width: 100%; overflow: hidden; }
-.trend-chart svg { width: 100%; min-height: 180px; overflow: visible; }
+.trend-chart__plot { position: relative; width: 100%; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.trend-chart__plot:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+.trend-chart.is-querying .trend-chart__plot { cursor: crosshair; touch-action: none; }
+.trend-chart svg { width: 100%; height: clamp(180px, 40vw, 230px); display: block; overflow: visible; }
 .chart-grid { stroke: color-mix(in srgb, var(--line) 40%, transparent); stroke-width: 1; stroke-dasharray: 4 5; }
 .chart-line { fill: none; stroke: var(--teal-2); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 2px 0 #062b31); }
 .trend-chart circle { fill: var(--gold); stroke: #62451b; stroke-width: 2; }
+.chart-query-crosshair line { stroke: #4a3d2d; stroke-width: 1.5; stroke-dasharray: 5 4; filter: drop-shadow(0 1px #eee1c6); }
+.chart-query-crosshair circle { stroke: #f1dfb8; stroke-width: 3; filter: drop-shadow(0 1px 2px #2d241c); }
+.chart-query-card { position: absolute; z-index: 4; width: max-content; max-width: 152px; display: grid; gap: 2px; padding: 8px 10px; color: #3c3125; background: #eadfc8f2; border: 1px solid #695a42; box-shadow: 3px 3px 0 #3e34269c; transform: translate(10px, -50%); pointer-events: none; }
+.chart-query-card.align-left { transform: translate(calc(-100% - 10px), -50%); }
+.chart-query-card time { color: #6c604d; font: 700 .6rem ui-monospace, "SFMono-Regular", monospace; }
+.chart-query-card strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; }
+.chart-query-card b { color: #7e493d; font: 900 .92rem ui-monospace, "SFMono-Regular", monospace; }
+.chart-query-card b small { font-size: .55rem; }
 .chart-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: .65rem; }
+.chart-query-hint { margin: 7px 0 0; color: var(--muted); text-align: center; font-size: .66rem; line-height: 1.5; }
+.trend-chart.is-querying .chart-query-hint { color: var(--rust); font-weight: 800; }
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
 .stat-grid div { padding: 8px 4px; display: grid; text-align: center; background: var(--paper-2); border: 1px solid var(--line); }
 .stat-grid small { color: var(--muted); font-size: .6rem; }
