@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-import { historyMarketOptions, type fetchMoaPoultryHistory, type MarketHistoryResult } from '@chicken-village/market-data';
+import { historyMarketOptions, type fetchMoaPoultryHistories, type HistoricalMarketItem, type MarketHistoryResult } from '@chicken-village/market-data';
 import { HistoryPage, historyStatistics } from './HistoryPage';
 
 const fixedNow = () => new Date('2026-07-24T12:00:00+08:00');
-type HistoryLoader = typeof fetchMoaPoultryHistory;
+type HistoryLoader = typeof fetchMoaPoultryHistories;
 
-function resultFor(item: Parameters<HistoryLoader>[0]): MarketHistoryResult {
+function resultFor(item: HistoricalMarketItem): MarketHistoryResult {
   const option = historyMarketOptions.find((candidate) => candidate.item === item)!;
   const values = item === 'black_south_female' ? [45, 47] : [50, 48];
   return {
@@ -28,13 +28,16 @@ function resultFor(item: Parameters<HistoryLoader>[0]): MarketHistoryResult {
 }
 
 describe('history page', () => {
-  it('switches the official series and requested time range', async () => {
-    const loader: HistoryLoader = vi.fn(async (item) => resultFor(item));
+  it('switches regions, overlays their official series and changes the requested range', async () => {
+    const loader: HistoryLoader = vi.fn(async (items: readonly HistoricalMarketItem[]) => items.map(resultFor));
     render(<MemoryRouter><HistoryPage loader={loader} now={fixedNow} /></MemoryRouter>);
 
-    expect(await screen.findByRole('img', { name: '紅羽土雞・公・南區價格折線圖' })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('行情項目'), { target: { value: 'black_south_female' } });
-    expect(await screen.findByRole('img', { name: '黑羽土雞・母・南區舍飼價格折線圖' })).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: '南區多系列價格疊圖' })).toBeInTheDocument();
+    expect(screen.getByText('5 條行情線')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '北區' }));
+    expect(await screen.findByRole('img', { name: '北區多系列價格疊圖' })).toBeInTheDocument();
+    expect(screen.getByText('2 條行情線')).toBeInTheDocument();
+    expect(vi.mocked(loader).mock.calls.at(-1)?.[0]).toEqual(['red_north_male', 'red_north_female']);
 
     fireEvent.click(screen.getByRole('button', { name: '30 日' }));
     await waitFor(() => expect(loader).toHaveBeenCalledTimes(3));
@@ -44,9 +47,9 @@ describe('history page', () => {
   });
 
   it('does not render invented statistics when the source has no rows', async () => {
-    const loader: HistoryLoader = vi.fn(async (item) => ({ ...resultFor(item), points: [] }));
+    const loader: HistoryLoader = vi.fn(async (items: readonly HistoricalMarketItem[]) => items.map((item) => ({ ...resultFor(item), points: [] })));
     render(<MemoryRouter><HistoryPage loader={loader} now={fixedNow} /></MemoryRouter>);
-    expect(await screen.findByText('此條件在所選期間沒有歷史資料')).toBeInTheDocument();
+    expect(await screen.findByText('此地區在所選期間沒有有效行情資料')).toBeInTheDocument();
     expect(screen.queryByText('NaN')).not.toBeInTheDocument();
     expect(screen.queryByText('Infinity')).not.toBeInTheDocument();
   });

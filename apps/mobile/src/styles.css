@@ -129,11 +129,11 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .chip { min-height: 44px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); white-space: nowrap; }
 .chip.selected { color: #fff6d9; border-color: #0c3439; background: var(--teal); }
 .history-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; padding: 14px; background: color-mix(in srgb, var(--paper) 82%, transparent); border: 1px solid var(--line); box-shadow: 3px 4px 0 #5c4b3030; }
-.history-controls > label, .history-range legend, .history-frequency span { color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
-.history-controls > label { grid-column: 1 / -1; }
-.history-select { grid-column: 1 / -1; width: 100%; min-height: 48px; padding: 0 38px 0 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 1px; font: 700 .82rem ui-serif, serif; }
-.history-range { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; margin: 0; padding: 0; border: 0; }
-.history-range legend { width: 100%; margin-bottom: 7px; }
+.history-region, .history-range { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.history-region { grid-column: 1 / -1; }
+.history-region legend, .history-range legend, .history-frequency span { width: 100%; color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
+.history-region legend, .history-range legend { margin-bottom: 7px; }
+.history-region-note { grid-column: 1 / -1; margin: 0; padding: 8px 10px; color: var(--muted); background: #8d72501a; border-left: 2px solid var(--rust); font-size: .72rem; line-height: 1.55; }
 .history-frequency { align-self: end; min-height: 44px; display: grid; justify-items: end; align-content: center; gap: 2px; padding-left: 12px; border-left: 1px solid var(--line); }
 .history-frequency strong { color: var(--rust); font-size: .75rem; white-space: nowrap; }
 .history-status:empty { display: none; }
@@ -142,6 +142,16 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .history-chart-heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 8px; }
 .history-chart-heading h2 { margin: 3px 0 0; font-size: 1rem; }
 .history-chart-heading > small { color: var(--muted); white-space: nowrap; }
+.history-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 12px 0 8px; }
+.history-legend > div { display: grid; grid-template-columns: 9px auto auto; align-items: center; gap: 5px; min-height: 28px; color: var(--muted); font-size: .65rem; }
+.history-legend i, .history-series-ledger i { width: 9px; height: 9px; display: inline-block; border: 1px solid #41392e; transform: rotate(45deg); }
+.history-legend strong { color: var(--ink); font-family: ui-monospace, "SFMono-Regular", monospace; }
+.history-series-ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin-top: 12px; border: 1px solid var(--line); }
+.history-series-ledger article { min-width: 0; padding: 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.history-series-ledger header { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 7px; }
+.history-series-ledger header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; }
+.history-series-ledger header b { color: var(--rust); font: 800 .9rem ui-monospace, "SFMono-Regular", monospace; }
+.history-series-ledger article > div { margin-top: 7px; display: grid; gap: 3px; color: var(--muted); font-size: .6rem; }
 .trend-chart { width: 100%; overflow: hidden; }
 .trend-chart svg { width: 100%; min-height: 180px; overflow: visible; }
 .chart-grid { stroke: color-mix(in srgb, var(--line) 40%, transparent); stroke-width: 1; stroke-dasharray: 4 5; }
@@ -257,6 +267,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .history-controls { grid-template-columns: 1fr; }
   .history-frequency { justify-items: start; padding: 8px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .history-series-ledger { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -334,7 +345,7 @@ body::before {
 .topbar strong { font-size: 1rem; letter-spacing: .18em; font-weight: 700; }
 .topbar small { color: #746a56; font-size: .61rem; }
 .topbar small.offline { color: #854f3f; }
-.topbar__crest { width: 42px; height: 42px; display: block; background: url('/assets/art/vanadis-guild-seal.png') center / cover; border: 1px solid #65533b; border-radius: 50%; filter: sepia(.18) contrast(.95); box-shadow: 0 2px 0 #8d784f; }
+.topbar__crest { width: 42px; height: 42px; display: block; background: url('/assets/art/app-icon-master.png') center / cover; border: 1px solid #65533b; border-radius: 4px; filter: sepia(.08) contrast(.98); box-shadow: 0 2px 0 #8d784f; }
 
 .icon-button {
   width: 44px;

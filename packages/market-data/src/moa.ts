@@ -95,38 +95,61 @@ export async function fetchMoaPoultryHistory(
   endDate: Date,
   signal?: AbortSignal,
 ): Promise<MarketHistoryResult> {
-  const definition = historyMarketOptions.find((option) => option.item === item);
-  if (!definition) throw new Error(`Unsupported poultry history item: ${item}`);
+  const results = await fetchMoaPoultryHistories([item], startDate, endDate, signal);
+  const result = results[0];
+  if (!result) throw new Error(`MOA returned no history result for ${item}`);
+  return result;
+}
+
+export async function fetchMoaPoultryHistories(
+  items: readonly HistoricalMarketItem[],
+  startDate: Date,
+  endDate: Date,
+  signal?: AbortSignal,
+): Promise<MarketHistoryResult[]> {
   const range = endDate.getTime() - startDate.getTime();
   if (!Number.isFinite(range) || range < 0 || range > 366 * 86_400_000) throw new Error('MOA history range must be between 0 and 366 days');
   const fetchedAt = new Date().toISOString();
-  const query = new URLSearchParams({ Start_time: apiDate(startDate), End_time: apiDate(endDate) });
-  const sourceUrl = `${BASE}/${definition.endpoint}/?${query.toString()}`;
-  const request: RequestInit = { headers: { Accept: 'application/json' } };
-  if (signal !== undefined) request.signal = signal;
-  const response = await fetch(sourceUrl, request);
-  if (!response.ok) throw new Error(`MOA ${definition.endpoint} returned ${response.status}`);
-  const text = await response.text();
-  const payload = JSON.parse(text.replace(/^\uFEFF/, '')) as MoaResponse<PoultryRow>;
-  if (payload.RS !== 'OK' || !Array.isArray(payload.Data)) throw new Error(`MOA ${definition.endpoint} returned an invalid payload`);
-  const snapshot: RawSnapshot = {
-    sourceUrl,
-    fetchedAt,
-    payload,
-    sha256: await sha256(text),
-    parserVersion: MOA_PARSER_VERSION,
-  };
-  return {
-    item,
-    label: definition.label,
-    points: parseMoaHistoryRows(item, payload.Data),
-    unit: 'TWD_PER_600G',
-    frequency: 'daily',
-    sourceName: '農業部 Open Data',
-    sourceUrl,
-    fetchedAt,
-    snapshot,
-  };
+  const definitions = items.map((item) => {
+    const definition = historyMarketOptions.find((option) => option.item === item);
+    if (!definition) throw new Error(`Unsupported poultry history item: ${item}`);
+    return definition;
+  });
+  const endpoints = [...new Set(definitions.map((definition) => definition.endpoint))];
+  const responses = await Promise.all(endpoints.map(async (endpoint) => {
+    const query = new URLSearchParams({ Start_time: apiDate(startDate), End_time: apiDate(endDate) });
+    const sourceUrl = `${BASE}/${endpoint}/?${query.toString()}`;
+    const request: RequestInit = { headers: { Accept: 'application/json' } };
+    if (signal !== undefined) request.signal = signal;
+    const response = await fetch(sourceUrl, request);
+    if (!response.ok) throw new Error(`MOA ${endpoint} returned ${response.status}`);
+    const text = await response.text();
+    const payload = JSON.parse(text.replace(/^\uFEFF/, '')) as MoaResponse<PoultryRow>;
+    if (payload.RS !== 'OK' || !Array.isArray(payload.Data)) throw new Error(`MOA ${endpoint} returned an invalid payload`);
+    const snapshot: RawSnapshot = {
+      sourceUrl,
+      fetchedAt,
+      payload,
+      sha256: await sha256(text),
+      parserVersion: MOA_PARSER_VERSION,
+    };
+    return { endpoint, payload, snapshot };
+  }));
+  return definitions.map((definition) => {
+    const response = responses.find((candidate) => candidate.endpoint === definition.endpoint);
+    if (!response) throw new Error(`MOA ${definition.endpoint} response is missing`);
+    return {
+      item: definition.item,
+      label: definition.label,
+      points: parseMoaHistoryRows(definition.item, response.payload.Data ?? []),
+      unit: 'TWD_PER_600G',
+      frequency: 'daily',
+      sourceName: '農業部 Open Data',
+      sourceUrl: response.snapshot.sourceUrl,
+      fetchedAt,
+      snapshot: response.snapshot,
+    };
+  });
 }
 
 interface FieldMap<T> { item: MarketItem; label: string; read: (row: T) => string | undefined }

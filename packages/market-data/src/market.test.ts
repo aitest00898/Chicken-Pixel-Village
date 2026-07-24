@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { marketFreshness, merchantLine, parseMoaHistoryRows, verifiedMarketFixture } from './index';
+import { describe, expect, it, vi } from 'vitest';
+import { fetchMoaPoultryHistories, marketFreshness, merchantLine, parseMoaHistoryRows, verifiedMarketFixture } from './index';
 
 describe('merchant formatter', () => {
   const current = verifiedMarketFixture.find((record) => record.item === 'egg_producer')!;
@@ -47,5 +47,25 @@ describe('MOA history parser', () => {
     expect(parseMoaHistoryRows('black_south_male', row)[0]?.value).toBe(48);
     expect(parseMoaHistoryRows('broiler_large', row)[0]?.value).toBe(33.8);
     expect(parseMoaHistoryRows('egg_producer', row)[0]?.value).toBe(34.5);
+  });
+
+  it('downloads a shared endpoint once for multiple overlay lines', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      RS: 'OK',
+      Data: [{ TransDate: '2026/07/01', RedFeather_S_M: '50', RedFeather_S_F: '48' }],
+      Next: false,
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const results = await fetchMoaPoultryHistories(
+        ['red_south_male', 'red_south_female'],
+        new Date('2026-07-01T00:00:00+08:00'),
+        new Date('2026-07-02T00:00:00+08:00'),
+      );
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(results.map((result) => result.points[0]?.value)).toEqual([50, 48]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
