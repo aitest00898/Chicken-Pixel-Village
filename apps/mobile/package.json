@@ -1,0 +1,36 @@
+{
+  "name": "@chicken-village/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "lint": "eslint src --max-warnings 0",
+    "preview": "vite preview --host 127.0.0.1",
+    "cap:sync": "cap sync",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android"
+  },
+  "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.0",
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/ios": "^8.4.2",
+    "@chicken-village/domain": "workspace:*",
+    "@chicken-village/market-data": "workspace:*",
+    "@chicken-village/sql-connect": "workspace:*",
+    "@chicken-village/sync": "workspace:*",
+    "@chicken-village/ui": "workspace:*",
+    "firebase": "^12.16.0",
+    "idb-keyval": "^6.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.2",
+    "@vitejs/plugin-react": "^6.0.4"
+  }
+}

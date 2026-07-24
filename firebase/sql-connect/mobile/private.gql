@@ -1,0 +1,35 @@
+# Private rows carry ownerUid as a denormalized authorization boundary. The
+# relational organization IDs remain the business boundary for joins.
+
+query MyOrganizations @auth(level: USER) {
+  organizations(where: {ownerUid: {eq_expr: "auth.uid"}, deletedAt: {isNull: true}}) {
+    id name revision createdAt updatedAt
+  }
+}
+
+query MyChickenHouses @auth(level: USER) {
+  chickenHouses(where: {ownerUid: {eq_expr: "auth.uid"}, deletedAt: {isNull: true}}, orderBy: {name: ASC}) {
+    id organizationId name capacity occupancy houseType revision createdAt updatedAt
+  }
+}
+
+mutation CreateOrganization($name: String!) @auth(level: USER) {
+  organization_insert(data: {ownerUid_expr: "auth.uid", name: $name})
+}
+
+mutation CreateChickenHouse($organizationId: UUID!, $name: String!, $capacity: Int!, $occupancy: Int!, $houseType: String!) @auth(level: USER) {
+  chickenHouse_insert(data: {
+    organizationId: $organizationId
+    ownerUid_expr: "auth.uid"
+    name: $name
+    capacity: $capacity
+    occupancy: $occupancy
+    houseType: $houseType
+  })
+}
+
+# Financial confirmation and reversal are intentionally not available to a
+# mobile connector. They are server-only transactional operations.
+query FinancialRecordsServerOnly @auth(level: NO_ACCESS) {
+  distributionRecords(limit: 1) { id status revision }
+}

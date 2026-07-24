@@ -1,0 +1,10 @@
+# Run locally from the SQL Connect emulator CodeLens after schema startup.
+# This file contains public, non-sensitive fixtures only.
+mutation SeedEquipment @auth(level: NO_ACCESS) {
+  equipmentItem_upsertMany(data: [
+    {id: "straw-hat", slot: "head", name: "稻草巡村帽", unlockDays: 7, spriteKey: "hat-straw"},
+    {id: "ledger-satchel", slot: "body", name: "村務帳冊袋", unlockDays: 14, spriteKey: "body-ledger"},
+    {id: "merchant-bell", slot: "hand", name: "行情商鈴", unlockDays: 30, spriteKey: "hand-bell"},
+    {id: "rooster-banner", slot: "back", name: "金雞旗", unlockDays: 60, spriteKey: "back-banner"}
+  ])
+}

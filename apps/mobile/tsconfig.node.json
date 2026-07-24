@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "composite": true, "types": ["node"] },
+  "include": ["vite.config.ts", "capacitor.config.ts"]
+}
+

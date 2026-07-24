@@ -1,0 +1,15 @@
+# The public connector deliberately exposes only validated market rows and
+# unlockable cosmetic metadata. No operational or financial data is public.
+
+query LatestMarketRecords @auth(level: PUBLIC, insecureReason: "Validated poultry market observations are public government-derived data.") {
+  marketRecords(orderBy: [{sourceDate: DESC}, {item: ASC}], limit: 80) {
+    id item label value unit frequency sourceDate sourcePublishedAt fetchedAt
+    sourceName sourceUrl status rawSnapshotHash parserVersion validationStatus
+  }
+}
+
+query ListEquipment @auth(level: PUBLIC, insecureReason: "Equipment names and unlock thresholds are non-sensitive game metadata.") {
+  equipmentItems(orderBy: {unlockDays: ASC}) {
+    id slot name unlockDays spriteKey
+  }
+}

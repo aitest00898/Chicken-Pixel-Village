@@ -1,0 +1,15 @@
+# Local-first SQL Connect service definition. The Cloud SQL identifier is a
+# deployment placeholder; local development uses the PGlite emulator only.
+specVersion: "v1"
+serviceId: chicken-pixel-village
+location: asia-east1
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: chicken_pixel_village
+      cloudSql:
+        instanceId: chicken-pixel-village
+        schemaValidation: COMPATIBLE
+connectorDirs:
+  - ./mobile

@@ -1,0 +1,47 @@
+import { useEffect, useState, type ReactNode } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { AppShell } from './components/AppShell';
+import { PrivateGate } from './components/PrivateGate';
+import { useMarketData } from './hooks/useMarketData';
+import { useVillageState } from './hooks/useVillageState';
+import { useAuthentication } from './hooks/useAuthentication';
+import { HomePage } from './pages/HomePage';
+import { TodayPage } from './pages/TodayPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { VillagePage } from './pages/VillagePage';
+import { HousesPage } from './pages/HousesPage';
+import { ManagerPage } from './pages/ManagerPage';
+import { SettingsPage } from './pages/SettingsPage';
+
+export function App() {
+  const location = useLocation();
+  const { bundle, syncing } = useMarketData();
+  const village = useVillageState();
+  const authentication = useAuthentication();
+  const [online, setOnline] = useState(navigator.onLine);
+  const [dark, setDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches);
+  const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  useEffect(() => { const on = () => setOnline(true); const off = () => setOnline(false); addEventListener('online', on); addEventListener('offline', off); return () => { removeEventListener('online', on); removeEventListener('offline', off); }; }, []);
+  useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light'; }, [dark]);
+  useEffect(() => { document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'; }, [reduced]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
+
+  if (!village.ready || !authentication.ready) return <div className="splash-screen"><div className="splash-screen__art" /><div className="splash-screen__copy"><p>雞情像素村</p><h1>正在開啟村莊……</h1><small>讀取本機雞舍與巡村紀錄</small></div></div>;
+
+  const privatePage = (content: ReactNode) => <PrivateGate authenticated={authentication.authenticated} configured={authentication.configured} onSignIn={authentication.signIn}>{content}</PrivateGate>;
+  return (
+    <AppShell offline={!online} syncLabel={syncing ? '正在確認最新行情…' : bundle.mode === 'live' ? '正式行情已同步' : '使用已驗證快照'}>
+      <Routes>
+        <Route path="/" element={<HomePage bundle={bundle} visits={village.visits} />} />
+        <Route path="/today" element={<TodayPage bundle={bundle} syncing={syncing} />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/village" element={<VillagePage houses={village.houses} />} />
+        <Route path="/houses" element={privatePage(<HousesPage houses={village.houses} onAdd={village.addHouse} />)} />
+        <Route path="/manager" element={<ManagerPage visits={village.visits} onVisit={village.visitToday} onEquip={village.equip} />} />
+        <Route path="/settings" element={<SettingsPage dark={dark} reduced={reduced} onDark={setDark} onReduced={setReduced} mode={bundle.mode} storageMode={village.storageMode} authLabel={authentication.userLabel} onSignOut={authentication.signOut} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AppShell>
+  );
+}

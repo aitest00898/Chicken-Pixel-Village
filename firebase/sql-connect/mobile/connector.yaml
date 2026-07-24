@@ -1,0 +1,8 @@
+connectorId: mobile
+generate:
+  javascriptSdk:
+    outputDir: ../../../packages/sql-connect-generated
+    package: "@chicken-village/sql-connect"
+  adminNodeSdk:
+    outputDir: ../../functions/sql-connect-admin-generated
+    package: "@chicken-village/sql-connect-admin"

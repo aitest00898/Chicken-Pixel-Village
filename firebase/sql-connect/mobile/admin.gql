@@ -1,0 +1,29 @@
+# Privileged financial lifecycle operations. These are callable only from the
+# generated Admin SDK. The Cloud Function supplies ownerUid from a verified
+# Firebase Auth token; the transaction rejects stale revisions and non-drafts.
+
+mutation ConfirmDistributionAdmin(
+  $id: UUID!
+  $ownerUid: String!
+  $expectedRevision: Int!
+  $confirmedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  query
+  @redact
+  @check(expr: "response.query.distributionRecords.size() == 1", message: "Distribution is missing, stale, already confirmed, or belongs to another user.") {
+    distributionRecords(where: {
+      id: {eq: $id}
+      ownerUid: {eq: $ownerUid}
+      revision: {eq: $expectedRevision}
+      status: {eq: "draft"}
+    }, limit: 1) {
+      id
+    }
+  }
+  distributionRecord_update(id: $id, data: {
+    status: "confirmed"
+    confirmedAt: $confirmedAt
+    revision_update: {inc: 1}
+    updatedAt_expr: "request.time"
+  }) @check(expr: "this != null", message: "Distribution confirmation did not update a record.")
+}

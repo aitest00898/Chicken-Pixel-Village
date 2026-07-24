@@ -8,6 +8,7 @@ coverage/
 .env.*
 !.env.example
 .firebase/
+firebase/sql-connect/.dataconnect/
 firebase-debug.log*
 dataconnect-debug.log*
 pglite-debug.log*

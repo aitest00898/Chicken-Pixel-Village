@@ -1,0 +1,163 @@
+# Shared cloud projection. Native devices keep an encrypted SQLite source for
+# offline work and synchronize through explicit revisioned operations.
+
+type Organization @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  ownerUid: String! @col(name: "owner_uid")
+  name: String!
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type ChickenHouse @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  name: String!
+  capacity: Int!
+  occupancy: Int!
+  houseType: String!
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type Batch @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  chickenHouse: ChickenHouse!
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  name: String!
+  birdCount: Int!
+  startedOn: Date!
+  endedOn: Date
+  status: String!
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type Shareholder @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  displayName: String!
+  contactNote: String
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type Shareholding @table(key: ["chickenHouse", "shareholder"]) {
+  chickenHouse: ChickenHouse!
+  shareholder: Shareholder!
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  ownershipBasisPoints: Int!
+  profitBasisPoints: Int!
+  lossBasisPoints: Int!
+  revision: Int! @default(value: 1)
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type DistributionRecord @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  chickenHouse: ChickenHouse!
+  batch: Batch
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  periodLabel: String!
+  totalAmountTwd: Int!
+  status: String!
+  confirmedAt: Timestamp
+  paidAt: Timestamp
+  reversedAt: Timestamp
+  reversalOfId: UUID
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type DistributionEntry @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  distributionRecord: DistributionRecord!
+  shareholder: Shareholder!
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  allocatedAmountTwd: Int!
+  paidAmountTwd: Int! @default(value: 0)
+  adjustmentAmountTwd: Int! @default(value: 0)
+  revision: Int! @default(value: 1)
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type RiskAssessment @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  chickenHouse: ChickenHouse!
+  batch: Batch
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  modelVersion: String!
+  rawAnswersJson: String!
+  completenessBasisPoints: Int!
+  finalScore: Int!
+  riskLevel: String!
+  assessedAt: Timestamp!
+  revision: Int! @default(value: 1)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type EquipmentItem @table(key: "id") {
+  id: String!
+  slot: String!
+  name: String!
+  unlockDays: Int!
+  spriteKey: String!
+}
+
+type VisitProgress @table(key: "ownerUid") {
+  ownerUid: String! @col(name: "owner_uid")
+  accumulatedDays: Int!
+  streakDays: Int!
+  lastVisitDate: Date
+  equippedJson: String!
+  revision: Int! @default(value: 1)
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type MarketRecord @table(key: "id") {
+  id: String!
+  item: String!
+  label: String!
+  value: Float
+  unit: String!
+  frequency: String!
+  sourceDate: Date!
+  sourcePublishedAt: Timestamp
+  fetchedAt: Timestamp!
+  sourceName: String!
+  sourceUrl: String!
+  status: String!
+  rawSnapshotHash: String!
+  parserVersion: String!
+  validationStatus: String!
+}
+
+type SyncOperation @table(key: "operationId") {
+  operationId: UUID!
+  organization: Organization!
+  ownerUid: String! @col(name: "owner_uid")
+  deviceId: String!
+  entityType: String!
+  entityId: String!
+  baseRevision: Int!
+  payloadHash: String!
+  state: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+  appliedAt: Timestamp
+}
