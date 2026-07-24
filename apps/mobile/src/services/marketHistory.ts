@@ -14,8 +14,9 @@ import {
   type MarketRecord,
   type RawSnapshot,
 } from '@chicken-village/market-data';
-import { collection, doc, getDocs, query, where, writeBatch } from 'firebase/firestore';
-import { firebaseFirestore } from './firebase';
+import { doc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore/lite';
+import { firebaseFirestore, firebaseFirestoreLite } from './firebase';
 
 interface StoredHistoryRecord {
   item: HistoricalMarketItem;
@@ -53,9 +54,9 @@ function isoDate(value: Date): string {
 }
 
 async function loadStoredRecords(startDate: Date, endDate: Date): Promise<StoredHistoryRecord[]> {
-  if (!firebaseFirestore) return [];
+  if (!firebaseFirestoreLite) return [];
   const snapshot = await getDocs(query(
-    collection(firebaseFirestore, 'market_history'),
+    collection(firebaseFirestoreLite, 'market_history'),
     where('sourceDate', '>=', isoDate(startDate)),
     where('sourceDate', '<=', isoDate(endDate)),
   ));

@@ -2,7 +2,8 @@ import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
 import { connectDataConnectEmulator, getDataConnect, type DataConnect } from 'firebase/data-connect';
 import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions';
-import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore';
+import { connectFirestoreEmulator, initializeFirestore, type Firestore } from 'firebase/firestore';
+import { getFirestore as getFirestoreLite, type Firestore as FirestoreLite } from 'firebase/firestore/lite';
 import { connectorConfig } from '@chicken-village/sql-connect';
 
 const config = {
@@ -27,13 +28,17 @@ let auth: Auth | null = null;
 let functions: Functions | null = null;
 let dataConnect: DataConnect | null = null;
 let firestore: Firestore | null = null;
+let firestoreLite: FirestoreLite | null = null;
 
 if (isCompleteFirebaseConfig(config)) {
   app = initializeApp(config);
   auth = getAuth(app);
   functions = getFunctions(app, 'asia-east1');
   dataConnect = getDataConnect(app, connectorConfig);
-  firestore = getFirestore(app);
+  firestore = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+  });
+  firestoreLite = getFirestoreLite(app);
   if (usingFirebaseEmulators) {
     const host = import.meta.env.VITE_FIREBASE_EMULATOR_HOST ?? '127.0.0.1';
     connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
@@ -43,4 +48,11 @@ if (isCompleteFirebaseConfig(config)) {
   }
 }
 
-export { app as firebaseApp, auth as firebaseAuth, functions as firebaseFunctions, dataConnect as firebaseDataConnect, firestore as firebaseFirestore };
+export {
+  app as firebaseApp,
+  auth as firebaseAuth,
+  functions as firebaseFunctions,
+  dataConnect as firebaseDataConnect,
+  firestore as firebaseFirestore,
+  firestoreLite as firebaseFirestoreLite,
+};
