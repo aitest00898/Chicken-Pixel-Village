@@ -14,3 +14,5 @@ Generated assets:
 All text remains live HTML. Art contains no product name, price or source text. No protected franchise assets, logos, fonts, names or signature objects are used.
 
 The four master assets were generated with the built-in image generation model from original prompts written for this repository, then integrated manually. Chroma-key cleanup was used only for the transparent sprite atlas; the loading scene, map and crest remain full original paintings.
+
+Exact prompts are archived in `ART_PROMPTS.md`.
