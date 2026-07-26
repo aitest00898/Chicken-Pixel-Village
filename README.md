@@ -23,6 +23,8 @@ Firebase emulator（不連 production）：
 pnpm firebase:emulators
 ```
 
+部署到 GitHub Pages 與保留 Netlify 回復路徑的設定見 `docs/DEPLOYMENT.md`。
+
 目前完成度、已執行證據與原生 toolchain 缺口分別見 `docs/DEVELOPMENT_STATUS.md` 與 `docs/VERIFICATION.md`。
 
 ## 安全邊界

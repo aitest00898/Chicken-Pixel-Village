@@ -56,6 +56,36 @@ service cloud.firestore {
         && request.resource.data.parserVersion is string;
     }
 
+    function validOfficialAutoMarketRecord(recordId) {
+      return validMarketRecord()
+        && request.resource.data.keys().hasOnly([
+          'id', 'item', 'label', 'value', 'unit', 'frequency', 'sourceDate',
+          'sourcePublishedAt', 'fetchedAt', 'sourceName', 'sourceUrl', 'status',
+          'rawSnapshotHash', 'parserVersion', 'validationStatus', 'capturedAt'
+        ])
+        && request.resource.data.item in [
+          'red_north_male', 'red_north_female', 'red_central_male',
+          'red_central_female', 'red_south_male', 'red_south_female',
+          'black_south_male', 'black_south_female', 'broiler_large',
+          'broiler_medium', 'broiler_store_kp', 'egg_transport', 'egg_producer'
+        ]
+        && request.resource.data.id == request.resource.data.sourceDate + ':' + request.resource.data.item
+        && recordId == request.resource.data.sourceDate + '__' + request.resource.data.item
+        && (request.resource.data.value == null
+          || (request.resource.data.value >= 0 && request.resource.data.value <= 500))
+        && request.resource.data.sourceDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.sourcePublishedAt == null
+        && request.resource.data.fetchedAt is string
+        && request.resource.data.frequency == 'daily'
+        && request.resource.data.sourceName == '農業部 Open Data'
+        && request.resource.data.sourceUrl.matches('^https://data[.]moa[.]gov[.]tw/api/v1/.*$')
+        && request.resource.data.status == 'verified-live'
+        && request.resource.data.rawSnapshotHash.matches('^[0-9a-f]{64}$')
+        && request.resource.data.parserVersion == 'moa-poultry-v1.0.0'
+        && request.resource.data.validationStatus == 'valid'
+        && request.resource.data.capturedAt is string;
+    }
+
     match /public_houses/{houseId} {
       allow read: if true;
       allow create: if isAdmin() && validHouse();
@@ -82,8 +112,8 @@ service cloud.firestore {
 
     match /market_history/{recordId} {
       allow read: if true;
-      allow create, update: if isAdmin() && validMarketRecord();
-      allow delete: if false;
+      allow create: if signedIn() && validOfficialAutoMarketRecord(recordId);
+      allow update, delete: if false;
     }
 
     match /visit_progress/{ownerUid} {

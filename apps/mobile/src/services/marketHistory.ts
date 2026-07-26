@@ -14,9 +14,9 @@ import {
   type MarketRecord,
   type RawSnapshot,
 } from '@chicken-village/market-data';
-import { doc, writeBatch } from 'firebase/firestore';
-import { collection, getDocs, query, where } from 'firebase/firestore/lite';
-import { firebaseFirestore, firebaseFirestoreLite } from './firebase';
+import { collection, doc, getDoc, getDocs, query, where, writeBatch } from 'firebase/firestore/lite';
+import { signInAnonymously } from 'firebase/auth';
+import { firebaseArchiveAuth, firebaseArchiveFirestoreLite, firebaseFirestoreLite } from './firebase';
 
 interface StoredHistoryRecord {
   item: HistoricalMarketItem;
@@ -121,13 +121,26 @@ export async function loadFirebaseMarketHistories(
 }
 
 export async function persistDailyMarketRecords(records: readonly MarketRecord[]) {
-  if (!firebaseFirestore || !records.length) return;
-  const batch = writeBatch(firebaseFirestore);
-  records.forEach((record) => {
-    const id = `${record.sourceDate}__${record.item}`.replaceAll('/', '-');
-    batch.set(doc(firebaseFirestore!, 'market_history', id), { ...record, capturedAt: new Date().toISOString() }, { merge: true });
+  const archiveAuth = firebaseArchiveAuth;
+  const archiveFirestore = firebaseArchiveFirestoreLite;
+  if (!archiveAuth || !archiveFirestore || !records.length) return { inserted: 0, skipped: 0 };
+  if (!archiveAuth.currentUser) await signInAnonymously(archiveAuth);
+  const uniqueRecords = [...new Map(records.map((record) => [
+    `${record.sourceDate}__${record.item}`.replaceAll('/', '-'),
+    record,
+  ])).entries()];
+  const existing = await Promise.all(uniqueRecords.map(async ([id]) => (
+    await getDoc(doc(archiveFirestore, 'market_history', id))
+  ).exists()));
+  const batch = writeBatch(archiveFirestore);
+  let inserted = 0;
+  uniqueRecords.forEach(([id, record], index) => {
+    if (existing[index]) return;
+    batch.set(doc(archiveFirestore, 'market_history', id), { ...record, capturedAt: new Date().toISOString() });
+    inserted += 1;
   });
-  await batch.commit();
+  if (inserted) await batch.commit();
+  return { inserted, skipped: uniqueRecords.length - inserted };
 }
 
 export async function loadPreviousMarketRecords(records: readonly MarketRecord[]): Promise<MarketRecord[]> {

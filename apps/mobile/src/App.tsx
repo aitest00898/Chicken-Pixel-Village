@@ -28,9 +28,11 @@ export function App() {
   useEffect(() => { document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'; }, [reduced]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
   useEffect(() => {
-    if (!authentication.isAdmin || bundle.mode !== 'live') return;
-    void persistDailyMarketRecords(bundle.records).catch((error: unknown) => console.error('Unable to archive daily market records', error));
-  }, [authentication.isAdmin, bundle]);
+    if (bundle.mode !== 'live') return;
+    void persistDailyMarketRecords(bundle.records)
+      .then((result) => console.info('Daily market archive checked', result))
+      .catch((error: unknown) => console.error('Unable to archive daily market records', error));
+  }, [bundle]);
 
   if (!village.ready || !authentication.ready) return <div className="splash-screen"><div className="splash-screen__art" /><div className="splash-screen__copy"><span className="folio-kicker">VOLUME I・領地營運誌</span><p>雞情像素村</p><h1>正在展開村莊編年史……</h1><small>校讀雞舍帳冊、行情公報與巡查紀錄</small></div></div>;
 

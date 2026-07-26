@@ -3,7 +3,7 @@ import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
 import { connectDataConnectEmulator, getDataConnect, type DataConnect } from 'firebase/data-connect';
 import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions';
 import { connectFirestoreEmulator, initializeFirestore, type Firestore } from 'firebase/firestore';
-import { getFirestore as getFirestoreLite, type Firestore as FirestoreLite } from 'firebase/firestore/lite';
+import { connectFirestoreEmulator as connectFirestoreLiteEmulator, getFirestore as getFirestoreLite, type Firestore as FirestoreLite } from 'firebase/firestore/lite';
 import { connectorConfig } from '@chicken-village/sql-connect';
 
 const config = {
@@ -29,6 +29,8 @@ let functions: Functions | null = null;
 let dataConnect: DataConnect | null = null;
 let firestore: Firestore | null = null;
 let firestoreLite: FirestoreLite | null = null;
+let archiveAuth: Auth | null = null;
+let archiveFirestoreLite: FirestoreLite | null = null;
 
 if (isCompleteFirebaseConfig(config)) {
   app = initializeApp(config);
@@ -39,12 +41,17 @@ if (isCompleteFirebaseConfig(config)) {
     experimentalAutoDetectLongPolling: true,
   });
   firestoreLite = getFirestoreLite(app);
+  const archiveApp = initializeApp(config, 'market-archive');
+  archiveAuth = getAuth(archiveApp);
+  archiveFirestoreLite = getFirestoreLite(archiveApp);
   if (usingFirebaseEmulators) {
     const host = import.meta.env.VITE_FIREBASE_EMULATOR_HOST ?? '127.0.0.1';
     connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
+    connectAuthEmulator(archiveAuth, `http://${host}:9099`, { disableWarnings: true });
     connectFunctionsEmulator(functions, host, 5001);
     connectDataConnectEmulator(dataConnect, host, 9399);
     connectFirestoreEmulator(firestore, host, 8080);
+    connectFirestoreLiteEmulator(archiveFirestoreLite, host, 8080);
   }
 }
 
@@ -55,4 +62,6 @@ export {
   dataConnect as firebaseDataConnect,
   firestore as firebaseFirestore,
   firestoreLite as firebaseFirestoreLite,
+  archiveAuth as firebaseArchiveAuth,
+  archiveFirestoreLite as firebaseArchiveFirestoreLite,
 };

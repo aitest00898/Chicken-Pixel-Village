@@ -2,35 +2,10 @@ import { initializeApp } from 'firebase-admin/app';
 import { confirmDistributionAdmin } from '@chicken-village/sql-connect-admin';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2/options';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { logger } from 'firebase-functions';
 import { isUuid, validExpectedRevision, validOfficialMarketRange } from './validation.js';
-import { archiveOfficialMarketRecords, recordMarketArchiveFailure } from './marketArchive.js';
 
 initializeApp();
 setGlobalOptions({ region: 'asia-east1', maxInstances: 10 });
-
-export const archiveDailyMarket = onSchedule(
-  {
-    schedule: '30 18 * * *',
-    timeZone: 'Asia/Taipei',
-    retryCount: 3,
-    maxRetrySeconds: 3600,
-    timeoutSeconds: 60,
-    memory: '256MiB',
-  },
-  async () => {
-    const startedAt = new Date();
-    try {
-      const result = await archiveOfficialMarketRecords(startedAt);
-      logger.info('Daily market archive completed', result);
-    } catch (error) {
-      logger.error('Daily market archive failed', error);
-      await recordMarketArchiveFailure(error, startedAt);
-      throw error;
-    }
-  },
-);
 
 interface ConfirmDistributionInput {
   distributionId?: unknown;
