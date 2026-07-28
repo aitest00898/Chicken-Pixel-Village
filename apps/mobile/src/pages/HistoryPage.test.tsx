@@ -33,12 +33,16 @@ describe('history page', () => {
     render(<MemoryRouter><HistoryPage loader={loader} now={fixedNow} /></MemoryRouter>);
 
     expect(await screen.findByRole('img', { name: '中區多系列價格疊圖' })).toBeInTheDocument();
-    expect(screen.getByText('14 條行情線')).toBeInTheDocument();
+    expect(screen.getByText('4 / 14 條行情線')).toBeInTheDocument();
     expect(screen.getAllByText('皇金・公').length).toBeGreaterThan(0);
     expect(screen.getAllByText('烏骨雞').length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: /紅羽・公/ }));
+    expect(screen.getByText('3 / 14 條行情線')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /紅羽・公/ }));
+    expect(screen.getByText('4 / 14 條行情線')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: '北區' }));
     expect(await screen.findByRole('img', { name: '北區多系列價格疊圖' })).toBeInTheDocument();
-    expect(screen.getByText('14 條行情線')).toBeInTheDocument();
+    expect(screen.getByText('4 / 14 條行情線')).toBeInTheDocument();
     const northItems = vi.mocked(loader).mock.calls.at(-1)?.[0] ?? [];
     expect(northItems).toHaveLength(14);
     expect(northItems).toEqual(expect.arrayContaining([
@@ -48,7 +52,7 @@ describe('history page', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '全台土雞' }));
     expect(await screen.findByRole('img', { name: '全台土雞多系列價格疊圖' })).toBeInTheDocument();
-    expect(screen.getByText('7 條行情線')).toBeInTheDocument();
+    expect(screen.getByText('4 / 7 條行情線')).toBeInTheDocument();
     expect(screen.getByText('日／月正式資料')).toBeInTheDocument();
     const nationalItems = vi.mocked(loader).mock.calls.at(-1)?.[0] ?? [];
     expect(nationalItems).toEqual([

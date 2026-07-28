@@ -109,6 +109,7 @@ type HistoryLoader = typeof loadFirebaseMarketHistories;
 interface HistoryPageProps { loader?: HistoryLoader; now?: () => Date }
 
 const currentTime = () => new Date();
+const initialVisibleCount = 4;
 
 function dateInput(date: Date): string {
   const year = date.getFullYear();
@@ -155,11 +156,16 @@ export function HistoryPage({ loader = loadFirebaseMarketHistories, now = curren
   const [regionId, setRegionId] = useState<HistoryRegionId>('central');
   const [days, setDays] = useState<(typeof rangeOptions)[number]['days']>(90);
   const [results, setResults] = useState<MarketHistoryResult[]>([]);
+  const [selectedItems, setSelectedItems] = useState<HistoricalMarketItem[]>(() => historyRegions.find((candidate) => candidate.id === 'central')!.items.slice(0, initialVisibleCount));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [requestVersion, setRequestVersion] = useState(0);
   const [queryActive, setQueryActive] = useState(false);
   const region = historyRegions.find((candidate) => candidate.id === regionId)!;
+
+  useEffect(() => {
+    setSelectedItems(region.items.slice(0, initialVisibleCount));
+  }, [region.items]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -185,7 +191,9 @@ export function HistoryPage({ loader = loadFirebaseMarketHistories, now = curren
     return () => controller.abort();
   }, [days, loader, now, region.items, requestVersion]);
 
+  const selectedSet = new Set(selectedItems);
   const summaries = results.map((result) => ({ result, statistics: historyStatistics(result.points), presentation: seriesPresentation[result.item] }));
+  const visibleSummaries = summaries.filter((summary) => selectedSet.has(summary.result.item));
   const validCount = summaries.reduce((total, summary) => total + summary.statistics.validCount, 0);
   const allDates = results.flatMap((result) => result.points.map((point) => point.date)).sort();
   const firstDate = allDates[0] ?? null;
@@ -210,13 +218,26 @@ export function HistoryPage({ loader = loadFirebaseMarketHistories, now = curren
           {!loading && !error && validCount === 0 ? <div className="history-empty"><strong>此地區在所選期間沒有有效行情資料</strong><small>原始缺值已保留，沒有插值。</small></div> : null}
         </div>
         {!loading && !error && validCount > 0 ? <>
-          <div className="history-chart-heading"><div><span className="folio-kicker">REGIONAL MARKET OVERLAY</span><h2>{region.label}・多品項行情疊圖</h2></div>{queryActive ? <button type="button" className="secondary-button compact history-query-exit" onClick={() => setQueryActive(false)}>退出查價</button> : <small>{summaries.length} 條行情線</small>}</div>
-          <div className="history-legend" aria-label="行情線圖例">{summaries.map(({ result, statistics, presentation }) => <div key={result.item}><i style={{ background: presentation.color }} /><span>{presentation.shortLabel}</span><strong>{statistics.latest?.toFixed(1) ?? '—'}</strong></div>)}</div>
-          <TrendChart series={summaries.map(({ result, presentation }) => ({ id: result.item, label: presentation.shortLabel, color: presentation.color, data: result.points }))} label={`${region.label}多系列價格疊圖`} queryActive={queryActive} onQueryActiveChange={setQueryActive} />
-          <div className="history-series-ledger">{summaries.map(({ result, statistics, presentation }) => <article key={result.item}>
-            <header><i style={{ background: presentation.color }} /><strong>{presentation.shortLabel}</strong><b>{statistics.latest?.toFixed(1) ?? '—'}</b></header>
+          <div className="history-chart-heading"><div><span className="folio-kicker">REGIONAL MARKET OVERLAY</span><h2>{region.label}・多品項行情疊圖</h2></div>{queryActive ? <button type="button" className="secondary-button compact history-query-exit" onClick={() => setQueryActive(false)}>退出查價</button> : <small>{visibleSummaries.length} / {summaries.length} 條行情線</small>}</div>
+          <div className="history-legend" aria-label="已選取行情線圖例">{visibleSummaries.map(({ result, statistics, presentation }) => <div key={result.item}><i style={{ background: presentation.color }} /><span>{presentation.shortLabel}</span><strong>{statistics.latest?.toFixed(1) ?? '—'}</strong></div>)}</div>
+          {visibleSummaries.length > 0 ? <TrendChart series={visibleSummaries.map(({ result, presentation }) => ({ id: result.item, label: presentation.shortLabel, color: presentation.color, data: result.points }))} label={`${region.label}多系列價格疊圖`} queryActive={queryActive} onQueryActiveChange={setQueryActive} /> : <div className="history-empty compact"><strong>尚未選取行情線</strong><small>請在下方品項卷宗點選要顯示於線圖的品相。</small></div>}
+          <div className="history-series-ledger" aria-label="行情品項顯示開關">{summaries.map(({ result, statistics, presentation }) => {
+            const selected = selectedSet.has(result.item);
+            return <button
+              key={result.item}
+              type="button"
+              className={`history-series-toggle${selected ? ' selected' : ''}`}
+              aria-pressed={selected}
+              onClick={() => {
+                setQueryActive(false);
+                setSelectedItems((items) => items.includes(result.item) ? items.filter((item) => item !== result.item) : [...items, result.item]);
+              }}
+              style={selected ? { borderColor: presentation.color, boxShadow: `inset 0 0 0 1px ${presentation.color}, 0 0 0 1px ${presentation.color}` } : undefined}
+            >
+              <header><i style={{ background: presentation.color }} /><strong>{presentation.shortLabel}</strong><b>{statistics.latest?.toFixed(1) ?? '—'}</b></header>
             <div><span>平均 {statistics.average?.toFixed(1) ?? '—'}</span><span>高／低 {statistics.highest?.toFixed(1) ?? '—'}／{statistics.lowest?.toFixed(1) ?? '—'}</span><span>調價 {shortDate(statistics.latestChange)}</span><span>漲跌 {statistics.difference === null ? '—' : statistics.difference === 0 ? '持平' : `${statistics.difference > 0 ? '+' : '−'}${Math.abs(statistics.difference).toFixed(1)}${statistics.percentage === null ? '' : `（${statistics.percentage > 0 ? '+' : '−'}${Math.abs(statistics.percentage).toFixed(1)}%）`}・較 ${shortDate(statistics.previousDate)}`}</span></div>
-          </article>)}</div>
+            </button>;
+          })}</div>
         </> : null}
       </PixelPanel>
 
