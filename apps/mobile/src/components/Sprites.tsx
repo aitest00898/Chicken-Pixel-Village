@@ -23,9 +23,9 @@ export function ManagerSprite({ pose = 'front' }: { pose?: 'front' | 'back' }) {
 export function ManagerAvatar({ equipped, role = 'resident' }: { equipped: VisitProgress['equipped']; role?: 'resident' | 'admin' }) {
   const selected = equipmentItems.filter((item) => equipped[item.slot] === item.id);
   const back = selected.find((item) => item.slot === 'back');
-  return <div className={`manager-avatar manager-avatar--${role}`} role="img" aria-label={`${role === 'admin' ? '管理者專用' : '村民'} Q 版紙娃娃，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
+  return <div className={`manager-avatar manager-avatar--${role}`} role="img" aria-label={`${role === 'admin' ? '管理者專用' : '村民'}等身紙娃娃，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
     {back ? <EquipmentArt item={back} className={`manager-avatar__equipment slot-${back.slot}`} /> : null}
-    <img src={assetUrl('assets/art/vanadis/character/manager-base.png')} alt="" />
+    <img src={assetUrl('assets/art/vanadis/character/manager-fullbody.png')} alt="" />
     {selected.filter((item) => item.slot !== 'back').map((item) => <EquipmentArt key={item.id} item={item} className={`manager-avatar__equipment slot-${item.slot}`} />)}
   </div>;
 }

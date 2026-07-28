@@ -6,6 +6,8 @@ const ASSET_VARIABLES = {
   '--asset-vanadis-market-bulletin': 'assets/art/vanadis-market-bulletin.webp',
   '--asset-vanadis-houses-atlas': 'assets/art/vanadis/houses/atlas.png',
   '--asset-manager-base': 'assets/art/vanadis/character/manager-base.png',
+  '--asset-manager-fullbody': 'assets/art/vanadis/character/manager-fullbody.png',
+  '--asset-wardrobe-ledger-bg': 'assets/art/vanadis/wardrobe/equipment-ledger-bg.jpg',
 } as const;
 
 export function assetUrl(path: string) {
