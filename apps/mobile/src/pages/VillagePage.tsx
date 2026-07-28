@@ -3,6 +3,7 @@ import { PixelPanel } from '@chicken-village/ui';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HouseSprite } from '../components/Sprites';
+import { assetUrl } from '../utils/assets';
 
 export function VillagePage({ houses, placements, onMove, canEdit }: { houses: ChickenHouse[]; placements: MapPlacement[]; onMove: (houseId: string, xDelta: number, yDelta: number) => void; canEdit: boolean }) {
   const [editing, setEditing] = useState('');
@@ -10,7 +11,7 @@ export function VillagePage({ houses, placements, onMove, canEdit }: { houses: C
   return <div className="page village-page">
     <header className="page-title"><p className="eyebrow">管理者領地圖・地理卷</p><h1>我的村莊</h1><p>以公會測繪圖呈現雞舍配置；位置會離線保存並同步，但不顯示任何真實地址。</p></header>
     <div className="village-board">
-      <img src="/assets/art/vanadis-village-map.webp" alt="水彩墨線繪製的村莊領地圖，有市場、史料館、河川、磨坊與三處雞舍用地" />
+      <img src={assetUrl('assets/art/vanadis-village-map.webp')} alt="水彩墨線繪製的村莊領地圖，有市場、史料館、河川、磨坊與三處雞舍用地" />
       <Link className="map-pin map-pin--market" to="/today"><span>市場</span></Link><Link className="map-pin map-pin--archive" to="/history"><span>史料館</span></Link>
       {active.map((house, index) => { const placement = placements.find((row) => row.chickenHouseId === house.id); const left = `${(placement?.xBasisPoints ?? 1500 + index * 2700) / 100}%`; const top = `${(placement?.yBasisPoints ?? 6900) / 100}%`; const marker = <><HouseSprite tier={capacityTier(house.designCapacity)} name={house.name} /><span>{house.name}<small>{house.currentBirdCount.toLocaleString()} 隻</small></span></>; return canEdit ? <button aria-label={`移動 ${house.name}`} className={`house-marker ${editing === house.id ? 'editing' : ''}`} style={{ left, top }} onClick={() => setEditing(editing === house.id ? '' : house.id)} key={house.id}>{marker}</button> : <Link aria-label={`查看 ${house.name}`} className="house-marker" style={{ left, top }} to="/houses" key={house.id}>{marker}</Link>; })}
     </div>

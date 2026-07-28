@@ -90,7 +90,7 @@ small { line-height: 1.4; }
 button:disabled { cursor: not-allowed; opacity: .48; }
 
 .home-page { padding-top: 0; }
-.home-hero { min-height: 390px; margin: 0 -14px; position: relative; overflow: hidden; background: url('/assets/art/dawn-village.png') center 72% / cover; border-bottom: 4px solid #183f45; box-shadow: 0 4px 0 #e3b65f; }
+.home-hero { min-height: 390px; margin: 0 -14px; position: relative; overflow: hidden; background: var(--asset-dawn-village) center 72% / cover; border-bottom: 4px solid #183f45; box-shadow: 0 4px 0 #e3b65f; }
 .home-hero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, #07191d2b 0%, #07191d00 45%, #07191ddd 100%); }
 .home-hero__copy { position: absolute; left: 18px; right: 18px; bottom: 20px; color: #fff7d7; text-shadow: 0 2px 0 #0a2429, 2px 0 0 #0a2429; }
 .home-hero__copy h1 { margin-bottom: 12px; font-size: clamp(2rem, 10vw, 3.4rem); }
@@ -112,7 +112,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .manager-strip > div > strong { font-size: .9rem; }
 .manager-strip .manager-sprite { transform: scale(.78); transform-origin: bottom center; margin: -20px -8px 0; }
 
-.market-scene { min-height: 280px; margin: -16px -14px 0; position: relative; background: url('/assets/art/dawn-village.png') center 82% / cover; border-bottom: 4px solid #d7aa51; }
+.market-scene { min-height: 280px; margin: -16px -14px 0; position: relative; background: var(--asset-dawn-village) center 82% / cover; border-bottom: 4px solid #d7aa51; }
 .market-scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 40%, #081c21c7); }
 .market-scene__dialog { position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 12px; padding: 13px 14px; color: #fff4d3; background: #102f36ed; border: 3px double #e8c66f; box-shadow: 0 3px 0 #071d22; }
 .market-scene__dialog p { margin: 7px 0 0; line-height: 1.65; font-size: .86rem; }
@@ -293,10 +293,10 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .equipment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .equipment-grid button { min-height: 130px; padding: 9px; display: grid; place-items: center; align-content: center; color: var(--ink); background: var(--paper-2); border: 1px solid var(--line); }
 .equipment-grid button.equipped { border: 3px solid var(--teal); box-shadow: inset 0 0 0 2px var(--gold); }.equipment-grid button:disabled { filter: grayscale(1); opacity: .48; }.equipment-grid strong { font-size: .75rem; }.equipment-grid small { color: var(--muted); font-size: .6rem; }
-.equipment-icon { width: 70px; height: 55px; display: block; background: url('/assets/art/sprite-atlas.png') no-repeat; background-size: 384px 256px; image-rendering: pixelated; }
+.equipment-icon { width: 70px; height: 55px; display: block; background: var(--asset-sprite-atlas) no-repeat; background-size: 384px 256px; image-rendering: pixelated; }
 .equipment-icon--straw-hat { background-position: -28px -114px; }.equipment-icon--work-jacket { background-position: -116px -113px; }.equipment-icon--feed-scoop { background-position: -199px -114px; }.equipment-icon--field-pack { background-position: -288px -113px; }
 
-.atlas-sprite { display: inline-block; flex: none; background: url('/assets/art/sprite-atlas.png') no-repeat; background-size: 384px 256px; image-rendering: pixelated; }
+.atlas-sprite { display: inline-block; flex: none; background: var(--asset-sprite-atlas) no-repeat; background-size: 384px 256px; image-rendering: pixelated; }
 .manager-sprite { width: 70px; height: 104px; background-position: -22px -10px; }
 .manager-sprite--back { background-position: -102px -10px; }
 .house-sprite { height: 66px; }
@@ -321,7 +321,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .setting-row span { display: grid; }.setting-row small { color: var(--muted); font-size: .65rem; }.setting-row b { color: var(--teal); font-size: .68rem; white-space: nowrap; }
 
 .splash-screen { width: min(100%, 720px); min-height: 100vh; margin: 0 auto; position: relative; overflow: hidden; color: #fff5d4; background: #173b42; }
-.splash-screen__art { position: absolute; inset: 0; background: url('/assets/art/dawn-village.png') center / cover; animation: slow-pan 8s ease-out both; }
+.splash-screen__art { position: absolute; inset: 0; background: var(--asset-dawn-village) center / cover; animation: slow-pan 8s ease-out both; }
 .splash-screen::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 35%, #071d22e8); }
 .splash-screen__copy { position: absolute; z-index: 1; left: 22px; right: 22px; bottom: calc(42px + var(--safe-bottom)); padding: 18px; background: #0d2d33e8; border: 3px double #e7c066; box-shadow: 0 4px 0 #07181b; }
 .splash-screen__copy p { color: #ffd46e; font-weight: 900; letter-spacing: .16em; }.splash-screen__copy h1 { margin-bottom: 6px; }.splash-screen__copy small { color: #bddbd4; }
@@ -425,7 +425,7 @@ body::before {
 .topbar strong { font-size: 1rem; letter-spacing: .18em; font-weight: 700; }
 .topbar small { color: #746a56; font-size: .61rem; }
 .topbar small.offline { color: #854f3f; }
-.topbar__crest { width: 42px; height: 42px; display: block; background: url('/assets/art/app-icon-master.png') center / cover; border: 1px solid #65533b; border-radius: 4px; filter: sepia(.08) contrast(.98); box-shadow: 0 2px 0 #8d784f; }
+.topbar__crest { width: 42px; height: 42px; display: block; background: var(--asset-app-icon-master) center / cover; border: 1px solid #65533b; border-radius: 4px; filter: sepia(.08) contrast(.98); box-shadow: 0 2px 0 #8d784f; }
 
 .icon-button {
   width: 44px;
@@ -509,7 +509,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .home-hero {
   min-height: 570px;
   margin-inline: -16px;
-  background: url('/assets/art/vanadis-village-hero.webp') center 57% / cover;
+  background: var(--asset-vanadis-village-hero) center 57% / cover;
   border-bottom: 1px solid #65563e;
   box-shadow: 0 6px 0 #9a7a4140;
 }
@@ -549,7 +549,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .market-scene {
   min-height: 390px;
   margin: -22px -16px 0;
-  background: url('/assets/art/vanadis-market-bulletin.webp') 62% center / cover;
+  background: var(--asset-vanadis-market-bulletin) 62% center / cover;
   border-bottom: 1px solid var(--line);
 }
 .market-scene::after { background: linear-gradient(90deg, #e9dec6ee 0 30%, #e9dec600 66%), linear-gradient(transparent 45%, #26241ed4); }
@@ -664,7 +664,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
   flex: none;
   width: 96px;
   height: 128px;
-  background-image: url('/assets/art/vanadis/houses/atlas.png');
+  background-image: var(--asset-vanadis-houses-atlas);
   background-repeat: no-repeat;
   background-size: 400% 200%;
   filter: drop-shadow(0 5px 3px #3b302a42) sepia(.08) saturate(.76);
@@ -685,12 +685,18 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .investment-round-detail > header { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; }
 .investment-round-detail > header .vanadis-house-art { width: 78px; height: 104px; }
 
-.manager-sprite { width: 70px; height: 100px; background: url('/assets/art/vanadis/character/manager-base.png') center / contain no-repeat; filter: sepia(.08) saturate(.76); }
+.manager-sprite { width: 70px; height: 100px; background: var(--asset-manager-base) center / contain no-repeat; filter: sepia(.08) saturate(.76); }
 .manager-sprite--back { transform: scaleX(-1); opacity: .85; }
 .manager-stage__avatar { position: absolute; z-index: 3; top: 4px; right: 4px; width: min(52%, 270px); display: grid; justify-items: center; color: #4a4032; }
 .manager-stage__avatar > small { margin-top: -8px; padding: 4px 7px; background: #e6dac1e8; border: 1px solid #75654a; font-size: .52rem; }
 .manager-avatar { position: relative; width: 100%; aspect-ratio: 1; }
 .manager-avatar > img { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: sepia(.05) saturate(.8); }
+.manager-avatar--resident > img { filter: sepia(.14) saturate(.62) brightness(.96); }
+.manager-avatar--resident::after,
+.manager-avatar--admin::after { position: absolute; z-index: 4; right: 8%; bottom: 10%; padding: 3px 5px; border: 1px solid #7e6b4d; background: #e5d8bedb; color: #4b4030; font-size: .48rem; letter-spacing: .08em; }
+.manager-avatar--resident::after { content: '村民'; }
+.manager-avatar--admin::before { content: ''; position: absolute; z-index: 3; left: 18%; top: 4%; width: 34%; height: 18%; border: 2px solid #9c7b3e; border-radius: 50%; box-shadow: 0 0 0 2px #e4c98255, inset 0 0 8px #9d6d24aa; transform: rotate(-8deg); }
+.manager-avatar--admin::after { content: '管理者'; color: #6d3f34; border-color: #8b5f3e; background: #ead5b4e3; }
 .vanadis-equipment-art { display: block; background-repeat: no-repeat; filter: sepia(.04) saturate(.78); }
 .manager-avatar__equipment { position: absolute; z-index: 2; }
 .manager-avatar__equipment.slot-back { z-index: 0; left: 3%; top: 24%; width: 76%; height: 62%; }
@@ -713,7 +719,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 }
 
 .splash-screen { width: min(100%, 760px); color: #eee3ce; background: #2b2a24; }
-.splash-screen__art { background: url('/assets/art/vanadis-village-hero.webp') center 58% / cover; animation: slow-pan 8s ease-out both; }
+.splash-screen__art { background: var(--asset-vanadis-village-hero) center 58% / cover; animation: slow-pan 8s ease-out both; }
 .splash-screen::after { background: linear-gradient(#eadfc517 0 30%, #24231ec4 78%); }
 .splash-screen__copy { left: 18px; right: 18px; bottom: calc(28px + var(--safe-bottom)); padding: 19px; background: #2b2a24e8; border: 1px solid #a08756; box-shadow: 4px 4px 0 #171712; }
 .splash-screen__copy::before { content: ''; position: absolute; inset: 6px; border: 1px solid #d2bd8a42; pointer-events: none; }

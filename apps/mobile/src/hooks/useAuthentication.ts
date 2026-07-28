@@ -1,4 +1,4 @@
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut as firebaseSignOut, type User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 import { firebaseAuth, firebaseFirestore, hasFirebaseConfig } from '../services/firebase';
@@ -14,11 +14,16 @@ export function useAuthentication() {
 
   useEffect(() => {
     if (!firebaseAuth) return;
+    const auth = firebaseAuth;
     let active = true;
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (next) => {
+    const unsubscribe = onAuthStateChanged(auth, (next) => {
       setReady(false);
       setError(null);
       void (async () => {
+        if (!next) {
+          await signInAnonymously(auth);
+          return;
+        }
         let admin = false;
         if (next && firebaseFirestore) admin = (await getDoc(doc(firebaseFirestore, 'admins', next.uid))).exists();
         if (!active) return;
@@ -56,6 +61,7 @@ export function useAuthentication() {
     configured: hasFirebaseConfig,
     userId: user?.uid ?? null,
     isAdmin: Boolean(user) && isAdmin,
+    isAnonymous: Boolean(user?.isAnonymous),
     username: Boolean(user) && isAdmin ? ADMIN_USERNAME : null,
     error,
     signIn,

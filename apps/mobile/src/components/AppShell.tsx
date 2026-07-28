@@ -7,7 +7,7 @@ const tabs = [
   { to: '/history', label: '歷史', icon: 'history' },
   { to: '/village', label: '領地', icon: 'map' },
   { to: '/houses', label: '帳冊', icon: 'house' },
-  { to: '/manager', label: '管理者', icon: 'person' },
+  { to: '/manager', label: '行裝', icon: 'person' },
 ] as const;
 
 function ChronicleIcon({ name }: { name: (typeof tabs)[number]['icon'] | 'settings' }) {

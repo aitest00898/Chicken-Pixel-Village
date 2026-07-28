@@ -8,7 +8,7 @@ describe('manager login rewards', () => {
   it('renders all twenty-four rewards and sends equip then unequip actions', () => {
     const onEquip = vi.fn();
     const visits: VisitProgress = { accumulatedDays: 24, streakDays: 3, lastVisitDate: '2026-07-24', equipped: { head: 'straw-hat' } };
-    render(<MemoryRouter><ManagerPage visits={visits} signedIn onEquip={onEquip} /></MemoryRouter>);
+    render(<MemoryRouter><ManagerPage visits={visits} signedIn isAdmin onEquip={onEquip} /></MemoryRouter>);
     expect(screen.getAllByRole('button')).toHaveLength(equipmentItems.length);
     expect(screen.getByRole('img', { name: /裝備 晨巡草帽/ })).toBeInTheDocument();
 

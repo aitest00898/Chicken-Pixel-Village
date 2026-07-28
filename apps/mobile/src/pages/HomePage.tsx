@@ -6,7 +6,7 @@ import { ManagerSprite } from '../components/Sprites';
 
 const menu = [
   ['/today', '今日雞情', '最新行情與商人解讀'], ['/history', '歷史行情', '史料館趨勢與缺值'], ['/village', '我的村莊', '遊戲地圖與雞舍配置'],
-  ['/houses', '我的雞舍', '批次、股東、分潤與風險'], ['/manager', '管理者', '巡村與外觀裝備'], ['/settings', '設定', '資料來源、離線與安全'],
+  ['/houses', '我的雞舍', '批次、股東、分潤與風險'], ['/manager', '行裝紙娃娃', '巡村與外觀裝備'], ['/settings', '設定', '資料來源、離線與安全'],
 ] as const;
 
 export function HomePage({ bundle, visits }: { bundle: MarketBundle; visits: VisitProgress }) {

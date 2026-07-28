@@ -1,6 +1,7 @@
 import { PixelPanel } from '@chicken-village/ui';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { assetUrl } from '../utils/assets';
 
 interface Props {
   configured: boolean;
@@ -34,7 +35,7 @@ export function AdminPage({ configured, isAdmin, username, authError, houseCount
   };
 
   return <div className="page admin-page"><PixelPanel className="admin-login">
-    <div className="lock-orb"><img src="/assets/art/vanadis-guild-seal.png" alt="雞情像素村管理公會徽章" /></div><p className="eyebrow">管理公會・封印卷宗</p><h1>進入管理介面</h1><p>一般使用者不需要登入即可瀏覽雞舍；此登入只開放資料維護權限。</p>
+    <div className="lock-orb"><img src={assetUrl('assets/art/vanadis-guild-seal.png')} alt="雞情像素村管理公會徽章" /></div><p className="eyebrow">管理公會・封印卷宗</p><h1>進入管理介面</h1><p>一般使用者不需要登入即可瀏覽雞舍；此登入只開放資料維護權限。</p>
     <form className="auth-form" onSubmit={submit}><label>管理員帳號<input autoComplete="username" value={account} onChange={(event) => setAccount(event.target.value)} required /></label><label>密碼<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label><button className="primary-button" disabled={!configured || submitting}>{submitting ? '驗證中…' : '登入管理介面'}</button></form>
     {error || authError ? <p className="form-error" role="alert">{error || authError}</p> : null}<small>密碼由 Firebase Authentication 驗證，不會寫入前端程式或 GitHub。</small>
   </PixelPanel></div>;

@@ -1,11 +1,12 @@
 import { equipmentItems, type CapacityTier, type EquipmentItem, type VisitProgress } from '@chicken-village/domain';
 import type { CSSProperties } from 'react';
+import { assetUrl } from '../utils/assets';
 
 function equipmentStyle(item: EquipmentItem): CSSProperties {
   const x = item.assetColumns === 1 ? 0 : item.assetColumn / (item.assetColumns - 1) * 100;
   const y = item.assetRows === 1 ? 0 : item.assetRow / (item.assetRows - 1) * 100;
   return {
-    backgroundImage: `url('/assets/art/vanadis/equipment/${item.assetAtlas === 'original' ? 'original-atlas.png' : 'atlas.png'}')`,
+    backgroundImage: `url('${assetUrl(`assets/art/vanadis/equipment/${item.assetAtlas === 'original' ? 'original-atlas.png' : 'atlas.png'}`)}')`,
     backgroundSize: `${item.assetColumns * 100}% ${item.assetRows * 100}%`,
     backgroundPosition: `${x}% ${y}%`,
   };
@@ -19,12 +20,12 @@ export function ManagerSprite({ pose = 'front' }: { pose?: 'front' | 'back' }) {
   return <span className={`manager-sprite manager-sprite--${pose}`} role="img" aria-label={pose === 'front' ? '瓦納迪斯風格 Q 版管理者' : '瓦納迪斯風格 Q 版管理者背影'} />;
 }
 
-export function ManagerAvatar({ equipped }: { equipped: VisitProgress['equipped'] }) {
+export function ManagerAvatar({ equipped, role = 'resident' }: { equipped: VisitProgress['equipped']; role?: 'resident' | 'admin' }) {
   const selected = equipmentItems.filter((item) => equipped[item.slot] === item.id);
   const back = selected.find((item) => item.slot === 'back');
-  return <div className="manager-avatar" role="img" aria-label={`Q 版管理者，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
+  return <div className={`manager-avatar manager-avatar--${role}`} role="img" aria-label={`${role === 'admin' ? '管理者專用' : '村民'} Q 版紙娃娃，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
     {back ? <EquipmentArt item={back} className={`manager-avatar__equipment slot-${back.slot}`} /> : null}
-    <img src="/assets/art/vanadis/character/manager-base.png" alt="" />
+    <img src={assetUrl('assets/art/vanadis/character/manager-base.png')} alt="" />
     {selected.filter((item) => item.slot !== 'back').map((item) => <EquipmentArt key={item.id} item={item} className={`manager-avatar__equipment slot-${item.slot}`} />)}
   </div>;
 }
