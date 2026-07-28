@@ -693,9 +693,12 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .manager-sprite--back { transform: scaleX(-1); opacity: .85; }
 .manager-stage__avatar { position: absolute; z-index: 3; left: 50%; top: clamp(104px, 16%, 132px); width: min(54%, 245px); display: grid; justify-items: center; color: #4a4032; transform: translateX(-50%); }
 .manager-stage__avatar > small { margin-top: -6px; padding: 4px 7px; background: #e6dac1e8; border: 1px solid #75654a; font-size: .52rem; }
+.avatar-art { display: block; background-repeat: no-repeat; filter: sepia(.05) saturate(.82); }
+.avatar-art--full { aspect-ratio: 2 / 3; }
+.avatar-art--chibi { aspect-ratio: 1 / 1.1; }
 .manager-avatar { position: relative; width: 100%; aspect-ratio: 2 / 3; }
-.manager-avatar > img { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: sepia(.05) saturate(.8); }
-.manager-avatar--resident > img { filter: sepia(.14) saturate(.62) brightness(.96); }
+.manager-avatar__base { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; }
+.manager-avatar--resident .manager-avatar__base { filter: sepia(.14) saturate(.68) brightness(.97); }
 .manager-avatar--resident::after,
 .manager-avatar--admin::after { position: absolute; z-index: 4; right: -2%; bottom: 7%; padding: 3px 5px; border: 1px solid #7e6b4d; background: #e5d8bedb; color: #4b4030; font-size: .48rem; letter-spacing: .08em; }
 .manager-avatar--resident::after { content: '村民'; }
@@ -707,6 +710,16 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .manager-avatar__equipment.slot-body { left: 20%; top: 20%; width: 60%; height: 35%; }
 .manager-avatar__equipment.slot-hand { left: 62%; top: 34%; width: 30%; height: 22%; }
 .login-recorded-badge { display: inline-flex; min-height: 34px; align-items: center; padding: 6px 10px; color: #e8d8b8; border: 1px solid #9b8356; font-size: .65rem; font-weight: 900; }
+.avatar-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); }
+.avatar-choice-grid button { min-width: 0; min-height: 230px; display: grid; gap: 5px; align-content: start; padding: 10px; color: var(--ink); background: transparent; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; cursor: pointer; }
+.avatar-choice-grid button.selected { background: color-mix(in srgb, var(--paper) 82%, #b8985b); box-shadow: inset 0 0 0 2px #9b7a3e75; }
+.avatar-choice-grid button:focus-visible { outline: 2px solid var(--teal); outline-offset: -4px; }
+.avatar-choice-grid__art { min-height: 136px; display: grid; grid-template-columns: minmax(0, 1fr) 56px; align-items: end; justify-items: center; gap: 6px; }
+.avatar-choice-grid__art .avatar-art--full { width: min(88px, 100%); height: 132px; }
+.avatar-choice-grid__art .avatar-art--chibi { width: 56px; height: 62px; }
+.avatar-choice-grid strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .76rem; }
+.avatar-choice-grid small { color: var(--rust); font-size: .58rem; font-weight: 900; }
+.avatar-choice-grid em { color: var(--muted); font-size: .56rem; font-style: normal; line-height: 1.45; }
 .equipment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .equipment-grid button { min-height: 160px; gap: 4px; }
 .equipment-grid .vanadis-equipment-art { width: 92px; height: 82px; }
@@ -720,6 +733,8 @@ h2 { letter-spacing: .1em; font-weight: 700; }
   .manager-stage__avatar { top: 112px; width: 50%; }
   .manager-stage { min-height: 660px; }
   .manager-stage__copy { padding: 12px; }
+  .avatar-choice-grid { grid-template-columns: 1fr; }
+  .avatar-choice-grid button { min-height: 205px; }
 }
 
 .splash-screen { width: min(100%, 760px); color: #eee3ce; background: #2b2a24; }

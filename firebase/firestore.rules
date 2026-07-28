@@ -40,6 +40,8 @@ service cloud.firestore {
         && request.resource.data.streakDays >= 0
         && (request.resource.data.lastVisitDate == null || request.resource.data.lastVisitDate is string)
         && request.resource.data.equipped is map
+        && (!('avatarId' in request.resource.data)
+          || request.resource.data.avatarId in ['caretaker-male', 'caretaker-female', 'manager-male', 'manager-female'])
         && request.resource.data.updatedAt is string;
     }
 

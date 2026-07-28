@@ -44,7 +44,7 @@ export function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/village" element={<VillagePage houses={village.houses} placements={village.mapPlacements} onMove={village.moveHouse} canEdit={authentication.isAdmin} />} />
         <Route path="/houses" element={<HousesPage village={village} online={online} isAdmin={authentication.isAdmin} />} />
-        <Route path="/manager" element={<ManagerPage visits={village.visits} signedIn={Boolean(authentication.userId)} isAdmin={authentication.isAdmin} onEquip={village.equip} />} />
+        <Route path="/manager" element={<ManagerPage visits={village.visits} signedIn={Boolean(authentication.userId)} isAdmin={authentication.isAdmin} onEquip={village.equip} onAvatar={village.selectAvatar} />} />
         <Route path="/admin" element={<AdminPage configured={authentication.configured} isAdmin={authentication.isAdmin} username={authentication.username} authError={authentication.error} houseCount={village.houses.filter((house) => !house.archivedAt).length} onSignIn={authentication.signIn} onSignOut={authentication.signOut} />} />
         <Route path="/settings" element={<SettingsPage dark={dark} reduced={reduced} onDark={setDark} onReduced={setReduced} mode={bundle.mode} storageMode={village.storageMode} isAdmin={authentication.isAdmin} adminUsername={authentication.username} onAdminSignOut={authentication.signOut} online={online} unsyncedCount={village.unsyncedCount} syncMode={village.syncMode} syncError={village.syncError} onSync={() => { void village.syncNow(online); }} />} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,4 +1,4 @@
-import type { ChickenHouse, DistributionRecord, EquipmentItem, FlockBatch, FosterFarmer, MapPlacement, Organization, OrganizationMembership, RiskAssessment, Shareholding, Shareholder, VisitProgress } from './types';
+import type { AvatarOption, ChickenHouse, DistributionRecord, EquipmentItem, FlockBatch, FosterFarmer, MapPlacement, Organization, OrganizationMembership, RiskAssessment, Shareholding, Shareholder, VisitProgress } from './types';
 
 const common = {
   organizationId: 'org-demo',
@@ -125,9 +125,17 @@ export const equipmentItems: EquipmentItem[] = [
   { id: 'travel-cloak', name: '灰藍旅行披風', slot: 'back', requiredVisitDays: 24, description: '前往遠場巡查時攜帶。', assetAtlas: 'chronicle', assetColumn: 4, assetRow: 3, assetColumns: 5, assetRows: 4 },
 ];
 
+export const avatarOptions: AvatarOption[] = [
+  { id: 'caretaker-male', name: '托爾・麥斯頓', title: '契約農戶', description: '負責飼料調配與雞舍日常管理的中堅力量。', atlasColumn: 0 },
+  { id: 'caretaker-female', name: '艾瑪・布魯克', title: '契約農戶', description: '溫柔細心，守護雞群與契約收成。', atlasColumn: 1 },
+  { id: 'manager-male', name: '海登', title: '村務經理', description: '以帳冊、羽筆與巡查紀錄管理村莊營運。', atlasColumn: 2 },
+  { id: 'manager-female', name: '艾琳', title: '經營經理', description: '統整營運紀錄，確保每顆蛋都有價值。', atlasColumn: 3 },
+];
+
 export const initialVisitProgress: VisitProgress = {
   accumulatedDays: 0,
   streakDays: 0,
   lastVisitDate: null,
   equipped: {},
+  avatarId: 'manager-male',
 };

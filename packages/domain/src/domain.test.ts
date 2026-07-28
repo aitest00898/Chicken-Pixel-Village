@@ -46,14 +46,14 @@ describe('5M1E risk', () => {
 
 describe('daily visit', () => {
   it('does not duplicate same-day visits and preserves accumulated days after a break', () => {
-    const start = { accumulatedDays: 5, streakDays: 3, lastVisitDate: '2026-07-20', equipped: {} };
+    const start = { accumulatedDays: 5, streakDays: 3, lastVisitDate: '2026-07-20', equipped: {}, avatarId: 'manager-male' as const };
     const afterBreak = recordVisit(start, '2026-07-23');
     expect(afterBreak).toMatchObject({ accumulatedDays: 6, streakDays: 1 });
     expect(recordVisit(afterBreak, '2026-07-23')).toEqual(afterBreak);
   });
 
   it('counts three distinct dates exactly once and exposes twenty-four cosmetic rewards', () => {
-    const first = recordVisit({ accumulatedDays: 0, streakDays: 0, lastVisitDate: null, equipped: {} }, '2026-07-22');
+    const first = recordVisit({ accumulatedDays: 0, streakDays: 0, lastVisitDate: null, equipped: {}, avatarId: 'manager-male' }, '2026-07-22');
     const duplicate = recordVisit(first, '2026-07-22');
     const second = recordVisit(duplicate, '2026-07-23');
     const third = recordVisit(second, '2026-07-24');

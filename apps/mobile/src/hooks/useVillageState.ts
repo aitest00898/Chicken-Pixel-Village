@@ -12,10 +12,12 @@ import {
   demoRiskAssessments,
   demoShareholders,
   demoShareholdings,
+  avatarOptions,
   initialVisitProgress,
   recordDistributionPayment,
   reverseDistribution,
   type AuditEvent,
+  type AvatarId,
   type ChickenHouse,
   type DistributionRecord,
   type FlockBatch,
@@ -35,7 +37,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { VillageOperations } from '../storage/types';
 import { syncPrivateHouses } from '../services/privateSync';
 import { publishPublicHouse, subscribePublicHouses } from '../services/publicHouses';
-import { recordDailyLogin, saveEquippedItem, subscribeVisitProgress } from '../services/visitProgress';
+import { recordDailyLogin, saveAvatarChoice, saveEquippedItem, subscribeVisitProgress } from '../services/visitProgress';
 
 const HOUSES_KEY = 'cpv:cache:houses:v1';
 const VISIT_KEY = 'cpv:draft:visit:v1';
@@ -269,8 +271,18 @@ export function useVillageState(ownerUid: string | null) {
     void saveEquippedItem(ownerUid, slot, itemId).catch((error: unknown) => setSyncError(error instanceof Error ? error.message : '無法保存行裝。'));
   }, [ownerUid, persistence]);
 
+  const selectAvatar = useCallback((avatarId: AvatarId) => {
+    if (!ownerUid || !avatarOptions.some((option) => option.id === avatarId)) return;
+    setVisits((current) => {
+      const next = { ...current, avatarId };
+      void persistence.saveVisitProgress(next);
+      return next;
+    });
+    void saveAvatarChoice(ownerUid, avatarId).catch((error: unknown) => setSyncError(error instanceof Error ? error.message : '無法保存人物形象。'));
+  }, [ownerUid, persistence]);
+
   const unsyncedCount = operations.outbox.filter((item) => item.status !== 'synced').length + houses.filter((house) => house.syncStatus !== 'synced').length;
-  return { houses, ...operations, visits, ready, storageMode, unsyncedCount, syncMode, syncError, addHouse, updateHouse, archiveHouse, addBatch, addShareholder, createDistribution, confirmDistributionRecord, payDistribution, reverseDistributionRecord, saveRisk, moveHouse, syncNow, equip };
+  return { houses, ...operations, visits, ready, storageMode, unsyncedCount, syncMode, syncError, addHouse, updateHouse, archiveHouse, addBatch, addShareholder, createDistribution, confirmDistributionRecord, payDistribution, reverseDistributionRecord, saveRisk, moveHouse, syncNow, equip, selectAvatar };
 }
 
 export type VillageState = ReturnType<typeof useVillageState>;

@@ -147,9 +147,20 @@ export interface EquipmentItem {
   assetRows: number;
 }
 
+export type AvatarId = 'caretaker-male' | 'caretaker-female' | 'manager-male' | 'manager-female';
+
+export interface AvatarOption {
+  id: AvatarId;
+  name: string;
+  title: string;
+  description: string;
+  atlasColumn: number;
+}
+
 export interface VisitProgress {
   accumulatedDays: number;
   streakDays: number;
   lastVisitDate: string | null;
   equipped: Partial<Record<EquipmentSlot, string>>;
+  avatarId: AvatarId;
 }

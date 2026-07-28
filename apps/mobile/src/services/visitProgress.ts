@@ -1,5 +1,5 @@
 import { deleteField, doc, onSnapshot, runTransaction, updateDoc } from 'firebase/firestore';
-import { initialVisitProgress, recordVisit, type EquipmentSlot, type VisitProgress } from '@chicken-village/domain';
+import { avatarOptions, initialVisitProgress, recordVisit, type AvatarId, type EquipmentSlot, type VisitProgress } from '@chicken-village/domain';
 import { firebaseFirestore } from './firebase';
 
 function taipeiDate(now = new Date()): string {
@@ -13,11 +13,13 @@ function taipeiDate(now = new Date()): string {
 function parseProgress(value: Record<string, unknown> | undefined): VisitProgress {
   if (!value) return initialVisitProgress;
   const equipped = value.equipped && typeof value.equipped === 'object' ? value.equipped as VisitProgress['equipped'] : {};
+  const avatarId = avatarOptions.some((option) => option.id === value.avatarId) ? value.avatarId as AvatarId : initialVisitProgress.avatarId;
   return {
     accumulatedDays: typeof value.accumulatedDays === 'number' ? Math.max(0, Math.trunc(value.accumulatedDays)) : 0,
     streakDays: typeof value.streakDays === 'number' ? Math.max(0, Math.trunc(value.streakDays)) : 0,
     lastVisitDate: typeof value.lastVisitDate === 'string' ? value.lastVisitDate : null,
     equipped,
+    avatarId,
   };
 }
 
@@ -47,6 +49,15 @@ export async function saveEquippedItem(ownerUid: string, slot: EquipmentSlot, it
   const progressRef = doc(firebaseFirestore, 'visit_progress', ownerUid);
   await updateDoc(progressRef, {
     [`equipped.${slot}`]: itemId === null ? deleteField() : itemId,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function saveAvatarChoice(ownerUid: string, avatarId: AvatarId) {
+  if (!firebaseFirestore) throw new Error('Firestore 尚未配置，無法保存人物形象。');
+  if (!avatarOptions.some((option) => option.id === avatarId)) throw new Error('不支援的人物形象。');
+  await updateDoc(doc(firebaseFirestore, 'visit_progress', ownerUid), {
+    avatarId,
     updatedAt: new Date().toISOString(),
   });
 }
