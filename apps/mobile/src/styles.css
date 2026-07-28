@@ -693,7 +693,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .manager-sprite--back { transform: scaleX(-1); opacity: .85; }
 .manager-stage__avatar { position: absolute; z-index: 3; left: 50%; top: clamp(104px, 16%, 132px); width: min(54%, 245px); display: grid; justify-items: center; color: #4a4032; transform: translateX(-50%); }
 .manager-stage__avatar > small { margin-top: -6px; padding: 4px 7px; background: #e6dac1e8; border: 1px solid #75654a; font-size: .52rem; }
-.avatar-art { display: block; background-repeat: no-repeat; filter: sepia(.05) saturate(.82); }
+.avatar-art { display: block; object-fit: contain; object-position: center bottom; filter: sepia(.05) saturate(.82); }
 .avatar-art--full { aspect-ratio: 2 / 3; }
 .avatar-art--chibi { aspect-ratio: 1 / 1.1; }
 .manager-avatar { position: relative; width: 100%; aspect-ratio: 2 / 3; }

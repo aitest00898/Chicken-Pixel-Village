@@ -18,15 +18,10 @@ export function EquipmentArt({ item, className = '' }: { item: EquipmentItem; cl
 
 export function AvatarArt({ avatarId, variant = 'full', className = '' }: { avatarId: AvatarId; variant?: 'full' | 'chibi'; className?: string }) {
   const option = avatarOptions.find((candidate) => candidate.id === avatarId) ?? avatarOptions[2]!;
-  return <span
+  return <img
     className={`avatar-art avatar-art--${variant} ${className}`}
-    style={{
-      backgroundImage: `url('${assetUrl('assets/art/vanadis/character/avatar-options-atlas.png')}')`,
-      backgroundSize: '400% 200%',
-      backgroundPosition: `${option.atlasColumn / 3 * 100}% ${variant === 'full' ? 0 : 100}%`,
-    }}
-    role="img"
-    aria-label={`${option.name}・${option.title}${variant === 'full' ? '等身' : 'Q版'}形象`}
+    src={assetUrl(`assets/art/vanadis/character/avatars/${option.id}-${variant}.png`)}
+    alt={`${option.name}・${option.title}${variant === 'full' ? '等身' : 'Q版'}形象`}
   />;
 }
 
