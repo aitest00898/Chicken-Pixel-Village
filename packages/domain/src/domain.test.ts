@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings } from './index';
+import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings, visibleEquippedItems, wardrobeRenderStages, wardrobeUnavailableReason, wearableAssetConfigs } from './index';
 import { demoShareholdings } from './fixtures';
 import type { DistributionRecord, RiskAnswer, RiskDimension } from './types';
 
@@ -63,6 +63,15 @@ describe('daily visit', () => {
     expect(new Set(equipmentItems.map((item) => item.id)).size).toBe(24);
     expect(equipmentItems.filter((item) => item.requiredVisitDays >= 5)).toHaveLength(20);
     expect(equipmentItems.every((item) => ['head', 'body', 'hand', 'back'].includes(item.slot))).toBe(true);
+  });
+
+  it('keeps catalogue art separate from missing character-specific wearable assets', () => {
+    expect(wearableAssetConfigs).toHaveLength(equipmentItems.length);
+    expect(new Set(wearableAssetConfigs.map((config) => config.itemId))).toEqual(new Set(equipmentItems.map((item) => item.id)));
+    expect(wardrobeRenderStages.indexOf('backpack-back')).toBeLessThan(wardrobeRenderStages.indexOf('base-character'));
+    expect(wardrobeRenderStages.indexOf('base-character')).toBeLessThan(wardrobeRenderStages.indexOf('front-straps'));
+    expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
+    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male')).toEqual([]);
   });
 });
 

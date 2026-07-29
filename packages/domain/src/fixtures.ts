@@ -1,4 +1,4 @@
-import type { AvatarOption, ChickenHouse, DistributionRecord, EquipmentItem, FlockBatch, FosterFarmer, MapPlacement, Organization, OrganizationMembership, RiskAssessment, Shareholding, Shareholder, VisitProgress } from './types';
+import type { AvatarId, AvatarOption, ChickenHouse, DistributionRecord, EquipmentItem, FlockBatch, FosterFarmer, ItemUsage, MapPlacement, Organization, OrganizationMembership, RiskAssessment, Shareholding, Shareholder, VisitProgress, WearableAssetConfig, WearableRenderStage } from './types';
 
 const common = {
   organizationId: 'org-demo',
@@ -130,6 +130,130 @@ export const avatarOptions: AvatarOption[] = [
   { id: 'caretaker-female', name: '艾瑪・布魯克', title: '契約農戶', description: '溫柔細心，守護雞群與契約收成。', atlasColumn: 1 },
   { id: 'manager-male', name: '海登', title: '村務經理', description: '以帳冊、羽筆與巡查紀錄管理村莊營運。', atlasColumn: 2 },
   { id: 'manager-female', name: '艾琳', title: '經營經理', description: '統整營運紀錄，確保每顆蛋都有價值。', atlasColumn: 3 },
+];
+
+const allAvatarIds = avatarOptions.map((option) => option.id) as AvatarId[];
+const haydenOnly = ['manager-male'] as AvatarId[];
+
+function wardrobeConfig({
+  itemId,
+  usageType,
+  slot,
+  renderStages,
+  compatibleCharacterIds = allAvatarIds,
+  wearable = true,
+  requiresPoseVariant = false,
+  hand,
+  unsupportedReason,
+}: {
+  itemId: string;
+  usageType: ItemUsage;
+  slot: WearableAssetConfig['slot'];
+  renderStages: WearableRenderStage[];
+  compatibleCharacterIds?: AvatarId[];
+  wearable?: boolean;
+  requiresPoseVariant?: boolean;
+  hand?: 'left' | 'right';
+  unsupportedReason?: string;
+}): WearableAssetConfig {
+  const config: WearableAssetConfig = {
+    itemId,
+    usageType,
+    slot,
+    wearable,
+    compatibleCharacterIds,
+    layerFiles: {},
+    renderStages,
+    assetStatus: 'missing',
+    fallbackBehavior: 'show-unsupported',
+  };
+  if (hand) config.hand = hand;
+  if (requiresPoseVariant) config.requiresPoseVariant = true;
+  if (unsupportedReason) config.unsupportedReason = unsupportedReason;
+  return config;
+}
+
+export const wearableAssetConfigs: WearableAssetConfig[] = [
+  {
+    itemId: 'straw-hat',
+    usageType: 'wearable',
+    slot: 'head',
+    wearable: true,
+    compatibleCharacterIds: haydenOnly,
+    layerFiles: {
+      main: 'assets/art/vanadis/equipment/wearable/straw-hat/manager-male/head-equipment-front.png',
+    },
+    renderStages: ['head-equipment-front'],
+    assetStatus: 'missing',
+    fallbackBehavior: 'show-unsupported',
+    unsupportedReason: '需要海登專用戴帽透明圖層，帽冠與帽簷必須依頭部角度重繪，不能使用商品草帽圖。',
+  },
+  {
+    itemId: 'work-jacket',
+    usageType: 'pose-variant',
+    slot: 'body',
+    wearable: true,
+    compatibleCharacterIds: haydenOnly,
+    layerFiles: {
+      bodyVariant: 'assets/art/vanadis/equipment/wearable/work-jacket/manager-male/body-variant.png',
+    },
+    renderStages: ['body-variant'],
+    hidesBaseParts: ['torso', 'arms', 'outer-coat'],
+    replacesBaseParts: ['torso', 'arms', 'outer-coat'],
+    assetStatus: 'missing',
+    fallbackBehavior: 'show-unsupported',
+    unsupportedReason: '需要海登穿著工作外套的 body variant，遮蔽原外衣、衣領、袖口與下襬，不能使用商品外套圖。',
+  },
+  {
+    itemId: 'feed-scoop',
+    usageType: 'handheld',
+    slot: 'hand',
+    wearable: false,
+    compatibleCharacterIds: haydenOnly,
+    hand: 'right',
+    layerFiles: {},
+    renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'],
+    requiresPoseVariant: true,
+    poseVariantId: 'manager-male-feed-scoop-grip',
+    assetStatus: 'unsupported',
+    fallbackBehavior: 'show-unsupported',
+    unsupportedReason: '海登目前基礎姿勢是持羽筆與帳冊；飼料勺需要專用握持手勢與手掌遮罩，未完成前不得顯示懸浮工具。',
+  },
+  {
+    itemId: 'field-pack',
+    usageType: 'wearable',
+    slot: 'back',
+    wearable: true,
+    compatibleCharacterIds: haydenOnly,
+    layerFiles: {
+      back: 'assets/art/vanadis/equipment/wearable/field-pack/manager-male/backpack-back.png',
+      front: 'assets/art/vanadis/equipment/wearable/field-pack/manager-male/front-straps.png',
+    },
+    renderStages: ['backpack-back', 'front-straps'],
+    assetStatus: 'missing',
+    fallbackBehavior: 'show-unsupported',
+    unsupportedReason: '需要海登專用背包後層與胸前背帶前層，不能使用商品背包圖。',
+  },
+  wardrobeConfig({ itemId: 'granary-hat', usageType: 'wearable', slot: 'head', renderStages: ['head-equipment-front'] }),
+  wardrobeConfig({ itemId: 'patrol-cap', usageType: 'wearable', slot: 'head', renderStages: ['head-equipment-front'] }),
+  wardrobeConfig({ itemId: 'scholar-beret', usageType: 'wearable', slot: 'head', renderStages: ['head-equipment-front'] }),
+  wardrobeConfig({ itemId: 'weather-hood', usageType: 'pose-variant', slot: 'head', renderStages: ['head-equipment-back', 'head-equipment-front'], requiresPoseVariant: true, unsupportedReason: '兜帽會遮蔽頭髮與部分臉部輪廓，需要角色專用頭髮/臉部遮罩。' }),
+  wardrobeConfig({ itemId: 'guild-circlet', usageType: 'wearable', slot: 'head', renderStages: ['head-equipment-front'] }),
+  wardrobeConfig({ itemId: 'fog-work-coat', usageType: 'pose-variant', slot: 'body', renderStages: ['body-variant'], requiresPoseVariant: true, unsupportedReason: '長衣會替換原始外衣輪廓，需要 body variant。' }),
+  wardrobeConfig({ itemId: 'ledger-vest', usageType: 'wearable', slot: 'body', renderStages: ['torso-clothing'] }),
+  wardrobeConfig({ itemId: 'rain-mantle', usageType: 'pose-variant', slot: 'body', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, unsupportedReason: '披肩跨越人物前後層，需要後層與前扣環。' }),
+  wardrobeConfig({ itemId: 'hatchery-apron', usageType: 'wearable', slot: 'body', renderStages: ['torso-clothing'] }),
+  wardrobeConfig({ itemId: 'guild-coat', usageType: 'pose-variant', slot: 'body', renderStages: ['body-variant'], requiresPoseVariant: true, unsupportedReason: '正式長衣覆蓋大部分原服裝，需要 body variant。' }),
+  wardrobeConfig({ itemId: 'brass-scoop', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '手持工具需要專用握持姿勢與手掌遮罩。' }),
+  wardrobeConfig({ itemId: 'quill-ledger', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'left', unsupportedReason: '此物品可能與海登基礎帳冊重疊，需要角色專用手臂/帳冊變體。' }),
+  wardrobeConfig({ itemId: 'inspection-lantern', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '提燈需要垂掛手勢，不能用商品圖懸浮。' }),
+  wardrobeConfig({ itemId: 'measuring-rod', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '丈量尺需要握持角度與手掌遮罩。' }),
+  wardrobeConfig({ itemId: 'market-scroll', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'left', unsupportedReason: '卷宗需要替換或遮蔽既有帳冊姿勢。' }),
+  wardrobeConfig({ itemId: 'ledger-satchel', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
+  wardrobeConfig({ itemId: 'wheat-pack', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
+  wardrobeConfig({ itemId: 'guild-banner', usageType: 'pose-variant', slot: 'back', renderStages: ['back-equipment', 'front-straps'], requiresPoseVariant: true, unsupportedReason: '大型旗幟改變背部輪廓，需角色專用後層。' }),
+  wardrobeConfig({ itemId: 'tool-frame', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
+  wardrobeConfig({ itemId: 'travel-cloak', usageType: 'pose-variant', slot: 'back', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, unsupportedReason: '披風本體在後、扣環在前，且可能與大型背包互斥。' }),
 ];
 
 export const initialVisitProgress: VisitProgress = {

@@ -1,10 +1,10 @@
-import { avatarOptions, equipmentItems, unlockedEquipment, type AvatarId, type VisitProgress } from '@chicken-village/domain';
+import { avatarOptions, equipmentItems, isWearableReadyForAvatar, unlockedEquipment, wardrobeUnavailableReason, wearableConfigFor, type AvatarId, type EquipmentSlot, type VisitProgress } from '@chicken-village/domain';
 import { PixelPanel, ProgressBar } from '@chicken-village/ui';
 import { Link } from 'react-router-dom';
 import { AvatarArt, EquipmentArt, ManagerAvatar } from '../components/Sprites';
 import { assetUrl } from '../utils/assets';
 
-export function ManagerPage({ visits, signedIn, isAdmin, onEquip, onAvatar }: { visits: VisitProgress; signedIn: boolean; isAdmin: boolean; onEquip: (slot: 'head' | 'body' | 'hand' | 'back', id: string | null) => void; onAvatar: (avatarId: AvatarId) => void }) {
+export function ManagerPage({ visits, signedIn, isAdmin, onEquip, onAvatar }: { visits: VisitProgress; signedIn: boolean; isAdmin: boolean; onEquip: (slot: EquipmentSlot, id: string | null) => void; onAvatar: (avatarId: AvatarId) => void }) {
   const unlocked = unlockedEquipment(equipmentItems, visits.accumulatedDays);
   const selectedAvatar = avatarOptions.find((option) => option.id === visits.avatarId) ?? avatarOptions[2]!;
   return (
@@ -34,7 +34,19 @@ export function ManagerPage({ visits, signedIn, isAdmin, onEquip, onAvatar }: { 
           </button>;
         })}</div>
       </PixelPanel>
-      <PixelPanel title="行裝圖鑑"><div className="equipment-grid">{equipmentItems.map((item) => { const available = visits.accumulatedDays >= item.requiredVisitDays; const equipped = visits.equipped[item.slot] === item.id; return <button key={item.id} disabled={!available || !signedIn} className={equipped ? 'equipped' : ''} aria-pressed={equipped} onClick={() => onEquip(item.slot, equipped ? null : item.id)}><EquipmentArt item={item} /><strong>{item.name}</strong><small>{available ? equipped ? '裝備中・點按脫下' : item.description : `累積登入 ${item.requiredVisitDays} 日解鎖`}</small></button>; })}</div></PixelPanel>
+      <PixelPanel title="行裝圖鑑"><div className="equipment-grid">{equipmentItems.map((item) => {
+        const available = visits.accumulatedDays >= item.requiredVisitDays;
+        const equipped = visits.equipped[item.slot] === item.id;
+        const ready = isWearableReadyForAvatar(item.id, selectedAvatar.id);
+        const config = wearableConfigFor(item.id);
+        const reason = available ? wardrobeUnavailableReason(item.id, selectedAvatar.id) : `累積登入 ${item.requiredVisitDays} 日解鎖`;
+        const canEquip = available && signedIn && ready;
+        const canUnequip = available && signedIn && equipped;
+        const disabled = !canEquip && !canUnequip;
+        const className = [equipped ? 'equipped' : '', ready ? '' : 'asset-missing'].filter(Boolean).join(' ');
+        const statusText = !signedIn ? '登入後可保存行裝' : equipped && !ready ? `已保存但暫無外觀・點按移除。${reason ?? ''}` : equipped ? '裝備中・點按脫下' : reason ?? item.description;
+        return <button key={item.id} disabled={disabled} className={className} aria-pressed={equipped} onClick={() => onEquip(item.slot, equipped ? null : item.id)}><EquipmentArt item={item} /><strong>{item.name}</strong><small>{config ? `${config.usageType}・${statusText}` : statusText}</small></button>;
+      })}</div></PixelPanel>
     </div>
   );
 }

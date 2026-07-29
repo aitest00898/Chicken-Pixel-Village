@@ -14,12 +14,14 @@ import {
   demoShareholdings,
   avatarOptions,
   initialVisitProgress,
+  isWearableReadyForAvatar,
   recordDistributionPayment,
   reverseDistribution,
   type AuditEvent,
   type AvatarId,
   type ChickenHouse,
   type DistributionRecord,
+  type EquipmentSlot,
   type FlockBatch,
   type MapPlacement,
   type RiskAnswer,
@@ -259,15 +261,22 @@ export function useVillageState(ownerUid: string | null) {
     }
   }, [houses, persistence, updateOperations]);
 
-  const equip = useCallback((slot: 'head' | 'body' | 'hand' | 'back', itemId: string | null) => {
+  const equip = useCallback((slot: EquipmentSlot, itemId: string | null) => {
     if (!ownerUid) return;
+    let shouldSave = true;
     setVisits((current) => {
+      if (itemId !== null && !isWearableReadyForAvatar(itemId, current.avatarId)) {
+        shouldSave = false;
+        setSyncError('此角色的專用穿戴資產尚未完成，未保存為已穿戴。');
+        return current;
+      }
       const equipped = { ...current.equipped };
       if (itemId === null) delete equipped[slot]; else equipped[slot] = itemId;
       const next = { ...current, equipped };
       void persistence.saveVisitProgress(next);
       return next;
     });
+    if (!shouldSave) return;
     void saveEquippedItem(ownerUid, slot, itemId).catch((error: unknown) => setSyncError(error instanceof Error ? error.message : '無法保存行裝。'));
   }, [ownerUid, persistence]);
 

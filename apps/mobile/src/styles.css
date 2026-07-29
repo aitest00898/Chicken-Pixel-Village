@@ -697,13 +697,34 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .avatar-art--full { aspect-ratio: 2 / 3; }
 .avatar-art--chibi { aspect-ratio: 1 / 1.1; }
 .manager-avatar { position: relative; width: 100%; aspect-ratio: 2 / 3; }
-.manager-avatar__base { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; }
+.manager-avatar__layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; pointer-events: none; }
+.manager-avatar__base { z-index: 20; }
 .manager-avatar--resident .manager-avatar__base { filter: sepia(.14) saturate(.68) brightness(.97); }
 .manager-avatar--resident::after,
 .manager-avatar--admin::after { position: absolute; z-index: 4; right: -2%; bottom: 7%; padding: 3px 5px; border: 1px solid #7e6b4d; background: #e5d8bedb; color: #4b4030; font-size: .48rem; letter-spacing: .08em; }
 .manager-avatar--resident::after { content: '村民'; }
 .manager-avatar--admin::after { content: '管理者'; color: #6d3f34; border-color: #8b5f3e; background: #ead5b4e3; }
 .vanadis-equipment-art { display: block; background-repeat: no-repeat; filter: sepia(.04) saturate(.78); }
+.manager-avatar__wearable--character-back-effect { z-index: 1; }
+.manager-avatar__wearable--back-equipment,
+.manager-avatar__wearable--cape-back,
+.manager-avatar__wearable--backpack-back { z-index: 10; }
+.manager-avatar__wearable--body-variant { z-index: 21; }
+.manager-avatar__wearable--inner-clothing { z-index: 22; }
+.manager-avatar__wearable--torso-clothing { z-index: 23; }
+.manager-avatar__wearable--waist-equipment { z-index: 24; }
+.manager-avatar__wearable--front-straps { z-index: 30; }
+.manager-avatar__wearable--handheld-back { z-index: 31; }
+.manager-avatar__wearable--character-arm,
+.manager-avatar__wearable--hand-mask { z-index: 32; }
+.manager-avatar__wearable--handheld-main { z-index: 33; }
+.manager-avatar__wearable--handheld-front { z-index: 34; }
+.manager-avatar__wearable--neck-accessory,
+.manager-avatar__wearable--chest-accessory { z-index: 35; }
+.manager-avatar__wearable--head-equipment-back,
+.manager-avatar__wearable--character-hair-or-face { z-index: 36; }
+.manager-avatar__wearable--head-equipment-front { z-index: 37; }
+.manager-avatar__wearable--foreground-effect { z-index: 38; }
 .manager-avatar__equipment { position: absolute; z-index: 2; }
 .manager-avatar__equipment.slot-back { z-index: 0; left: 8%; top: 26%; width: 52%; height: 36%; }
 .manager-avatar__equipment.slot-head { left: 28%; top: 0; width: 44%; height: 16%; }
@@ -724,6 +745,9 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .equipment-grid button { min-height: 160px; gap: 4px; }
 .equipment-grid .vanadis-equipment-art { width: 92px; height: 82px; }
 .equipment-grid button.equipped::after { content: '已穿戴'; margin-top: 3px; color: var(--rust); font-size: .54rem; font-weight: 900; letter-spacing: .08em; }
+.equipment-grid button.asset-missing { opacity: .62; }
+.equipment-grid button.asset-missing::after { content: '穿戴資產未完成'; margin-top: 3px; color: var(--muted); font-size: .52rem; font-weight: 900; letter-spacing: .06em; }
+.equipment-grid button.equipped.asset-missing::after { content: '已保存・暫無外觀'; color: var(--rust); }
 
 @media (max-width: 430px) {
   .investment-house-files { grid-template-columns: 1fr; }

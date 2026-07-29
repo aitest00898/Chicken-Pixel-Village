@@ -134,6 +134,55 @@ export interface AuditEvent extends SyncEntity {
 
 export type EquipmentSlot = 'head' | 'body' | 'hand' | 'back';
 
+export type ItemUsage = 'wearable' | 'handheld' | 'collectible' | 'appearance-only' | 'pose-variant' | 'unsupported';
+
+export type WearableAssetStatus = 'ready' | 'missing' | 'unsupported';
+
+export type WearableFallbackBehavior = 'hide' | 'show-unsupported';
+
+export type WearableRenderStage =
+  | 'character-back-effect'
+  | 'back-equipment'
+  | 'cape-back'
+  | 'backpack-back'
+  | 'base-character'
+  | 'body-variant'
+  | 'inner-clothing'
+  | 'torso-clothing'
+  | 'waist-equipment'
+  | 'front-straps'
+  | 'handheld-back'
+  | 'character-arm'
+  | 'hand-mask'
+  | 'handheld-main'
+  | 'handheld-front'
+  | 'neck-accessory'
+  | 'chest-accessory'
+  | 'head-equipment-back'
+  | 'character-hair-or-face'
+  | 'head-equipment-front'
+  | 'foreground-effect';
+
+export interface WearableAssetConfig {
+  itemId: string;
+  usageType: ItemUsage;
+  slot: EquipmentSlot | null;
+  wearable: boolean;
+  compatibleCharacterIds: AvatarId[];
+  hand?: 'left' | 'right';
+  layerFiles: Partial<Record<'back' | 'main' | 'front' | 'mask' | 'bodyVariant', string>>;
+  renderStages: WearableRenderStage[];
+  hidesBaseParts?: string[];
+  replacesBaseParts?: string[];
+  conflictsWithSlots?: EquipmentSlot[];
+  conflictsWithItems?: string[];
+  requiresPoseVariant?: boolean;
+  poseVariantId?: string;
+  assetStatus: WearableAssetStatus;
+  fallbackBehavior: WearableFallbackBehavior;
+  unsupportedReason?: string;
+}
+
 export interface EquipmentItem {
   id: string;
   name: string;
