@@ -76,7 +76,7 @@
 
 | itemId | itemName | usageType | slot | wearable | first-pass status | notes |
 |---|---|---:|---|---:|---|---|
-| `straw-hat` | 晨巡草帽 | wearable | head | yes | missing | 海登試作目標；需角色專用戴帽層 |
+| `straw-hat` | 晨巡草帽 | wearable | head | yes | ready for `manager-male` | 海登專用戴帽層已接入；其他角色仍缺資產 |
 | `work-jacket` | 霧綠工作外套 | pose-variant | body | yes | missing | 海登試作目標；需 body variant |
 | `feed-scoop` | 舊銅飼料勺 | handheld | hand | no | unsupported | 海登試作目標；需握持姿勢與手掌遮罩 |
 | `field-pack` | 田野背包 | wearable | back | yes | missing | 海登試作目標；需 back + front straps |
@@ -131,7 +131,7 @@
 
 `apps/mobile/src/wardrobeMatrixExport.test.ts` 會檢查輸出 JSON 與 domain runtime matrix 完全一致。若 manifest 或角色/物品變更，必須重新執行 `pnpm wardrobe:export`。
 
-- `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
+- `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
 - `manager-male` + `field-pack`：compatible, requiredLayers=`back/front`, requiresMask=no, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
 - `manager-male` + `feed-scoop`：compatible, usageType=`handheld`, wearable=no, requiresPoseVariant=yes, assetStatus=`unsupported`, implementationStatus=`blocked-by-art`, visualVerificationStatus=`not-ready`。
@@ -160,7 +160,12 @@
 - 實際處理結果：draft 圖層已轉為 `410x690` RGBA PNG，但合成檢查可見帽緣綠色殘邊，且帽簷遮住眼部過多。
 - 判定：不合格，不得接入正式資產，不得將 `assetStatus` 改為 `ready`。
 
-因此 `straw-hat` 仍維持 `assetStatus="missing"`。後續正式資產必須以影像編修方式輸出同畫布透明 PNG，通過 `pnpm wardrobe:qa-assets`，並完成疊圖視覺驗證後才能改為 `ready`。
+同日第二輪以洋紅色鍵重新生成、縮放至海登頭部位置並逐版去邊；`v038` 通過資產 QA 與合成檢查，已提升為正式海登草帽穿戴層：
+
+- 正式資產：`apps/mobile/public/assets/art/vanadis/equipment/wearable/straw-hat/manager-male/head-equipment-front.png`
+- 合成驗證：`docs/generated/visual-checks/straw-hat-manager-male/manager-male-straw-hat-ready-composite.png`
+- 判定：可接入第一階段試作，`straw-hat` 對 `manager-male` 改為 `assetStatus="ready"`。
+- 已知限制：此資產仍是單一 `head-equipment-front` 前層，未拆出 `head-equipment-back`；帽冠與頭髮接觸處已可視為戴上，但若後續需要更精細的頭髮前後遮擋，應追加後層或頭髮遮罩。
 
 可用檢查指令：
 

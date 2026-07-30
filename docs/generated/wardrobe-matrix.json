@@ -52,7 +52,7 @@
     "requiresMask": false,
     "requiresBodyVariant": false,
     "requiresPoseVariant": true,
-    "assetStatus": "unsupported",
+    "assetStatus": "missing",
     "implementationStatus": "blocked-by-art",
     "visualVerificationStatus": "not-ready",
     "notes": "此角色尚未建立相容穿戴資產。"
@@ -491,7 +491,7 @@
     "requiresMask": false,
     "requiresBodyVariant": false,
     "requiresPoseVariant": true,
-    "assetStatus": "unsupported",
+    "assetStatus": "missing",
     "implementationStatus": "blocked-by-art",
     "visualVerificationStatus": "not-ready",
     "notes": "此角色尚未建立相容穿戴資產。"
@@ -892,10 +892,10 @@
     "requiresMask": false,
     "requiresBodyVariant": false,
     "requiresPoseVariant": false,
-    "assetStatus": "missing",
-    "implementationStatus": "program-wired",
-    "visualVerificationStatus": "not-ready",
-    "notes": "需要海登專用戴帽透明圖層，帽冠與帽簷必須依頭部角度重繪，不能使用商品草帽圖。"
+    "assetStatus": "ready",
+    "implementationStatus": "art-ready",
+    "visualVerificationStatus": "needs-review",
+    "notes": "需角色專用透明穿戴資產。"
   },
   {
     "characterId": "manager-male",
@@ -1369,7 +1369,7 @@
     "requiresMask": false,
     "requiresBodyVariant": false,
     "requiresPoseVariant": true,
-    "assetStatus": "unsupported",
+    "assetStatus": "missing",
     "implementationStatus": "blocked-by-art",
     "visualVerificationStatus": "not-ready",
     "notes": "此角色尚未建立相容穿戴資產。"

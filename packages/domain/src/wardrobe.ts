@@ -116,7 +116,7 @@ export function wardrobeMatrixEntries(): WardrobeMatrixEntry[] {
     const config = wearableConfigFor(item.id);
     const compatible = Boolean(config?.compatibleCharacterIds.includes(avatar.id));
     const requiredLayers = config ? Object.entries(config.layerFiles).filter(([, file]) => Boolean(file)).map(([layer]) => layer) : [];
-    const assetStatus = config?.assetStatus ?? 'unsupported';
+    const assetStatus = compatible ? (config?.assetStatus ?? 'unsupported') : 'missing';
     const implementationStatus: WardrobeMatrixEntry['implementationStatus'] =
       assetStatus === 'ready' ? 'art-ready' :
         !config?.wearable ? 'blocked-by-art' :

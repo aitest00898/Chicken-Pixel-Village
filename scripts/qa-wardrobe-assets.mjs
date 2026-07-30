@@ -8,6 +8,7 @@ const wearableRoot = resolve(repoRoot, 'apps/mobile/public/assets/art/vanadis/eq
 const includeDrafts = process.argv.includes('--include-drafts');
 const expectedWidth = 410;
 const expectedHeight = 690;
+const minimumVisiblePixels = 3000;
 
 async function listPngs(dir) {
   try {
@@ -106,7 +107,7 @@ function validateImage(image) {
   ];
   if (corners.some((pixel) => pixel.a > 4)) issues.push('canvas corners are not transparent');
   let opaquePixels = 0;
-  let greenFringePixels = 0;
+  let chromaFringePixels = 0;
   for (let index = 0; index < image.pixels.length; index += 4) {
     const r = image.pixels[index];
     const g = image.pixels[index + 1];
@@ -114,12 +115,15 @@ function validateImage(image) {
     const a = image.pixels[index + 3];
     if (a > 12) {
       opaquePixels += 1;
-      if (g > 120 && g > r * 1.45 && g > b * 1.45) greenFringePixels += 1;
+      const looksGreen = g > 120 && g > r * 1.45 && g > b * 1.45;
+      const looksMagenta = r > 120 && b > 120 && r > g * 1.45 && b > g * 1.45;
+      if (looksGreen || looksMagenta) chromaFringePixels += 1;
     }
   }
   if (opaquePixels === 0) issues.push('no visible wearable pixels');
-  const fringeRatio = opaquePixels === 0 ? 0 : greenFringePixels / opaquePixels;
-  if (greenFringePixels > 40 && fringeRatio > 0.0025) issues.push(`green fringe pixels ${greenFringePixels}/${opaquePixels} (${(fringeRatio * 100).toFixed(2)}%)`);
+  else if (opaquePixels < minimumVisiblePixels) issues.push(`visible wearable pixels ${opaquePixels}, expected at least ${minimumVisiblePixels}`);
+  const fringeRatio = opaquePixels === 0 ? 0 : chromaFringePixels / opaquePixels;
+  if (chromaFringePixels > 40 && fringeRatio > 0.0025) issues.push(`chroma-key fringe pixels ${chromaFringePixels}/${opaquePixels} (${(fringeRatio * 100).toFixed(2)}%)`);
   return issues;
 }
 

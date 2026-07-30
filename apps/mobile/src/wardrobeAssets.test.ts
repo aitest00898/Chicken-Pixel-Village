@@ -1,13 +1,13 @@
 import { wearableAssetConfigs } from '@chicken-village/domain';
 import { describe, expect, it } from 'vitest';
 
-const wearableFiles = import.meta.glob('../../public/assets/art/vanadis/equipment/wearable/**/*', {
+const wearableFiles = import.meta.glob('../public/assets/art/vanadis/equipment/wearable/**/*.png', {
   query: '?url',
   import: 'default',
 });
 
-function publicAssetToGlobKey(file: string): string {
-  return `../../public/${file}`;
+function publicAssetPath(file: string): string {
+  return `../public/${file}`;
 }
 
 describe('wardrobe wearable assets', () => {
@@ -18,7 +18,7 @@ describe('wardrobe wearable assets', () => {
       expect(config.layerFiles, `${config.itemId} should not be marked ready without layer files`).not.toEqual({});
       for (const [layerType, file] of Object.entries(config.layerFiles)) {
         expect(file, `${config.itemId}:${layerType} should use a character-specific wearable path`).toContain('/equipment/wearable/');
-        expect(availableFiles.has(publicAssetToGlobKey(file)), `${config.itemId}:${layerType} missing ${file}`).toBe(true);
+        expect(availableFiles.has(publicAssetPath(file)), `${config.itemId}:${layerType} missing ${file}`).toBe(true);
       }
     }
   });

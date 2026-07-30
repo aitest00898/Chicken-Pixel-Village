@@ -6,7 +6,7 @@ Generated from `packages/domain/src/wardrobe.ts` via `scripts/export-wardrobe-ma
 |---|---|---|---|---:|---:|---|---:|---:|---:|---|---|---|---|
 | caretaker-male | straw-hat | wearable | head | true | false | main | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-male | work-jacket | pose-variant | body | true | false | bodyVariant | false | true | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
-| caretaker-male | feed-scoop | handheld | hand | false | false | - | false | false | true | unsupported | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
+| caretaker-male | feed-scoop | handheld | hand | false | false | - | false | false | true | missing | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-male | field-pack | wearable | back | true | false | back+front | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-male | granary-hat | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | caretaker-male | patrol-cap | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
@@ -30,7 +30,7 @@ Generated from `packages/domain/src/wardrobe.ts` via `scripts/export-wardrobe-ma
 | caretaker-male | travel-cloak | pose-variant | back | true | true | - | false | false | true | missing | manifest-only | not-ready | 披風本體在後、扣環在前，且可能與大型背包互斥。 |
 | caretaker-female | straw-hat | wearable | head | true | false | main | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-female | work-jacket | pose-variant | body | true | false | bodyVariant | false | true | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
-| caretaker-female | feed-scoop | handheld | hand | false | false | - | false | false | true | unsupported | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
+| caretaker-female | feed-scoop | handheld | hand | false | false | - | false | false | true | missing | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-female | field-pack | wearable | back | true | false | back+front | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | caretaker-female | granary-hat | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | caretaker-female | patrol-cap | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
@@ -52,7 +52,7 @@ Generated from `packages/domain/src/wardrobe.ts` via `scripts/export-wardrobe-ma
 | caretaker-female | guild-banner | pose-variant | back | true | true | - | false | false | true | missing | manifest-only | not-ready | 大型旗幟改變背部輪廓，需角色專用後層。 |
 | caretaker-female | tool-frame | wearable | back | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | caretaker-female | travel-cloak | pose-variant | back | true | true | - | false | false | true | missing | manifest-only | not-ready | 披風本體在後、扣環在前，且可能與大型背包互斥。 |
-| manager-male | straw-hat | wearable | head | true | true | main | false | false | false | missing | program-wired | not-ready | 需要海登專用戴帽透明圖層，帽冠與帽簷必須依頭部角度重繪，不能使用商品草帽圖。 |
+| manager-male | straw-hat | wearable | head | true | true | main | false | false | false | ready | art-ready | needs-review | 需角色專用透明穿戴資產。 |
 | manager-male | work-jacket | pose-variant | body | true | true | bodyVariant | false | true | false | missing | program-wired | not-ready | 需要海登穿著工作外套的 body variant，遮蔽原外衣、衣領、袖口與下襬，不能使用商品外套圖。 |
 | manager-male | feed-scoop | handheld | hand | false | true | - | false | false | true | unsupported | blocked-by-art | not-ready | 海登目前基礎姿勢是持羽筆與帳冊；飼料勺需要專用握持手勢與手掌遮罩，未完成前不得顯示懸浮工具。 |
 | manager-male | field-pack | wearable | back | true | true | back+front | false | false | false | missing | program-wired | not-ready | 需要海登專用背包後層與胸前背帶前層，不能使用商品背包圖。 |
@@ -78,7 +78,7 @@ Generated from `packages/domain/src/wardrobe.ts` via `scripts/export-wardrobe-ma
 | manager-male | travel-cloak | pose-variant | back | true | true | - | false | false | true | missing | manifest-only | not-ready | 披風本體在後、扣環在前，且可能與大型背包互斥。 |
 | manager-female | straw-hat | wearable | head | true | false | main | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | manager-female | work-jacket | pose-variant | body | true | false | bodyVariant | false | true | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
-| manager-female | feed-scoop | handheld | hand | false | false | - | false | false | true | unsupported | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
+| manager-female | feed-scoop | handheld | hand | false | false | - | false | false | true | missing | blocked-by-art | not-ready | 此角色尚未建立相容穿戴資產。 |
 | manager-female | field-pack | wearable | back | true | false | back+front | false | false | false | missing | manifest-only | not-ready | 此角色尚未建立相容穿戴資產。 |
 | manager-female | granary-hat | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | manager-female | patrol-cap | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |

@@ -77,14 +77,14 @@ describe('daily visit', () => {
     expect(wearableLayerFileForStage(fieldPack, 'front-straps')).toContain('/field-pack/manager-male/front-straps.png');
     expect(wearableLayerFilesFor('field-pack')).toEqual([]);
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
-    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male')).toEqual([]);
+    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat']);
   });
 
   it('centralizes equip validation before local or Firebase state is written', () => {
     const equipped = { head: 'straw-hat' } as const;
     expect(changeEquippedItem(equipped, 'manager-male', 'head', null)).toEqual({ equipped: {}, error: null });
     expect(changeEquippedItem({}, 'manager-male', 'head', 'work-jacket').error).toMatch(/欄位不一致/);
-    expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat').error).toBe('此角色專用穿戴圖層尚未完成。');
+    expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat')).toEqual({ equipped: { head: 'straw-hat' }, error: null });
     expect(changeEquippedItem({}, 'manager-female', 'head', 'straw-hat').error).toBe('此角色尚未支援此裝備。');
     expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
     expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
@@ -100,8 +100,9 @@ describe('daily visit', () => {
       itemName: '晨巡草帽',
       compatible: true,
       requiredLayers: ['main'],
-      implementationStatus: 'program-wired',
-      visualVerificationStatus: 'not-ready',
+      assetStatus: 'ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
     });
     const eileenHat = matrix.find((entry) => entry.characterId === 'manager-female' && entry.itemId === 'straw-hat');
     expect(eileenHat).toMatchObject({ compatible: false, implementationStatus: 'manifest-only', visualVerificationStatus: 'not-ready' });

@@ -9,8 +9,15 @@ describe('exported wardrobe matrix', () => {
     expect(exportedMatrix).toContainEqual(expect.objectContaining({
       characterId: 'manager-male',
       itemId: 'straw-hat',
-      implementationStatus: 'program-wired',
-      visualVerificationStatus: 'not-ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
+    }));
+    expect(exportedMatrix).toContainEqual(expect.objectContaining({
+      characterId: 'caretaker-male',
+      itemId: 'straw-hat',
+      compatible: false,
+      assetStatus: 'missing',
+      implementationStatus: 'manifest-only',
     }));
   });
 });

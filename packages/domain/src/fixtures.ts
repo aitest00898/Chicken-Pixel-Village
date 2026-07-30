@@ -190,9 +190,8 @@ export const wearableAssetConfigs: WearableAssetConfig[] = [
       main: 'assets/art/vanadis/equipment/wearable/straw-hat/manager-male/head-equipment-front.png',
     },
     renderStages: ['head-equipment-front'],
-    assetStatus: 'missing',
+    assetStatus: 'ready',
     fallbackBehavior: 'show-unsupported',
-    unsupportedReason: '需要海登專用戴帽透明圖層，帽冠與帽簷必須依頭部角度重繪，不能使用商品草帽圖。',
   },
   {
     itemId: 'work-jacket',
