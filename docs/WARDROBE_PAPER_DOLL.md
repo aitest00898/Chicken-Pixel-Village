@@ -29,6 +29,8 @@
 - 不把其他角色的資產套用到目前角色。
 - 不新增穿戴寫入。
 - 若舊資料已保存，允許使用者點按移除，並顯示「已保存但暫無外觀」。
+- 若 manifest 未來把資產標為 `ready`，測試會要求每個 layer file 實際存在於 `apps/mobile/public/assets/art/vanadis/equipment/wearable/`；不得指向商品 atlas。
+- 若瀏覽器載入 ready layer 失敗，`ManagerAvatar` 會隱藏該失敗圖層，避免顯示破圖 icon；但該資產仍必須由測試與視覺驗證追查修正。
 
 ## Render stage
 
@@ -106,6 +108,16 @@
 - `caretaker-male`、`caretaker-female`、`manager-female` 的所有物品：classification 已建立，但 first-pass compatible wearable asset 尚未完成；implementationStatus=`manifest-only`；visualVerificationStatus=`not-ready`。
 
 不得將 `program-wired` 視為 `art-ready`。只有實際透明 layer 檔案存在且經視覺驗證後，才可把 assetStatus 改為 `ready`。
+
+## 圖片試作紀錄
+
+2026-07-30 進行 `straw-hat` / `manager-male` / `head-equipment-front` 圖像生成試作，輸出檔位於 Codex 暫存：
+
+- `/Users/joe/.codex/generated_images/019f91ed-26f9-7580-ba23-13a5475293fa/call_Ta7tw0WPfOU8yFWUMFuE25xb.png`
+- 實際輸出：`963x1634`、RGB、綠幕背景。
+- 判定：不合格，不得接入正式資產。原因是輸出為獨立商品帽展示圖，未使用海登 `410x690` 同畫布座標，未依海登頭部位置與角度產生真正穿戴層，也沒有透明 alpha。
+
+因此 `straw-hat` 仍維持 `assetStatus="missing"`。後續正式資產必須以影像編修方式輸出同畫布透明 PNG，且需完成疊圖視覺驗證後才能改為 `ready`。
 
 ## 海登 first-pass 資產編修提示詞
 

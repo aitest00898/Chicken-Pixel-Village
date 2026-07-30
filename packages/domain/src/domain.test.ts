@@ -68,6 +68,8 @@ describe('daily visit', () => {
   it('keeps catalogue art separate from missing character-specific wearable assets', () => {
     expect(wearableAssetConfigs).toHaveLength(equipmentItems.length);
     expect(new Set(wearableAssetConfigs.map((config) => config.itemId))).toEqual(new Set(equipmentItems.map((item) => item.id)));
+    const layerFiles = wearableAssetConfigs.flatMap((config) => Object.values(config.layerFiles));
+    expect(layerFiles.every((file) => !file.includes('/equipment/atlas.png') && !file.includes('/equipment/original-atlas.png'))).toBe(true);
     expect(wardrobeRenderStages.indexOf('backpack-back')).toBeLessThan(wardrobeRenderStages.indexOf('base-character'));
     expect(wardrobeRenderStages.indexOf('base-character')).toBeLessThan(wardrobeRenderStages.indexOf('front-straps'));
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);

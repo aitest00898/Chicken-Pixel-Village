@@ -1,5 +1,6 @@
 import { avatarOptions, visibleEquippedItems, wardrobeRenderStages, wearableConfigFor, type AvatarId, type CapacityTier, type EquipmentItem, type VisitProgress } from '@chicken-village/domain';
 import type { CSSProperties } from 'react';
+import { useState } from 'react';
 import { assetUrl } from '../utils/assets';
 
 function equipmentStyle(item: EquipmentItem): CSSProperties {
@@ -29,6 +30,18 @@ export function ManagerSprite({ pose = 'front' }: { pose?: 'front' | 'back' }) {
   return <span className={`manager-sprite manager-sprite--${pose}`} role="img" aria-label={pose === 'front' ? '瓦納迪斯風格 Q 版管理者' : '瓦納迪斯風格 Q 版管理者背影'} />;
 }
 
+function WearableLayer({ item, stage, file }: { item: EquipmentItem; stage: string; file: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <span className={`manager-avatar__layer manager-avatar__wearable manager-avatar__wearable--failed manager-avatar__wearable--${stage}`} data-missing-wearable={`${item.id}:${stage}`} aria-hidden="true" />;
+  return <img
+    className={`manager-avatar__layer manager-avatar__wearable manager-avatar__wearable--${stage}`}
+    src={assetUrl(file)}
+    alt=""
+    aria-hidden="true"
+    onError={() => setFailed(true)}
+  />;
+}
+
 export function ManagerAvatar({ equipped, avatarId, role = 'resident' }: { equipped: VisitProgress['equipped']; avatarId: AvatarId; role?: 'resident' | 'admin' }) {
   const selected = visibleEquippedItems(equipped, avatarId);
   const layers = selected.flatMap((item) => {
@@ -49,12 +62,11 @@ export function ManagerAvatar({ equipped, avatarId, role = 'resident' }: { equip
   return <div className={`manager-avatar manager-avatar--${role}`} role="img" aria-label={`${role === 'admin' ? '管理者專用' : '村民'}等身紙娃娃，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
     {wardrobeRenderStages.map((stage) => {
       if (stage === 'base-character' && !usesBodyVariant) return <AvatarArt key={stage} avatarId={avatarId} variant="full" className="manager-avatar__base manager-avatar__layer" />;
-      return layers.filter((layer) => layer.stage === stage).map((layer) => <img
+      return layers.filter((layer) => layer.stage === stage).map((layer) => <WearableLayer
         key={`${layer.item.id}-${layer.stage}-${layer.file}`}
-        className={`manager-avatar__layer manager-avatar__wearable manager-avatar__wearable--${layer.stage}`}
-        src={assetUrl(layer.file)}
-        alt=""
-        aria-hidden="true"
+        item={layer.item}
+        stage={layer.stage}
+        file={layer.file}
       />);
     })}
   </div>;
