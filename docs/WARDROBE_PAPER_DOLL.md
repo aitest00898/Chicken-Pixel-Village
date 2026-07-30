@@ -10,6 +10,7 @@
 - 穿戴層解析：`packages/domain/src/wardrobe.ts` 的 `wearableLayerFileForStage(...)` 與 `wearableLayerFilesFor(...)`。
 - 人物 × 裝備矩陣：`packages/domain/src/wardrobe.ts` 的 `wardrobeMatrixEntries(...)`。
 - 矩陣輸出腳本：`pnpm wardrobe:export`，輸出到 `docs/generated/wardrobe-matrix.json` 與 `docs/generated/wardrobe-matrix.md`。
+- 正式穿戴資產 QA：`pnpm wardrobe:qa-assets`，檢查正式 wearable PNG 是否為 `410x690`、RGBA、透明角落且沒有明顯綠幕殘邊；draft 檔預設不列入。
 - 使用頁面：`apps/mobile/src/pages/ManagerPage.tsx`。
 - 穿戴/脫下/切換角色：`apps/mobile/src/hooks/useVillageState.ts` 的 `equip` 與 `selectAvatar`。
 - Firebase 持久化：`apps/mobile/src/services/visitProgress.ts`，Firestore `visit_progress/{uid}` 的 `equipped` 與 `avatarId`。
@@ -153,11 +154,18 @@
 
 2026-07-30 進行 `straw-hat` / `manager-male` / `head-equipment-front` 圖像生成試作，輸出檔位於 Codex 暫存：
 
-- `/Users/joe/.codex/generated_images/019f91ed-26f9-7580-ba23-13a5475293fa/call_Ta7tw0WPfOU8yFWUMFuE25xb.png`
-- 實際輸出：`963x1634`、RGB、綠幕背景。
-- 判定：不合格，不得接入正式資產。原因是輸出為獨立商品帽展示圖，未使用海登 `410x690` 同畫布座標，未依海登頭部位置與角度產生真正穿戴層，也沒有透明 alpha。
+- `/Users/joe/.codex/generated_images/019f91ed-26f9-7580-ba23-13a5475293fa/call_5Tboc9LrpLTvNRnLUZ4qR7kS.png`
+- draft 去背圖層：`docs/generated/visual-checks/straw-hat-manager-male/head-equipment-front-draft.png`
+- draft 合成檢查：`docs/generated/visual-checks/manager-male-straw-hat-draft-composite.png`
+- 實際處理結果：draft 圖層已轉為 `410x690` RGBA PNG，但合成檢查可見帽緣綠色殘邊，且帽簷遮住眼部過多。
+- 判定：不合格，不得接入正式資產，不得將 `assetStatus` 改為 `ready`。
 
-因此 `straw-hat` 仍維持 `assetStatus="missing"`。後續正式資產必須以影像編修方式輸出同畫布透明 PNG，且需完成疊圖視覺驗證後才能改為 `ready`。
+因此 `straw-hat` 仍維持 `assetStatus="missing"`。後續正式資產必須以影像編修方式輸出同畫布透明 PNG，通過 `pnpm wardrobe:qa-assets`，並完成疊圖視覺驗證後才能改為 `ready`。
+
+可用檢查指令：
+
+- `pnpm wardrobe:qa-assets`：只檢查正式 wearable 資產，應作為 ready 資產提交前的最低門檻。
+- `node scripts/qa-wardrobe-assets.mjs --include-drafts`：包含 `apps/mobile/public/.../wearable/**/draft/*.png` 檢查；不合格 draft 應移到 `docs/generated/visual-checks/` 作為人工證據，不留在 app public 資產目錄。
 
 ## 海登 first-pass 資產編修提示詞
 
