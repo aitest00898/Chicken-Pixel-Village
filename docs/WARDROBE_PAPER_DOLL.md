@@ -79,7 +79,7 @@
 | `straw-hat` | 晨巡草帽 | wearable | head | yes | ready for `manager-male` | 海登專用戴帽層已接入；其他角色仍缺資產 |
 | `work-jacket` | 霧綠工作外套 | pose-variant | body | yes | ready candidate for `manager-male` | 海登專用 body variant 已接入；保留原臉、姿勢與座標，仍需人工美術複核 |
 | `feed-scoop` | 舊銅飼料勺 | handheld | hand | no | unsupported | 海登試作目標；需握持姿勢與手掌遮罩 |
-| `field-pack` | 田野背包 | wearable | back | yes | missing | 海登試作目標；需 back + front straps |
+| `field-pack` | 田野背包 | wearable | back | yes | ready candidate for `manager-male` | 海登專用 back/front layers 已接入；背包本體在後層、胸前背帶在前層，仍需人工美術複核 |
 | `granary-hat` | 穀倉織帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
 | `patrol-cap` | 墨藍巡查帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
 | `scholar-beret` | 羽筆學士帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
@@ -133,7 +133,7 @@
 
 - `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
-- `manager-male` + `field-pack`：compatible, requiredLayers=`back/front`, requiresMask=no, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
+- `manager-male` + `field-pack`：compatible, requiredLayers=`back/front`, requiresMask=no, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `feed-scoop`：compatible, usageType=`handheld`, wearable=no, requiresPoseVariant=yes, assetStatus=`unsupported`, implementationStatus=`blocked-by-art`, visualVerificationStatus=`not-ready`。
 - 其餘 `manager-male` 物品：依物品分類 compatible，但 assetStatus=`missing` 或 `unsupported`，implementationStatus=`manifest-only`。
 - `caretaker-male`、`caretaker-female`、`manager-female` 的所有物品：classification 已建立，但 first-pass compatible wearable asset 尚未完成；implementationStatus=`manifest-only`；visualVerificationStatus=`not-ready`。
@@ -174,6 +174,16 @@
 - 草帽合成驗證：`docs/generated/visual-checks/work-jacket-manager-male/manager-male-work-jacket-straw-hat-composite.png`
 - 判定：可接入第一階段 body-variant 流程，`work-jacket` 對 `manager-male` 改為 `assetStatus="ready"`，但 `visualVerificationStatus` 維持 `needs-review`。
 - 已知限制：此資產是保守重染 body variant，能證明「商品圖與穿戴圖分離、body-variant 替換、同畫布 0,0 對齊、草帽可疊加」流程；外套版型仍沿用海登原長外套輪廓，後續若要求更接近圖鑑短版工作外套，需由正式美術另繪同畫布 body variant。
+
+同日建立 `field-pack` / `manager-male` 的前後分層試作。商品背包圖僅作材質參考；正式穿戴資產分成背包本體後層與胸前背帶前層，並在圖層內完成裁切、定位、透明清理與帳冊/手部區域遮罩，避免把整個商品背包貼在人物前方。
+
+- 後層正式資產：`apps/mobile/public/assets/art/vanadis/equipment/wearable/field-pack/manager-male/backpack-back.png`
+- 前層正式資產：`apps/mobile/public/assets/art/vanadis/equipment/wearable/field-pack/manager-male/front-straps.png`
+- 基礎人物合成驗證：`docs/generated/visual-checks/field-pack-manager-male/manager-male-field-pack-composite.png`
+- 外套合成驗證：`docs/generated/visual-checks/field-pack-manager-male/manager-male-work-jacket-field-pack-composite.png`
+- 草帽＋外套＋背包合成驗證：`docs/generated/visual-checks/field-pack-manager-male/manager-male-straw-hat-work-jacket-field-pack-composite.png`
+- 判定：可接入第一階段 back slot 流程，`field-pack` 對 `manager-male` 改為 `assetStatus="ready"`，但 `visualVerificationStatus` 維持 `needs-review`。
+- 已知限制：背包後層與前層已驗證前後遮擋順序，但前層背帶仍是生成後調整的 first-pass 資產；若後續要求背帶完全依手掌、帳冊與外套縫線逐像素貼合，需由正式美術另繪或追加手部/帳冊遮罩。
 
 可用檢查指令：
 

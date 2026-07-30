@@ -55,7 +55,7 @@ Generated from `packages/domain/src/wardrobe.ts` via `scripts/export-wardrobe-ma
 | manager-male | straw-hat | wearable | head | true | true | main | false | false | false | ready | art-ready | needs-review | 需角色專用透明穿戴資產。 |
 | manager-male | work-jacket | pose-variant | body | true | true | bodyVariant | false | true | false | ready | art-ready | needs-review | 需角色專用透明穿戴資產。 |
 | manager-male | feed-scoop | handheld | hand | false | true | - | false | false | true | unsupported | blocked-by-art | not-ready | 海登目前基礎姿勢是持羽筆與帳冊；飼料勺需要專用握持手勢與手掌遮罩，未完成前不得顯示懸浮工具。 |
-| manager-male | field-pack | wearable | back | true | true | back+front | false | false | false | missing | program-wired | not-ready | 需要海登專用背包後層與胸前背帶前層，不能使用商品背包圖。 |
+| manager-male | field-pack | wearable | back | true | true | back+front | false | false | false | ready | art-ready | needs-review | 需角色專用透明穿戴資產。 |
 | manager-male | granary-hat | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | manager-male | patrol-cap | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |
 | manager-male | scholar-beret | wearable | head | true | true | - | false | false | false | missing | manifest-only | not-ready | 需角色專用透明穿戴資產。 |

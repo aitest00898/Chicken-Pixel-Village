@@ -22,6 +22,14 @@ describe('exported wardrobe matrix', () => {
       visualVerificationStatus: 'needs-review',
     }));
     expect(exportedMatrix).toContainEqual(expect.objectContaining({
+      characterId: 'manager-male',
+      itemId: 'field-pack',
+      requiredLayers: ['back', 'front'],
+      assetStatus: 'ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
+    }));
+    expect(exportedMatrix).toContainEqual(expect.objectContaining({
       characterId: 'caretaker-male',
       itemId: 'straw-hat',
       compatible: false,

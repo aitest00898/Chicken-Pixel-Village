@@ -75,9 +75,9 @@ describe('daily visit', () => {
     const fieldPack = wearableConfigFor('field-pack')!;
     expect(wearableLayerFileForStage(fieldPack, 'backpack-back')).toContain('/field-pack/manager-male/backpack-back.png');
     expect(wearableLayerFileForStage(fieldPack, 'front-straps')).toContain('/field-pack/manager-male/front-straps.png');
-    expect(wearableLayerFilesFor('field-pack')).toEqual([]);
+    expect(wearableLayerFilesFor('field-pack').map((layer) => layer.stage)).toEqual(['backpack-back', 'front-straps']);
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
-    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat', 'work-jacket']);
+    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat', 'work-jacket', 'field-pack']);
   });
 
   it('centralizes equip validation before local or Firebase state is written', () => {
@@ -86,6 +86,7 @@ describe('daily visit', () => {
     expect(changeEquippedItem({}, 'manager-male', 'head', 'work-jacket').error).toMatch(/欄位不一致/);
     expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat')).toEqual({ equipped: { head: 'straw-hat' }, error: null });
     expect(changeEquippedItem({ head: 'straw-hat' }, 'manager-male', 'body', 'work-jacket')).toEqual({ equipped: { head: 'straw-hat', body: 'work-jacket' }, error: null });
+    expect(changeEquippedItem({ head: 'straw-hat', body: 'work-jacket' }, 'manager-male', 'back', 'field-pack')).toEqual({ equipped: { head: 'straw-hat', body: 'work-jacket', back: 'field-pack' }, error: null });
     expect(changeEquippedItem({}, 'manager-female', 'head', 'straw-hat').error).toBe('此角色尚未支援此裝備。');
     expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
     expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
@@ -112,6 +113,16 @@ describe('daily visit', () => {
       compatible: true,
       requiredLayers: ['bodyVariant'],
       requiresBodyVariant: true,
+      assetStatus: 'ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
+    });
+    const haydenFieldPack = matrix.find((entry) => entry.characterId === 'manager-male' && entry.itemId === 'field-pack');
+    expect(haydenFieldPack).toMatchObject({
+      characterName: '海登',
+      itemName: '田野背包',
+      compatible: true,
+      requiredLayers: ['back', 'front'],
       assetStatus: 'ready',
       implementationStatus: 'art-ready',
       visualVerificationStatus: 'needs-review',
