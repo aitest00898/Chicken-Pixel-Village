@@ -76,8 +76,13 @@ describe('daily visit', () => {
     expect(wearableLayerFileForStage(fieldPack, 'backpack-back')).toContain('/field-pack/manager-male/backpack-back.png');
     expect(wearableLayerFileForStage(fieldPack, 'front-straps')).toContain('/field-pack/manager-male/front-straps.png');
     expect(wearableLayerFilesFor('field-pack').map((layer) => layer.stage)).toEqual(['backpack-back', 'front-straps']);
-    expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
-    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat', 'work-jacket', 'field-pack']);
+    const feedScoop = wearableConfigFor('feed-scoop')!;
+    expect(wearableLayerFileForStage(feedScoop, 'body-variant')).toContain('/feed-scoop/manager-male/body-variant.png');
+    expect(wearableLayerFileForStage(feedScoop, 'handheld-back')).toContain('/feed-scoop/manager-male/handheld-back.png');
+    expect(wearableLayerFileForStage(feedScoop, 'hand-mask')).toContain('/feed-scoop/manager-male/hand-mask.png');
+    expect(wearableLayerFilesFor('feed-scoop').map((layer) => layer.stage)).toEqual(['body-variant', 'handheld-back', 'hand-mask']);
+    expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toBeNull();
+    expect(visibleEquippedItems({ head: 'straw-hat', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat', 'feed-scoop', 'field-pack']);
   });
 
   it('centralizes equip validation before local or Firebase state is written', () => {
@@ -87,8 +92,11 @@ describe('daily visit', () => {
     expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat')).toEqual({ equipped: { head: 'straw-hat' }, error: null });
     expect(changeEquippedItem({ head: 'straw-hat' }, 'manager-male', 'body', 'work-jacket')).toEqual({ equipped: { head: 'straw-hat', body: 'work-jacket' }, error: null });
     expect(changeEquippedItem({ head: 'straw-hat', body: 'work-jacket' }, 'manager-male', 'back', 'field-pack')).toEqual({ equipped: { head: 'straw-hat', body: 'work-jacket', back: 'field-pack' }, error: null });
+    expect(changeEquippedItem({ head: 'straw-hat', back: 'field-pack' }, 'manager-male', 'hand', 'feed-scoop')).toEqual({ equipped: { head: 'straw-hat', back: 'field-pack', hand: 'feed-scoop' }, error: null });
+    expect(changeEquippedItem({ body: 'work-jacket' }, 'manager-male', 'hand', 'feed-scoop').error).toMatch(/body 欄位裝備衝突/);
+    expect(changeEquippedItem({ hand: 'feed-scoop' }, 'manager-male', 'body', 'work-jacket').error).toMatch(/舊銅飼料勺/);
     expect(changeEquippedItem({}, 'manager-female', 'head', 'straw-hat').error).toBe('此角色尚未支援此裝備。');
-    expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
+    expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toBeNull();
     expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
     expect(wearableAssetConfigs.find((config) => config.itemId === 'rain-mantle')?.conflictsWithItems).toContain('field-pack');
   });
@@ -130,7 +138,16 @@ describe('daily visit', () => {
     const eileenHat = matrix.find((entry) => entry.characterId === 'manager-female' && entry.itemId === 'straw-hat');
     expect(eileenHat).toMatchObject({ compatible: false, implementationStatus: 'manifest-only', visualVerificationStatus: 'not-ready' });
     const haydenScoop = matrix.find((entry) => entry.characterId === 'manager-male' && entry.itemId === 'feed-scoop');
-    expect(haydenScoop).toMatchObject({ usageType: 'handheld', wearable: false, requiresPoseVariant: true, implementationStatus: 'blocked-by-art' });
+    expect(haydenScoop).toMatchObject({
+      usageType: 'handheld',
+      wearable: true,
+      requiredLayers: ['bodyVariant', 'back', 'mask'],
+      requiresBodyVariant: true,
+      requiresPoseVariant: true,
+      assetStatus: 'ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
+    });
   });
 });
 

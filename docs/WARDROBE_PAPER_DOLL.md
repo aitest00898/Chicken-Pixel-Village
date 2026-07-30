@@ -78,7 +78,7 @@
 |---|---|---:|---|---:|---|---|
 | `straw-hat` | 晨巡草帽 | wearable | head | yes | ready for `manager-male` | 海登專用戴帽層已接入；其他角色仍缺資產 |
 | `work-jacket` | 霧綠工作外套 | pose-variant | body | yes | ready candidate for `manager-male` | 海登專用 body variant 已接入；保留原臉、姿勢與座標，仍需人工美術複核 |
-| `feed-scoop` | 舊銅飼料勺 | handheld | hand | no | unsupported | 海登試作目標；需握持姿勢與手掌遮罩 |
+| `feed-scoop` | 舊銅飼料勺 | handheld | hand | yes | ready candidate for `manager-male` | 海登專用握持 body variant、工具後層與手部遮罩已接入；目前與 body slot 互斥 |
 | `field-pack` | 田野背包 | wearable | back | yes | ready candidate for `manager-male` | 海登專用 back/front layers 已接入；背包本體在後層、胸前背帶在前層，仍需人工美術複核 |
 | `granary-hat` | 穀倉織帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
 | `patrol-cap` | 墨藍巡查帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
@@ -134,7 +134,7 @@
 - `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `field-pack`：compatible, requiredLayers=`back/front`, requiresMask=no, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
-- `manager-male` + `feed-scoop`：compatible, usageType=`handheld`, wearable=no, requiresPoseVariant=yes, assetStatus=`unsupported`, implementationStatus=`blocked-by-art`, visualVerificationStatus=`not-ready`。
+- `manager-male` + `feed-scoop`：compatible, usageType=`handheld`, wearable=yes, requiredLayers=`bodyVariant/back/mask`, requiresBodyVariant=yes, requiresPoseVariant=yes, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - 其餘 `manager-male` 物品：依物品分類 compatible，但 assetStatus=`missing` 或 `unsupported`，implementationStatus=`manifest-only`。
 - `caretaker-male`、`caretaker-female`、`manager-female` 的所有物品：classification 已建立，但 first-pass compatible wearable asset 尚未完成；implementationStatus=`manifest-only`；visualVerificationStatus=`not-ready`。
 
@@ -148,7 +148,8 @@
 - `field-pack` 與 `travel-cloak`、`guild-banner`、`wheat-pack`、`ledger-satchel`、`tool-frame` 互斥，避免大型背部輪廓重疊。
 - `rain-mantle` 與 `field-pack`、`ledger-satchel`、`wheat-pack`、`guild-banner`、`tool-frame` 互斥，因披肩會跨越前後層並遮擋肩線。
 - `travel-cloak` 與 `field-pack`、`ledger-satchel`、`wheat-pack`、`guild-banner`、`tool-frame` 互斥，因披風與大型背部裝備共用背部輪廓。
-- 手持物目前維持 `wearable=false` 且 `requiresPoseVariant=true`；未完成握持姿勢與手掌遮罩前不得寫入已穿戴。
+- `feed-scoop` 已有海登 first-pass 握持資產，但目前使用完整 `body-variant` 移除羽筆，因此與 `body` slot 暫時互斥；避免同時套用 `work-jacket` 與 `feed-scoop` 兩個 body variant。
+- 其他手持物目前維持 `wearable=false` 且 `requiresPoseVariant=true`；未完成握持姿勢與手掌遮罩前不得寫入已穿戴。
 
 ## 圖片試作紀錄
 
@@ -184,6 +185,16 @@
 - 草帽＋外套＋背包合成驗證：`docs/generated/visual-checks/field-pack-manager-male/manager-male-straw-hat-work-jacket-field-pack-composite.png`
 - 判定：可接入第一階段 back slot 流程，`field-pack` 對 `manager-male` 改為 `assetStatus="ready"`，但 `visualVerificationStatus` 維持 `needs-review`。
 - 已知限制：背包後層與前層已驗證前後遮擋順序，但前層背帶仍是生成後調整的 first-pass 資產；若後續要求背帶完全依手掌、帳冊與外套縫線逐像素貼合，需由正式美術另繪或追加手部/帳冊遮罩。
+
+同日建立 `feed-scoop` / `manager-male` 的手持工具試作。商品飼料勺圖僅作材質參考；正式穿戴資產分成移除羽筆的海登 body variant、飼料勺後層與右手遮罩。合成順序為 `body-variant -> handheld-back -> hand-mask`，讓握柄進入右手並由手指遮住部分握柄，避免工具懸浮。
+
+- 握持 body variant：`apps/mobile/public/assets/art/vanadis/equipment/wearable/feed-scoop/manager-male/body-variant.png`
+- 工具後層：`apps/mobile/public/assets/art/vanadis/equipment/wearable/feed-scoop/manager-male/handheld-back.png`
+- 手部遮罩：`apps/mobile/public/assets/art/vanadis/equipment/wearable/feed-scoop/manager-male/hand-mask.png`
+- 單件合成驗證：`docs/generated/visual-checks/feed-scoop-manager-male/manager-male-feed-scoop-composite.png`
+- 草帽＋背包＋飼料勺合成驗證：`docs/generated/visual-checks/feed-scoop-manager-male/manager-male-straw-hat-field-pack-feed-scoop-composite.png`
+- 判定：可接入第一階段 hand slot 流程，`feed-scoop` 對 `manager-male` 改為 `assetStatus="ready"`，但 `visualVerificationStatus` 維持 `needs-review`。
+- 已知限制：此資產透過完整 body variant 移除羽筆，尚不是獨立手臂 variant；因此目前與 body slot 互斥。若後續要同時支援 `work-jacket + feed-scoop`，需另製可疊在工作外套上的手臂/手掌/工具分層，而不是預製所有完整人物組合。
 
 可用檢查指令：
 

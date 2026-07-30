@@ -9,6 +9,7 @@ const includeDrafts = process.argv.includes('--include-drafts');
 const expectedWidth = 410;
 const expectedHeight = 690;
 const minimumVisiblePixels = 3000;
+const minimumMaskVisiblePixels = 120;
 
 async function listPngs(dir) {
   try {
@@ -96,7 +97,7 @@ function pixelAt(image, x, y) {
   };
 }
 
-function validateImage(image) {
+function validateImage(image, label) {
   const issues = [];
   if (image.width !== expectedWidth || image.height !== expectedHeight) issues.push(`size ${image.width}x${image.height}, expected ${expectedWidth}x${expectedHeight}`);
   const corners = [
@@ -120,8 +121,9 @@ function validateImage(image) {
       if (looksGreen || looksMagenta) chromaFringePixels += 1;
     }
   }
+  const expectedVisiblePixels = label.includes('/hand-mask.png') ? minimumMaskVisiblePixels : minimumVisiblePixels;
   if (opaquePixels === 0) issues.push('no visible wearable pixels');
-  else if (opaquePixels < minimumVisiblePixels) issues.push(`visible wearable pixels ${opaquePixels}, expected at least ${minimumVisiblePixels}`);
+  else if (opaquePixels < expectedVisiblePixels) issues.push(`visible wearable pixels ${opaquePixels}, expected at least ${expectedVisiblePixels}`);
   const fringeRatio = opaquePixels === 0 ? 0 : chromaFringePixels / opaquePixels;
   if (chromaFringePixels > 40 && fringeRatio > 0.0025) issues.push(`chroma-key fringe pixels ${chromaFringePixels}/${opaquePixels} (${(fringeRatio * 100).toFixed(2)}%)`);
   return issues;
@@ -139,7 +141,7 @@ for (const path of candidates) {
   const label = relative(repoRoot, path);
   try {
     const image = parsePng(await readFile(path));
-    const issues = validateImage(image);
+    const issues = validateImage(image, label);
     if (issues.length) {
       failed = true;
       console.error(`FAIL ${label}: ${issues.join('; ')}`);
