@@ -205,9 +205,8 @@ export const wearableAssetConfigs: WearableAssetConfig[] = [
     renderStages: ['body-variant'],
     hidesBaseParts: ['torso', 'arms', 'outer-coat'],
     replacesBaseParts: ['torso', 'arms', 'outer-coat'],
-    assetStatus: 'missing',
+    assetStatus: 'ready',
     fallbackBehavior: 'show-unsupported',
-    unsupportedReason: '需要海登穿著工作外套的 body variant，遮蔽原外衣、衣領、袖口與下襬，不能使用商品外套圖。',
   },
   {
     itemId: 'feed-scoop',

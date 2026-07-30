@@ -77,7 +77,7 @@ describe('daily visit', () => {
     expect(wearableLayerFileForStage(fieldPack, 'front-straps')).toContain('/field-pack/manager-male/front-straps.png');
     expect(wearableLayerFilesFor('field-pack')).toEqual([]);
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
-    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat']);
+    expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male').map((item) => item.id)).toEqual(['straw-hat', 'work-jacket']);
   });
 
   it('centralizes equip validation before local or Firebase state is written', () => {
@@ -85,6 +85,7 @@ describe('daily visit', () => {
     expect(changeEquippedItem(equipped, 'manager-male', 'head', null)).toEqual({ equipped: {}, error: null });
     expect(changeEquippedItem({}, 'manager-male', 'head', 'work-jacket').error).toMatch(/欄位不一致/);
     expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat')).toEqual({ equipped: { head: 'straw-hat' }, error: null });
+    expect(changeEquippedItem({ head: 'straw-hat' }, 'manager-male', 'body', 'work-jacket')).toEqual({ equipped: { head: 'straw-hat', body: 'work-jacket' }, error: null });
     expect(changeEquippedItem({}, 'manager-female', 'head', 'straw-hat').error).toBe('此角色尚未支援此裝備。');
     expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
     expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
@@ -100,6 +101,17 @@ describe('daily visit', () => {
       itemName: '晨巡草帽',
       compatible: true,
       requiredLayers: ['main'],
+      assetStatus: 'ready',
+      implementationStatus: 'art-ready',
+      visualVerificationStatus: 'needs-review',
+    });
+    const haydenJacket = matrix.find((entry) => entry.characterId === 'manager-male' && entry.itemId === 'work-jacket');
+    expect(haydenJacket).toMatchObject({
+      characterName: '海登',
+      itemName: '霧綠工作外套',
+      compatible: true,
+      requiredLayers: ['bodyVariant'],
+      requiresBodyVariant: true,
       assetStatus: 'ready',
       implementationStatus: 'art-ready',
       visualVerificationStatus: 'needs-review',

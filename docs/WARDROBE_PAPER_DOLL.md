@@ -77,7 +77,7 @@
 | itemId | itemName | usageType | slot | wearable | first-pass status | notes |
 |---|---|---:|---|---:|---|---|
 | `straw-hat` | 晨巡草帽 | wearable | head | yes | ready for `manager-male` | 海登專用戴帽層已接入；其他角色仍缺資產 |
-| `work-jacket` | 霧綠工作外套 | pose-variant | body | yes | missing | 海登試作目標；需 body variant |
+| `work-jacket` | 霧綠工作外套 | pose-variant | body | yes | ready candidate for `manager-male` | 海登專用 body variant 已接入；保留原臉、姿勢與座標，仍需人工美術複核 |
 | `feed-scoop` | 舊銅飼料勺 | handheld | hand | no | unsupported | 海登試作目標；需握持姿勢與手掌遮罩 |
 | `field-pack` | 田野背包 | wearable | back | yes | missing | 海登試作目標；需 back + front straps |
 | `granary-hat` | 穀倉織帽 | wearable | head | yes | missing | 需角色專用戴帽層 |
@@ -132,7 +132,7 @@
 `apps/mobile/src/wardrobeMatrixExport.test.ts` 會檢查輸出 JSON 與 domain runtime matrix 完全一致。若 manifest 或角色/物品變更，必須重新執行 `pnpm wardrobe:export`。
 
 - `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
-- `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
+- `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`ready`, implementationStatus=`art-ready`, visualVerificationStatus=`needs-review`。
 - `manager-male` + `field-pack`：compatible, requiredLayers=`back/front`, requiresMask=no, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
 - `manager-male` + `feed-scoop`：compatible, usageType=`handheld`, wearable=no, requiresPoseVariant=yes, assetStatus=`unsupported`, implementationStatus=`blocked-by-art`, visualVerificationStatus=`not-ready`。
 - 其餘 `manager-male` 物品：依物品分類 compatible，但 assetStatus=`missing` 或 `unsupported`，implementationStatus=`manifest-only`。
@@ -166,6 +166,14 @@
 - 合成驗證：`docs/generated/visual-checks/straw-hat-manager-male/manager-male-straw-hat-ready-composite.png`
 - 判定：可接入第一階段試作，`straw-hat` 對 `manager-male` 改為 `assetStatus="ready"`。
 - 已知限制：此資產仍是單一 `head-equipment-front` 前層，未拆出 `head-equipment-back`；帽冠與頭髮接觸處已可視為戴上，但若後續需要更精細的頭髮前後遮擋，應追加後層或頭髮遮罩。
+
+同日嘗試以圖像生成建立 `work-jacket` body variant；全人物重繪候選可呈現外套，但臉部、比例與構圖漂移，不得接入正式資產。改採保守圖像編修方式：以 `manager-male-full.png` 為唯一人物基準，只重染上身外衣區域為霧綠並清理少量色鍵殘點，確保臉部、姿勢、手勢、帳冊、羽筆、靴子、畫布尺寸與座標維持一致。
+
+- 正式資產：`apps/mobile/public/assets/art/vanadis/equipment/wearable/work-jacket/manager-male/body-variant.png`
+- 單件驗證：`docs/generated/visual-checks/work-jacket-manager-male/manager-male-work-jacket-body-variant.png`
+- 草帽合成驗證：`docs/generated/visual-checks/work-jacket-manager-male/manager-male-work-jacket-straw-hat-composite.png`
+- 判定：可接入第一階段 body-variant 流程，`work-jacket` 對 `manager-male` 改為 `assetStatus="ready"`，但 `visualVerificationStatus` 維持 `needs-review`。
+- 已知限制：此資產是保守重染 body variant，能證明「商品圖與穿戴圖分離、body-variant 替換、同畫布 0,0 對齊、草帽可疊加」流程；外套版型仍沿用海登原長外套輪廓，後續若要求更接近圖鑑短版工作外套，需由正式美術另繪同畫布 body variant。
 
 可用檢查指令：
 
