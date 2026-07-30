@@ -183,6 +183,31 @@ export interface WearableAssetConfig {
   unsupportedReason?: string;
 }
 
+export interface WearableLayerFile {
+  itemId: string;
+  stage: WearableRenderStage;
+  file: string;
+}
+
+export interface WardrobeMatrixEntry {
+  characterId: AvatarId;
+  characterName: string;
+  itemId: string;
+  itemName: string;
+  usageType: ItemUsage;
+  slot: EquipmentSlot | null;
+  wearable: boolean;
+  compatible: boolean;
+  requiredLayers: string[];
+  requiresMask: boolean;
+  requiresBodyVariant: boolean;
+  requiresPoseVariant: boolean;
+  assetStatus: WearableAssetStatus;
+  implementationStatus: 'program-wired' | 'manifest-only' | 'blocked-by-art' | 'art-ready';
+  visualVerificationStatus: 'not-ready' | 'needs-review' | 'verified';
+  notes: string;
+}
+
 export interface EquipmentItem {
   id: string;
   name: string;

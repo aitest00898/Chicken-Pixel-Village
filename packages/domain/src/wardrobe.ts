@@ -1,5 +1,5 @@
-import { equipmentItems, wearableAssetConfigs } from './fixtures';
-import type { AvatarId, EquipmentItem, EquipmentSlot, VisitProgress, WearableAssetConfig, WearableRenderStage } from './types';
+import { avatarOptions, equipmentItems, wearableAssetConfigs } from './fixtures';
+import type { AvatarId, EquipmentItem, EquipmentSlot, VisitProgress, WardrobeMatrixEntry, WearableAssetConfig, WearableLayerFile, WearableRenderStage } from './types';
 
 export const wardrobeRenderStages: WearableRenderStage[] = [
   'character-back-effect',
@@ -36,6 +36,24 @@ export function equipmentItemFor(itemId: string): EquipmentItem | undefined {
 export function isWearableReadyForAvatar(itemId: string, avatarId: AvatarId): boolean {
   const config = wearableConfigFor(itemId);
   return Boolean(config?.wearable && config.assetStatus === 'ready' && config.compatibleCharacterIds.includes(avatarId));
+}
+
+export function wearableLayerFileForStage(config: WearableAssetConfig, stage: WearableRenderStage): string | undefined {
+  const files = config.layerFiles;
+  if (stage === 'body-variant') return files.bodyVariant;
+  if (stage === 'backpack-back' || stage === 'back-equipment' || stage === 'cape-back' || stage === 'handheld-back' || stage === 'head-equipment-back') return files.back;
+  if (stage === 'front-straps' || stage === 'handheld-front' || stage === 'head-equipment-front' || stage === 'chest-accessory') return files.front ?? files.main;
+  if (stage === 'hand-mask') return files.mask;
+  return files.main;
+}
+
+export function wearableLayerFilesFor(itemId: string): WearableLayerFile[] {
+  const config = wearableConfigFor(itemId);
+  if (!config || config.assetStatus !== 'ready') return [];
+  return config.renderStages.flatMap((stage) => {
+    const file = wearableLayerFileForStage(config, stage);
+    return file ? [{ itemId, stage, file }] : [];
+  }).sort((a, b) => wardrobeRenderStages.indexOf(a.stage) - wardrobeRenderStages.indexOf(b.stage));
 }
 
 export function wardrobeUnavailableReason(itemId: string, avatarId: AvatarId): string | null {
@@ -91,4 +109,36 @@ export function equippedItemsBySlot(equipped: VisitProgress['equipped']): Partia
     if (equipped[item.slot] === item.id) result[item.slot] = item;
     return result;
   }, {});
+}
+
+export function wardrobeMatrixEntries(): WardrobeMatrixEntry[] {
+  return avatarOptions.flatMap((avatar) => equipmentItems.map((item) => {
+    const config = wearableConfigFor(item.id);
+    const compatible = Boolean(config?.compatibleCharacterIds.includes(avatar.id));
+    const requiredLayers = config ? Object.entries(config.layerFiles).filter(([, file]) => Boolean(file)).map(([layer]) => layer) : [];
+    const assetStatus = config?.assetStatus ?? 'unsupported';
+    const implementationStatus: WardrobeMatrixEntry['implementationStatus'] =
+      assetStatus === 'ready' ? 'art-ready' :
+        !config?.wearable ? 'blocked-by-art' :
+          compatible && requiredLayers.length > 0 ? 'program-wired' :
+            'manifest-only';
+    return {
+      characterId: avatar.id,
+      characterName: avatar.name,
+      itemId: item.id,
+      itemName: item.name,
+      usageType: config?.usageType ?? 'unsupported',
+      slot: config?.slot ?? item.slot,
+      wearable: Boolean(config?.wearable),
+      compatible,
+      requiredLayers,
+      requiresMask: requiredLayers.includes('mask'),
+      requiresBodyVariant: requiredLayers.includes('bodyVariant') || config?.renderStages.includes('body-variant') === true,
+      requiresPoseVariant: config?.requiresPoseVariant === true,
+      assetStatus,
+      implementationStatus,
+      visualVerificationStatus: assetStatus === 'ready' ? 'needs-review' : 'not-ready',
+      notes: config?.unsupportedReason ?? (compatible ? '需角色專用透明穿戴資產。' : '此角色尚未建立相容穿戴資產。'),
+    };
+  }));
 }

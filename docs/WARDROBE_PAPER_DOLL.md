@@ -7,6 +7,8 @@
 - 基礎人物圖：`apps/mobile/public/assets/art/vanadis/character/avatars/{avatarId}-{full|chibi}.png`。
 - 商品圖：`apps/mobile/public/assets/art/vanadis/equipment/original-atlas.png` 與 `apps/mobile/public/assets/art/vanadis/equipment/atlas.png`。
 - 紙娃娃渲染：`apps/mobile/src/components/Sprites.tsx` 的 `ManagerAvatar`。
+- 穿戴層解析：`packages/domain/src/wardrobe.ts` 的 `wearableLayerFileForStage(...)` 與 `wearableLayerFilesFor(...)`。
+- 人物 × 裝備矩陣：`packages/domain/src/wardrobe.ts` 的 `wardrobeMatrixEntries(...)`。
 - 使用頁面：`apps/mobile/src/pages/ManagerPage.tsx`。
 - 穿戴/脫下/切換角色：`apps/mobile/src/hooks/useVillageState.ts` 的 `equip` 與 `selectAvatar`。
 - Firebase 持久化：`apps/mobile/src/services/visitProgress.ts`，Firestore `visit_progress/{uid}` 的 `equipped` 與 `avatarId`。
@@ -100,6 +102,25 @@
 ## 人物 × 裝備矩陣規則
 
 目前僅建立海登 first-pass 試作定義；但 4 位角色 × 24 件物品都已由 `wearableAssetConfigs` 表達狀態。
+
+可程式檢查矩陣由 `wardrobeMatrixEntries(...)` 輸出，共 `4 × 24 = 96` 筆。每筆包含：
+
+- `characterId`
+- `characterName`
+- `itemId`
+- `itemName`
+- `usageType`
+- `slot`
+- `wearable`
+- `compatible`
+- `requiredLayers`
+- `requiresMask`
+- `requiresBodyVariant`
+- `requiresPoseVariant`
+- `assetStatus`
+- `implementationStatus`
+- `visualVerificationStatus`
+- `notes`
 
 - `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
 - `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。

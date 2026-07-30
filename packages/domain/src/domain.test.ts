@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocateIntegerTwd, capacityTier, calculateRisk, changeEquippedItem, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings, visibleEquippedItems, wardrobeEquipUnavailableReason, wardrobeRenderStages, wardrobeUnavailableReason, wearableAssetConfigs } from './index';
+import { allocateIntegerTwd, avatarOptions, capacityTier, calculateRisk, changeEquippedItem, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings, visibleEquippedItems, wardrobeEquipUnavailableReason, wardrobeMatrixEntries, wardrobeRenderStages, wardrobeUnavailableReason, wearableAssetConfigs, wearableLayerFileForStage, wearableConfigFor, wearableLayerFilesFor } from './index';
 import { demoShareholdings } from './fixtures';
 import type { DistributionRecord, RiskAnswer, RiskDimension } from './types';
 
@@ -72,6 +72,10 @@ describe('daily visit', () => {
     expect(layerFiles.every((file) => !file.includes('/equipment/atlas.png') && !file.includes('/equipment/original-atlas.png'))).toBe(true);
     expect(wardrobeRenderStages.indexOf('backpack-back')).toBeLessThan(wardrobeRenderStages.indexOf('base-character'));
     expect(wardrobeRenderStages.indexOf('base-character')).toBeLessThan(wardrobeRenderStages.indexOf('front-straps'));
+    const fieldPack = wearableConfigFor('field-pack')!;
+    expect(wearableLayerFileForStage(fieldPack, 'backpack-back')).toContain('/field-pack/manager-male/backpack-back.png');
+    expect(wearableLayerFileForStage(fieldPack, 'front-straps')).toContain('/field-pack/manager-male/front-straps.png');
+    expect(wearableLayerFilesFor('field-pack')).toEqual([]);
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
     expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male')).toEqual([]);
   });
@@ -85,6 +89,24 @@ describe('daily visit', () => {
     expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
     expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
     expect(wearableAssetConfigs.find((config) => config.itemId === 'rain-mantle')?.conflictsWithItems).toContain('field-pack');
+  });
+
+  it('exports a complete character by equipment implementation matrix', () => {
+    const matrix = wardrobeMatrixEntries();
+    expect(matrix).toHaveLength(avatarOptions.length * equipmentItems.length);
+    const haydenHat = matrix.find((entry) => entry.characterId === 'manager-male' && entry.itemId === 'straw-hat');
+    expect(haydenHat).toMatchObject({
+      characterName: '海登',
+      itemName: '晨巡草帽',
+      compatible: true,
+      requiredLayers: ['main'],
+      implementationStatus: 'program-wired',
+      visualVerificationStatus: 'not-ready',
+    });
+    const eileenHat = matrix.find((entry) => entry.characterId === 'manager-female' && entry.itemId === 'straw-hat');
+    expect(eileenHat).toMatchObject({ compatible: false, implementationStatus: 'manifest-only', visualVerificationStatus: 'not-ready' });
+    const haydenScoop = matrix.find((entry) => entry.characterId === 'manager-male' && entry.itemId === 'feed-scoop');
+    expect(haydenScoop).toMatchObject({ usageType: 'handheld', wearable: false, requiresPoseVariant: true, implementationStatus: 'blocked-by-art' });
   });
 });
 

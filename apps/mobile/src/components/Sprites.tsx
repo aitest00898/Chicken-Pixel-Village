@@ -1,4 +1,4 @@
-import { avatarOptions, visibleEquippedItems, wardrobeRenderStages, wearableConfigFor, type AvatarId, type CapacityTier, type EquipmentItem, type VisitProgress } from '@chicken-village/domain';
+import { avatarOptions, visibleEquippedItems, wardrobeRenderStages, wearableLayerFilesFor, type AvatarId, type CapacityTier, type EquipmentItem, type VisitProgress } from '@chicken-village/domain';
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { assetUrl } from '../utils/assets';
@@ -44,20 +44,7 @@ function WearableLayer({ item, stage, file }: { item: EquipmentItem; stage: stri
 
 export function ManagerAvatar({ equipped, avatarId, role = 'resident' }: { equipped: VisitProgress['equipped']; avatarId: AvatarId; role?: 'resident' | 'admin' }) {
   const selected = visibleEquippedItems(equipped, avatarId);
-  const layers = selected.flatMap((item) => {
-    const config = wearableConfigFor(item.id);
-    if (!config || config.assetStatus !== 'ready') return [];
-    return config.renderStages.flatMap((stage) => {
-      const files = config.layerFiles;
-      const file =
-        stage === 'body-variant' ? files.bodyVariant :
-          stage === 'backpack-back' || stage === 'back-equipment' || stage === 'cape-back' || stage === 'handheld-back' || stage === 'head-equipment-back' ? files.back :
-            stage === 'front-straps' || stage === 'handheld-front' || stage === 'head-equipment-front' || stage === 'chest-accessory' ? files.front ?? files.main :
-              stage === 'hand-mask' ? files.mask :
-                files.main;
-      return file ? [{ item, stage, file }] : [];
-    });
-  }).sort((a, b) => wardrobeRenderStages.indexOf(a.stage) - wardrobeRenderStages.indexOf(b.stage));
+  const layers = selected.flatMap((item) => wearableLayerFilesFor(item.id).map((layer) => ({ ...layer, item })));
   const usesBodyVariant = layers.some((layer) => layer.stage === 'body-variant');
   return <div className={`manager-avatar manager-avatar--${role}`} role="img" aria-label={`${role === 'admin' ? '管理者專用' : '村民'}等身紙娃娃，裝備 ${selected.map((item) => item.name).join('、') || '無'}`}>
     {wardrobeRenderStages.map((stage) => {
