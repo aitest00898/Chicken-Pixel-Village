@@ -9,6 +9,7 @@
 - 紙娃娃渲染：`apps/mobile/src/components/Sprites.tsx` 的 `ManagerAvatar`。
 - 穿戴層解析：`packages/domain/src/wardrobe.ts` 的 `wearableLayerFileForStage(...)` 與 `wearableLayerFilesFor(...)`。
 - 人物 × 裝備矩陣：`packages/domain/src/wardrobe.ts` 的 `wardrobeMatrixEntries(...)`。
+- 矩陣輸出腳本：`pnpm wardrobe:export`，輸出到 `docs/generated/wardrobe-matrix.json` 與 `docs/generated/wardrobe-matrix.md`。
 - 使用頁面：`apps/mobile/src/pages/ManagerPage.tsx`。
 - 穿戴/脫下/切換角色：`apps/mobile/src/hooks/useVillageState.ts` 的 `equip` 與 `selectAvatar`。
 - Firebase 持久化：`apps/mobile/src/services/visitProgress.ts`，Firestore `visit_progress/{uid}` 的 `equipped` 與 `avatarId`。
@@ -121,6 +122,13 @@
 - `implementationStatus`
 - `visualVerificationStatus`
 - `notes`
+
+已輸出的人工交付檔：
+
+- `docs/generated/wardrobe-matrix.json`：供自動化檢查、資產追蹤或後續工具讀取。
+- `docs/generated/wardrobe-matrix.md`：供美術、人工驗收與開發追蹤閱讀；內含海登 first-pass 四項資產提示詞。
+
+`apps/mobile/src/wardrobeMatrixExport.test.ts` 會檢查輸出 JSON 與 domain runtime matrix 完全一致。若 manifest 或角色/物品變更，必須重新執行 `pnpm wardrobe:export`。
 
 - `manager-male` + `straw-hat`：compatible, requiredLayers=`main`, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。
 - `manager-male` + `work-jacket`：compatible, requiredLayers=`bodyVariant`, requiresBodyVariant=yes, assetStatus=`missing`, implementationStatus=`program-wired`, visualVerificationStatus=`not-ready`。

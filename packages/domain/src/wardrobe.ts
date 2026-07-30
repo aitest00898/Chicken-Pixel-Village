@@ -138,7 +138,7 @@ export function wardrobeMatrixEntries(): WardrobeMatrixEntry[] {
       assetStatus,
       implementationStatus,
       visualVerificationStatus: assetStatus === 'ready' ? 'needs-review' : 'not-ready',
-      notes: config?.unsupportedReason ?? (compatible ? '需角色專用透明穿戴資產。' : '此角色尚未建立相容穿戴資產。'),
+      notes: compatible ? (config?.unsupportedReason ?? '需角色專用透明穿戴資產。') : '此角色尚未建立相容穿戴資產。',
     };
   }));
 }
