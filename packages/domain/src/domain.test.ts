@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocateIntegerTwd, capacityTier, calculateRisk, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings, visibleEquippedItems, wardrobeRenderStages, wardrobeUnavailableReason, wearableAssetConfigs } from './index';
+import { allocateIntegerTwd, capacityTier, calculateRisk, changeEquippedItem, confirmDistribution, equipmentItems, recordDistributionPayment, recordVisit, SQLITE_MIGRATIONS, validateShareholdings, visibleEquippedItems, wardrobeEquipUnavailableReason, wardrobeRenderStages, wardrobeUnavailableReason, wearableAssetConfigs } from './index';
 import { demoShareholdings } from './fixtures';
 import type { DistributionRecord, RiskAnswer, RiskDimension } from './types';
 
@@ -74,6 +74,17 @@ describe('daily visit', () => {
     expect(wardrobeRenderStages.indexOf('base-character')).toBeLessThan(wardrobeRenderStages.indexOf('front-straps'));
     expect(wardrobeUnavailableReason('feed-scoop', 'manager-male')).toMatch(/握持/);
     expect(visibleEquippedItems({ head: 'straw-hat', body: 'work-jacket', hand: 'feed-scoop', back: 'field-pack' }, 'manager-male')).toEqual([]);
+  });
+
+  it('centralizes equip validation before local or Firebase state is written', () => {
+    const equipped = { head: 'straw-hat' } as const;
+    expect(changeEquippedItem(equipped, 'manager-male', 'head', null)).toEqual({ equipped: {}, error: null });
+    expect(changeEquippedItem({}, 'manager-male', 'head', 'work-jacket').error).toMatch(/欄位不一致/);
+    expect(changeEquippedItem({}, 'manager-male', 'head', 'straw-hat').error).toBe('此角色專用穿戴圖層尚未完成。');
+    expect(changeEquippedItem({}, 'manager-female', 'head', 'straw-hat').error).toBe('此角色尚未支援此裝備。');
+    expect(wardrobeEquipUnavailableReason('feed-scoop', 'manager-male', {})).toMatch(/握持/);
+    expect(wearableAssetConfigs.find((config) => config.itemId === 'field-pack')?.conflictsWithItems).toContain('travel-cloak');
+    expect(wearableAssetConfigs.find((config) => config.itemId === 'rain-mantle')?.conflictsWithItems).toContain('field-pack');
   });
 });
 

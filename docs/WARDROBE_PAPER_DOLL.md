@@ -31,6 +31,7 @@
 - 若舊資料已保存，允許使用者點按移除，並顯示「已保存但暫無外觀」。
 - 若 manifest 未來把資產標為 `ready`，測試會要求每個 layer file 實際存在於 `apps/mobile/public/assets/art/vanadis/equipment/wearable/`；不得指向商品 atlas。
 - 若瀏覽器載入 ready layer 失敗，`ManagerAvatar` 會隱藏該失敗圖層，避免顯示破圖 icon；但該資產仍必須由測試與視覺驗證追查修正。
+- 穿戴、脫下、slot 檢查、角色相容性、缺資產與互斥檢查集中於 domain 層 `changeEquippedItem(...)`，Firebase 寫入前必須先取得合法結果。
 
 ## Render stage
 
@@ -108,6 +109,16 @@
 - `caretaker-male`、`caretaker-female`、`manager-female` 的所有物品：classification 已建立，但 first-pass compatible wearable asset 尚未完成；implementationStatus=`manifest-only`；visualVerificationStatus=`not-ready`。
 
 不得將 `program-wired` 視為 `art-ready`。只有實際透明 layer 檔案存在且經視覺驗證後，才可把 assetStatus 改為 `ready`。
+
+## 裝備互斥與保存規則
+
+- 同一個 slot 仍由 `VisitProgress.equipped` 的 `Partial<Record<EquipmentSlot, string>>` 表達，因此同一欄位一次只能保存一件。
+- `changeEquippedItem(...)` 會拒絕 itemId 與 slot 不一致的寫入，例如 body 裝備不能寫入 head 欄位。
+- `changeEquippedItem(...)` 會拒絕缺少角色專用 ready 資產的裝備，避免錯誤狀態寫入 local cache 或 Firebase。
+- `field-pack` 與 `travel-cloak`、`guild-banner`、`wheat-pack`、`ledger-satchel`、`tool-frame` 互斥，避免大型背部輪廓重疊。
+- `rain-mantle` 與 `field-pack`、`ledger-satchel`、`wheat-pack`、`guild-banner`、`tool-frame` 互斥，因披肩會跨越前後層並遮擋肩線。
+- `travel-cloak` 與 `field-pack`、`ledger-satchel`、`wheat-pack`、`guild-banner`、`tool-frame` 互斥，因披風與大型背部裝備共用背部輪廓。
+- 手持物目前維持 `wearable=false` 且 `requiresPoseVariant=true`；未完成握持姿勢與手掌遮罩前不得寫入已穿戴。
 
 ## 圖片試作紀錄
 

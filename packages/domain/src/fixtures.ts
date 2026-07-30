@@ -144,6 +144,8 @@ function wardrobeConfig({
   wearable = true,
   requiresPoseVariant = false,
   hand,
+  conflictsWithSlots,
+  conflictsWithItems,
   unsupportedReason,
 }: {
   itemId: string;
@@ -154,6 +156,8 @@ function wardrobeConfig({
   wearable?: boolean;
   requiresPoseVariant?: boolean;
   hand?: 'left' | 'right';
+  conflictsWithSlots?: WearableAssetConfig['conflictsWithSlots'];
+  conflictsWithItems?: WearableAssetConfig['conflictsWithItems'];
   unsupportedReason?: string;
 }): WearableAssetConfig {
   const config: WearableAssetConfig = {
@@ -169,6 +173,8 @@ function wardrobeConfig({
   };
   if (hand) config.hand = hand;
   if (requiresPoseVariant) config.requiresPoseVariant = true;
+  if (conflictsWithSlots?.length) config.conflictsWithSlots = conflictsWithSlots;
+  if (conflictsWithItems?.length) config.conflictsWithItems = conflictsWithItems;
   if (unsupportedReason) config.unsupportedReason = unsupportedReason;
   return config;
 }
@@ -230,6 +236,7 @@ export const wearableAssetConfigs: WearableAssetConfig[] = [
       front: 'assets/art/vanadis/equipment/wearable/field-pack/manager-male/front-straps.png',
     },
     renderStages: ['backpack-back', 'front-straps'],
+    conflictsWithItems: ['travel-cloak', 'guild-banner', 'wheat-pack', 'ledger-satchel', 'tool-frame'],
     assetStatus: 'missing',
     fallbackBehavior: 'show-unsupported',
     unsupportedReason: '需要海登專用背包後層與胸前背帶前層，不能使用商品背包圖。',
@@ -241,7 +248,7 @@ export const wearableAssetConfigs: WearableAssetConfig[] = [
   wardrobeConfig({ itemId: 'guild-circlet', usageType: 'wearable', slot: 'head', renderStages: ['head-equipment-front'] }),
   wardrobeConfig({ itemId: 'fog-work-coat', usageType: 'pose-variant', slot: 'body', renderStages: ['body-variant'], requiresPoseVariant: true, unsupportedReason: '長衣會替換原始外衣輪廓，需要 body variant。' }),
   wardrobeConfig({ itemId: 'ledger-vest', usageType: 'wearable', slot: 'body', renderStages: ['torso-clothing'] }),
-  wardrobeConfig({ itemId: 'rain-mantle', usageType: 'pose-variant', slot: 'body', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, unsupportedReason: '披肩跨越人物前後層，需要後層與前扣環。' }),
+  wardrobeConfig({ itemId: 'rain-mantle', usageType: 'pose-variant', slot: 'body', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, conflictsWithItems: ['field-pack', 'ledger-satchel', 'wheat-pack', 'guild-banner', 'tool-frame'], unsupportedReason: '披肩跨越人物前後層，需要後層與前扣環。' }),
   wardrobeConfig({ itemId: 'hatchery-apron', usageType: 'wearable', slot: 'body', renderStages: ['torso-clothing'] }),
   wardrobeConfig({ itemId: 'guild-coat', usageType: 'pose-variant', slot: 'body', renderStages: ['body-variant'], requiresPoseVariant: true, unsupportedReason: '正式長衣覆蓋大部分原服裝，需要 body variant。' }),
   wardrobeConfig({ itemId: 'brass-scoop', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '手持工具需要專用握持姿勢與手掌遮罩。' }),
@@ -249,11 +256,11 @@ export const wearableAssetConfigs: WearableAssetConfig[] = [
   wardrobeConfig({ itemId: 'inspection-lantern', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '提燈需要垂掛手勢，不能用商品圖懸浮。' }),
   wardrobeConfig({ itemId: 'measuring-rod', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'right', unsupportedReason: '丈量尺需要握持角度與手掌遮罩。' }),
   wardrobeConfig({ itemId: 'market-scroll', usageType: 'handheld', slot: 'hand', renderStages: ['handheld-back', 'hand-mask', 'handheld-main', 'handheld-front'], wearable: false, requiresPoseVariant: true, hand: 'left', unsupportedReason: '卷宗需要替換或遮蔽既有帳冊姿勢。' }),
-  wardrobeConfig({ itemId: 'ledger-satchel', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
-  wardrobeConfig({ itemId: 'wheat-pack', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
-  wardrobeConfig({ itemId: 'guild-banner', usageType: 'pose-variant', slot: 'back', renderStages: ['back-equipment', 'front-straps'], requiresPoseVariant: true, unsupportedReason: '大型旗幟改變背部輪廓，需角色專用後層。' }),
-  wardrobeConfig({ itemId: 'tool-frame', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'] }),
-  wardrobeConfig({ itemId: 'travel-cloak', usageType: 'pose-variant', slot: 'back', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, unsupportedReason: '披風本體在後、扣環在前，且可能與大型背包互斥。' }),
+  wardrobeConfig({ itemId: 'ledger-satchel', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'], conflictsWithItems: ['rain-mantle', 'travel-cloak'] }),
+  wardrobeConfig({ itemId: 'wheat-pack', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'], conflictsWithItems: ['rain-mantle', 'travel-cloak'] }),
+  wardrobeConfig({ itemId: 'guild-banner', usageType: 'pose-variant', slot: 'back', renderStages: ['back-equipment', 'front-straps'], requiresPoseVariant: true, conflictsWithItems: ['rain-mantle', 'travel-cloak'], unsupportedReason: '大型旗幟改變背部輪廓，需角色專用後層。' }),
+  wardrobeConfig({ itemId: 'tool-frame', usageType: 'wearable', slot: 'back', renderStages: ['back-equipment', 'front-straps'], conflictsWithItems: ['rain-mantle', 'travel-cloak'] }),
+  wardrobeConfig({ itemId: 'travel-cloak', usageType: 'pose-variant', slot: 'back', renderStages: ['cape-back', 'chest-accessory'], requiresPoseVariant: true, conflictsWithItems: ['field-pack', 'ledger-satchel', 'wheat-pack', 'guild-banner', 'tool-frame'], unsupportedReason: '披風本體在後、扣環在前，且可能與大型背包互斥。' }),
 ];
 
 export const initialVisitProgress: VisitProgress = {

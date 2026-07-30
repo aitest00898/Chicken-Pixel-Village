@@ -13,8 +13,8 @@ import {
   demoShareholders,
   demoShareholdings,
   avatarOptions,
+  changeEquippedItem,
   initialVisitProgress,
-  isWearableReadyForAvatar,
   recordDistributionPayment,
   reverseDistribution,
   type AuditEvent,
@@ -265,14 +265,13 @@ export function useVillageState(ownerUid: string | null) {
     if (!ownerUid) return;
     let shouldSave = true;
     setVisits((current) => {
-      if (itemId !== null && !isWearableReadyForAvatar(itemId, current.avatarId)) {
+      const result = changeEquippedItem(current.equipped, current.avatarId, slot, itemId);
+      if (result.error) {
         shouldSave = false;
-        setSyncError('此角色的專用穿戴資產尚未完成，未保存為已穿戴。');
+        setSyncError(result.error);
         return current;
       }
-      const equipped = { ...current.equipped };
-      if (itemId === null) delete equipped[slot]; else equipped[slot] = itemId;
-      const next = { ...current, equipped };
+      const next = { ...current, equipped: result.equipped };
       void persistence.saveVisitProgress(next);
       return next;
     });

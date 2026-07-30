@@ -51,6 +51,37 @@ export function wardrobeUnavailableReason(itemId: string, avatarId: AvatarId): s
   return null;
 }
 
+export function wardrobeEquipUnavailableReason(itemId: string, avatarId: AvatarId, equipped: VisitProgress['equipped'] = {}): string | null {
+  const item = equipmentItemFor(itemId);
+  if (!item) return '未知行裝。';
+  const baseReason = wardrobeUnavailableReason(itemId, avatarId);
+  if (baseReason) return baseReason;
+  const config = wearableConfigFor(itemId);
+  if (!config) return '尚未建立穿戴設定。';
+  const conflictingItem = Object.values(equipped).find((equippedItemId) => equippedItemId && config.conflictsWithItems?.includes(equippedItemId));
+  if (conflictingItem) {
+    const itemName = equipmentItemFor(conflictingItem)?.name ?? conflictingItem;
+    return `與目前穿戴的「${itemName}」衝突。`;
+  }
+  const conflictingSlot = config.conflictsWithSlots?.find((candidate) => candidate !== item.slot && Boolean(equipped[candidate]));
+  if (conflictingSlot) return `與目前 ${conflictingSlot} 欄位裝備衝突。`;
+  return null;
+}
+
+export function changeEquippedItem(equipped: VisitProgress['equipped'], avatarId: AvatarId, slot: EquipmentSlot, itemId: string | null): { equipped: VisitProgress['equipped']; error: string | null } {
+  if (itemId === null) {
+    const next = { ...equipped };
+    delete next[slot];
+    return { equipped: next, error: null };
+  }
+  const item = equipmentItemFor(itemId);
+  if (!item) return { equipped, error: '未知行裝。' };
+  if (item.slot !== slot) return { equipped, error: `行裝欄位不一致：${item.name} 屬於 ${item.slot}，不能寫入 ${slot}。` };
+  const reason = wardrobeEquipUnavailableReason(itemId, avatarId, equipped);
+  if (reason) return { equipped, error: reason };
+  return { equipped: { ...equipped, [slot]: itemId }, error: null };
+}
+
 export function visibleEquippedItems(equipped: VisitProgress['equipped'], avatarId: AvatarId): EquipmentItem[] {
   return equipmentItems.filter((item) => equipped[item.slot] === item.id && isWearableReadyForAvatar(item.id, avatarId));
 }

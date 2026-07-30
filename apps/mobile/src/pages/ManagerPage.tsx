@@ -1,4 +1,4 @@
-import { avatarOptions, equipmentItems, isWearableReadyForAvatar, unlockedEquipment, wardrobeUnavailableReason, wearableConfigFor, type AvatarId, type EquipmentSlot, type VisitProgress } from '@chicken-village/domain';
+import { avatarOptions, equipmentItems, isWearableReadyForAvatar, unlockedEquipment, wardrobeEquipUnavailableReason, wearableConfigFor, type AvatarId, type EquipmentSlot, type VisitProgress } from '@chicken-village/domain';
 import { PixelPanel, ProgressBar } from '@chicken-village/ui';
 import { Link } from 'react-router-dom';
 import { AvatarArt, EquipmentArt, ManagerAvatar } from '../components/Sprites';
@@ -39,7 +39,7 @@ export function ManagerPage({ visits, signedIn, isAdmin, onEquip, onAvatar }: { 
         const equipped = visits.equipped[item.slot] === item.id;
         const ready = isWearableReadyForAvatar(item.id, selectedAvatar.id);
         const config = wearableConfigFor(item.id);
-        const reason = available ? wardrobeUnavailableReason(item.id, selectedAvatar.id) : `累積登入 ${item.requiredVisitDays} 日解鎖`;
+        const reason = available ? wardrobeEquipUnavailableReason(item.id, selectedAvatar.id, visits.equipped) : `累積登入 ${item.requiredVisitDays} 日解鎖`;
         const canEquip = available && signedIn && ready;
         const canUnequip = available && signedIn && equipped;
         const disabled = !canEquip && !canUnequip;
