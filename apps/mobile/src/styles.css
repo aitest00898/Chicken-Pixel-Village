@@ -117,7 +117,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .market-scene__dialog { position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 12px; padding: 13px 14px; color: #fff4d3; background: #102f36ed; border: 3px double #e8c66f; box-shadow: 0 3px 0 #071d22; }
 .market-scene__dialog p { margin: 7px 0 0; line-height: 1.65; font-size: .86rem; }
 .merchant-name { color: #ffd36c; font-weight: 900; font-size: .72rem; }
+.merchant-rotation { display: block; margin-top: 7px; color: #c9d7c9; font-size: .62rem; letter-spacing: .08em; }
 .market-meta { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: .68rem; }
+.route-loading { min-height: 180px; display: grid; place-items: center; color: var(--muted); letter-spacing: .12em; }
 .price-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .price-card { min-width: 0; min-height: 96px; padding: 10px; display: grid; align-content: center; background: var(--paper-2); border: 1px solid var(--line); }
 .price-card span { font-size: .7rem; color: var(--muted); }
@@ -562,6 +564,7 @@ h2 { letter-spacing: .1em; font-weight: 700; }
 .market-scene__edition b { margin-top: 4px; font-size: 1.08rem; letter-spacing: .15em; font-weight: 500; }
 .market-scene__dialog { left: 14px; right: 14px; padding: 13px 15px; color: #eadfc8; background: #2c2b25e8; border: 1px solid #a48a59; box-shadow: 3px 3px 0 #151610; }
 .merchant-name { color: #cdb77e; letter-spacing: .12em; }
+.merchant-rotation { color: #b3a17a; }
 .price-grid { gap: 0; border: 1px solid var(--line); }
 .price-card { min-height: 108px; padding: 13px; background: transparent; border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .price-card strong { color: #52655f; font-family: ui-monospace, "SFMono-Regular", monospace; }

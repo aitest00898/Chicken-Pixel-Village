@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { useMarketData } from './hooks/useMarketData';
 import { useVillageState } from './hooks/useVillageState';
 import { useAuthentication } from './hooks/useAuthentication';
-import { HomePage } from './pages/HomePage';
-import { TodayPage } from './pages/TodayPage';
-import { HistoryPage } from './pages/HistoryPage';
-import { VillagePage } from './pages/VillagePage';
-import { HousesPage } from './pages/HousesPage';
-import { ManagerPage } from './pages/ManagerPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { AdminPage } from './pages/AdminPage';
 import { persistDailyMarketRecords } from './services/marketHistory';
+
+const HomePage = lazy(() => import('./pages/HomePage').then(({ HomePage: page }) => ({ default: page })));
+const TodayPage = lazy(() => import('./pages/TodayPage').then(({ TodayPage: page }) => ({ default: page })));
+const HistoryPage = lazy(() => import('./pages/HistoryPage').then(({ HistoryPage: page }) => ({ default: page })));
+const VillagePage = lazy(() => import('./pages/VillagePage').then(({ VillagePage: page }) => ({ default: page })));
+const HousesPage = lazy(() => import('./pages/HousesPage').then(({ HousesPage: page }) => ({ default: page })));
+const ManagerPage = lazy(() => import('./pages/ManagerPage').then(({ ManagerPage: page }) => ({ default: page })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(({ SettingsPage: page }) => ({ default: page })));
+const AdminPage = lazy(() => import('./pages/AdminPage').then(({ AdminPage: page }) => ({ default: page })));
 
 export function App() {
   const location = useLocation();
@@ -38,17 +39,19 @@ export function App() {
 
   return (
     <AppShell offline={!online} syncLabel={syncing ? '正在確認最新行情…' : village.unsyncedCount ? `本機草稿 ${village.unsyncedCount} 筆待同步` : bundle.mode === 'live' ? '正式行情已同步' : '使用已驗證快照'}>
-      <Routes>
-        <Route path="/" element={<HomePage bundle={bundle} visits={village.visits} />} />
-        <Route path="/today" element={<TodayPage bundle={bundle} previousRecords={previousRecords} syncing={syncing} />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/village" element={<VillagePage houses={village.houses} placements={village.mapPlacements} onMove={village.moveHouse} canEdit={authentication.isAdmin} />} />
-        <Route path="/houses" element={<HousesPage village={village} online={online} isAdmin={authentication.isAdmin} />} />
-        <Route path="/manager" element={<ManagerPage visits={village.visits} signedIn={Boolean(authentication.userId)} isAdmin={authentication.isAdmin} onEquip={village.equip} onAvatar={village.selectAvatar} />} />
-        <Route path="/admin" element={<AdminPage configured={authentication.configured} isAdmin={authentication.isAdmin} username={authentication.username} authError={authentication.error} houseCount={village.houses.filter((house) => !house.archivedAt).length} onSignIn={authentication.signIn} onSignOut={authentication.signOut} />} />
-        <Route path="/settings" element={<SettingsPage dark={dark} reduced={reduced} onDark={setDark} onReduced={setReduced} mode={bundle.mode} storageMode={village.storageMode} isAdmin={authentication.isAdmin} adminUsername={authentication.username} onAdminSignOut={authentication.signOut} online={online} unsyncedCount={village.unsyncedCount} syncMode={village.syncMode} syncError={village.syncError} onSync={() => { void village.syncNow(online); }} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<div className="route-loading" aria-live="polite">正在開啟卷宗……</div>}>
+        <Routes>
+          <Route path="/" element={<HomePage bundle={bundle} visits={village.visits} />} />
+          <Route path="/today" element={<TodayPage bundle={bundle} previousRecords={previousRecords} syncing={syncing} />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/village" element={<VillagePage houses={village.houses} placements={village.mapPlacements} onMove={village.moveHouse} canEdit={authentication.isAdmin} />} />
+          <Route path="/houses" element={<HousesPage village={village} online={online} isAdmin={authentication.isAdmin} />} />
+          <Route path="/manager" element={<ManagerPage visits={village.visits} signedIn={Boolean(authentication.userId)} isAdmin={authentication.isAdmin} onEquip={village.equip} onAvatar={village.selectAvatar} />} />
+          <Route path="/admin" element={<AdminPage configured={authentication.configured} isAdmin={authentication.isAdmin} username={authentication.username} authError={authentication.error} houseCount={village.houses.filter((house) => !house.archivedAt).length} onSignIn={authentication.signIn} onSignOut={authentication.signOut} />} />
+          <Route path="/settings" element={<SettingsPage dark={dark} reduced={reduced} onDark={setDark} onReduced={setReduced} mode={bundle.mode} storageMode={village.storageMode} isAdmin={authentication.isAdmin} adminUsername={authentication.username} onAdminSignOut={authentication.signOut} online={online} unsyncedCount={village.unsyncedCount} syncMode={village.syncMode} syncError={village.syncError} onSync={() => { void village.syncNow(online); }} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </AppShell>
   );
 }

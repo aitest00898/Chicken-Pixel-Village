@@ -23,6 +23,23 @@ Public chicken-house records use Cloud Firestore collection `public_houses`. Rea
 
 When Firebase variables are present, Settings → Sync uses the generated SQL Connect SDK: it creates an owner membership, pushes UUID-stable house drafts with revision checks, then pulls the server snapshot. Without Firebase variables, the same button explicitly reports a local demonstration sync and never implies a cloud write.
 
+### Manual market bulletin import
+
+管理員提供的全區土雞日報不得由一般用戶端寫入，也不得覆寫既有 `market_history` 文件。請將核對後的資料整理成 `{"documents":[{"path":"market_history/YYYY-MM-DD__item","data":{...}}]}`，每筆資料必須保留 `id`、`sourceDate`、`sourceName`、`sourceUrl`、`fetchedAt`、`capturedAt`、`rawSnapshotHash` 與 `parserVersion`。使用以下指令先做乾跑，再以具備 Firebase Admin 憑證的受控環境套用：
+
+```bash
+node firebase/functions/scripts/import-firestore.mjs \
+  --input path/to/association-bulletin.json \
+  --project chicken-pixel-village
+
+node firebase/functions/scripts/import-firestore.mjs \
+  --input path/to/association-bulletin.json \
+  --project chicken-pixel-village \
+  --apply
+```
+
+匯入器只會建立不存在的文件；若同一個路徑已有不同內容會直接停止，避免把更正資料偽裝成更新。更正必須建立新的來源／調整紀錄，不可覆寫歷史價格。
+
 The mobile app reads Firebase values from Vite environment files (template: `.env.example`). Local working copies use `.env.development.local` with emulators enabled and `.env.production.local` with emulators disabled; both files are ignored by Git. Do not start the development server with emulators enabled unless the emulator suite is running.
 
 Validated locally on 2026-07-24:

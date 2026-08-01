@@ -42,6 +42,7 @@ jobs:
       - name: Build GitHub Pages artifact
         run: |
           VITE_DEPLOY_TARGET=github-pages pnpm --filter @chicken-village/mobile build
+          VITE_DEPLOY_TARGET=github-pages pnpm pwa:qa
           cp apps/mobile/dist/index.html apps/mobile/dist/404.html
 
       - name: Configure Pages

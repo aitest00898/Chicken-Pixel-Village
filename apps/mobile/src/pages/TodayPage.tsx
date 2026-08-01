@@ -1,5 +1,8 @@
 import { DataBadge, PixelPanel } from '@chicken-village/ui';
 import { marketChange, merchantLine, type MarketBundle, type MarketRecord } from '@chicken-village/market-data';
+import { useEffect, useMemo, useState } from 'react';
+
+const MERCHANT_ROTATION_MS = 6000;
 
 function changeLabel(current: MarketRecord, previous?: MarketRecord) {
   const change = marketChange(current, previous);
@@ -10,9 +13,54 @@ function changeLabel(current: MarketRecord, previous?: MarketRecord) {
   return { tone: change.direction, text: `${sign}${Math.abs(change.difference).toFixed(1)} ${percent}・較 ${previous!.sourceDate}` };
 }
 
+function groupWeight(record: MarketRecord): number {
+  if (record.item.startsWith('red_')) return 0;
+  if (record.item.startsWith('black_')) return 1;
+  if (record.item.startsWith('broiler_')) return 2;
+  if (record.item.startsWith('egg_')) return 3;
+  return 4;
+}
+
+export function merchantRotationRecords(records: readonly MarketRecord[]): MarketRecord[] {
+  const validRecords = records
+    .filter((record) => record.value !== null && record.frequency === 'daily')
+    .sort((left, right) => {
+      const weight = groupWeight(left) - groupWeight(right);
+      if (weight !== 0) return weight;
+      return left.label.localeCompare(right.label, 'zh-Hant');
+    });
+  const grouped = new Map<number, MarketRecord[]>();
+  validRecords.forEach((record) => {
+    const weight = groupWeight(record);
+    grouped.set(weight, [...(grouped.get(weight) ?? []), record]);
+  });
+  const result: MarketRecord[] = [];
+  const groups = [...grouped.keys()].sort((left, right) => left - right).map((key) => grouped.get(key) ?? []);
+  const maxLength = Math.max(0, ...groups.map((group) => group.length));
+  for (let index = 0; index < maxLength; index += 1) {
+    groups.forEach((group) => {
+      const record = group[index];
+      if (record) result.push(record);
+    });
+  }
+  return result;
+}
+
 export function TodayPage({ bundle, previousRecords, syncing }: { bundle: MarketBundle; previousRecords: MarketRecord[]; syncing: boolean }) {
-  const egg = bundle.records.find((record) => record.item === 'egg_producer') ?? bundle.records[0];
+  const [merchantIndex, setMerchantIndex] = useState(0);
+  const merchantRecords = useMemo(() => merchantRotationRecords(bundle.records), [bundle.records]);
+  const merchantRecord = merchantRecords[merchantRecords.length ? merchantIndex % merchantRecords.length : 0] ?? bundle.records[0];
   const previousFor = (record: MarketRecord) => previousRecords.find((candidate) => candidate.item === record.item);
+  useEffect(() => {
+    setMerchantIndex(0);
+  }, [merchantRecords]);
+  useEffect(() => {
+    if (merchantRecords.length <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setMerchantIndex((current) => (current + 1) % merchantRecords.length);
+    }, MERCHANT_ROTATION_MS);
+    return () => window.clearInterval(timer);
+  }, [merchantRecords]);
   const groups = [
     ['雞蛋與白肉雞', bundle.records.filter((record) => record.item.startsWith('egg_') || record.item.startsWith('broiler_'))],
     ['紅羽土雞', bundle.records.filter((record) => record.item.startsWith('red_'))],
@@ -20,7 +68,7 @@ export function TodayPage({ bundle, previousRecords, syncing }: { bundle: Market
   ] as const;
   return (
     <div className="page today-page">
-      <section className="market-scene illustrated-plate"><div className="market-scene__edition"><span>DAILY BULLETIN</span><b>商會每日公報</b></div><div className="market-scene__dialog"><span className="merchant-name">行情商人・阿穀・口述紀錄</span><p>{egg ? merchantLine(egg, previousFor(egg)) : '目前沒有可用行情。'}</p></div></section>
+      <section className="market-scene illustrated-plate"><div className="market-scene__edition"><span>DAILY BULLETIN</span><b>商會每日公報</b></div><div className="market-scene__dialog" aria-live="polite"><span className="merchant-name">行情商人・阿穀・輪動報價</span><p>{merchantRecord ? merchantLine(merchantRecord, previousFor(merchantRecord)) : '目前沒有可用行情。'}</p>{merchantRecords.length > 1 ? <small className="merchant-rotation">輪報 {merchantIndex % merchantRecords.length + 1} / {merchantRecords.length}・不同區域與雞種依序報價</small> : null}</div></section>
       <div className="market-meta"><DataBadge tone={bundle.mode === 'live' ? 'live' : 'fixture'}>{bundle.mode === 'live' ? '已連正式 API' : '已驗證快照'}</DataBadge><span>{syncing ? '正在背景同步…' : bundle.message}</span></div>
       {groups.map(([title, records], chapter) => <PixelPanel title={`${String(chapter + 1).padStart(2, '0')}・${title}`} key={title}><div className="price-grid">{records.map((record) => {
         const change = changeLabel(record, previousFor(record));

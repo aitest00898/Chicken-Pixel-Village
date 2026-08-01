@@ -16,6 +16,11 @@ Netlify or local preview.
 The workflow copies `index.html` to `404.html` after build. This gives GitHub
 Pages a static fallback for direct refreshes on app routes.
 
+The manifest and icon links are emitted with the same Vite base path, while the
+manifest itself uses `./` URLs. This keeps Safari/iOS Add to Home Screen on
+`/Chicken-Pixel-Village/` instead of falling back to the user root domain.
+The workflow runs `pnpm pwa:qa` after the Pages build to verify both paths.
+
 If Firebase Auth is enabled in the web app, add this authorized domain in the
 Firebase console:
 
